@@ -109,13 +109,11 @@ Q = function(` fun`, ..., more.args=list(), name=NULL, run=T, get=F, n.chunks=NU
     else
         do.call(batchMap, c(list(reg=reg, fun=fun, more.args=more.args), l.))
 
-    setwd(tmpdir)
     if (expand.grid || is.null(unlist(ln)))
         resultNames = apply(expand.grid(lnFull), 1, function(x) paste(x,collapse=grid.sep))
     else
         resultNames = as.matrix(apply(do.call(cbind, ln), 1, unique))
-    save(resultNames, name, file="names.RData")
-    setwd('..')
+    save(resultNames, name, file=file.path(tmpdir, "names.RData"))
 
     assign('.QLocalRegistries', c(.QLocalRegistries, setNames(list(reg), name)), 
            envir=parent.env(environment()))
@@ -159,7 +157,7 @@ Qget = function(clean=T, regs=Qregs()) {
     getResult = function(reg) {
         waitForJobs(reg)
         result = reduceResultsList(reg, fun=function(job, res) res) #TODO: resubmit/all-or-error
-        load(file.path(reg$id, 'names.RData')) # resultNames
+        load(file.path(reg$file.dir, 'names.RData')) # resultNames
         if (clean)
             Qclean(reg)
         setNames(result, resultNames[as.integer(names(result))])
@@ -194,11 +192,8 @@ Qregs = function(name=".*", directory="Rtmp[0-9a-zA-Z]+", local=T) {
     regfiles = rownames(details[with(details, order(as.POSIXct(mtime))),])
     
     getRegistry = function(rdir) {
-        prevdir = getwd()
-        setwd(rdir)
-        load('registry.RData')
-        load('names.RData')
-        setwd(prevdir)
+        load(file.path(rdir, 'registry.RData'))
+        load(file.path(rdir, 'names.RData'))
         list(name, reg)
     }
     regs = lapply(regdirs, getRegistry)
