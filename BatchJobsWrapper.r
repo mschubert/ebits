@@ -100,9 +100,8 @@ Q = function(` fun`, ..., more.args=list(), name=NULL, run=T, get=F, n.chunks=NU
                     if (is.null(ln[[i]])) 1:length(l.[[i]]) 
                     else ln[[i]])
  
-    tmpdir = tempfile(pattern="QRtmp", tmpdir=".")
-    tmpdir = substr(tmpdir, 3, nchar(tmpdir))
-    reg = makeRegistry(id=tmpdir, file.dir=tmpdir, seed=seed)
+    tmpdir = tempdir()
+    reg = makeRegistry(id=basename(tmpdir), file.dir=tmpdir, seed=seed)
 
     # fill the registry with function calls, save names as well
     if (expand.grid)
@@ -184,7 +183,7 @@ Qclean = function(regs=Qregs()) {
 #'  directory: regular expression specifying the directories to look for registries
 #'  local    : only return registries created in this R session
 #'  @return  : a list of registry objects
-Qregs = function(name=".*", directory="QRtmp[0-9a-zA-Z]+", local=T) {
+Qregs = function(name=".*", directory="Rtmp[0-9a-zA-Z]+", local=T) {
     if (local)
         return(.QLocalRegistries)
     
