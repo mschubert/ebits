@@ -2,18 +2,18 @@
 
 import('./functional', attach = TRUE)
 
-lstrip <- lp(sub, '^ +', '')
+lstrip = lp(sub, '^ +', '')
 
-rstrip <- lp(sub, ' +$', '')
+rstrip = lp(sub, ' +$', '')
 
-strip <- lstrip %.% rstrip
+strip = lstrip %.% rstrip
 
 # FIXME Vectorize
-rev <- p(paste, collapse = '') %.% base::rev %.% item(1) %.% p(strsplit, '')
+rev = p(paste, collapse = '') %.% base::rev %.% item(1) %.% p(strsplit, '')
 
-capitalize <-
+capitalize =
     p(fapply, toupper %.% p(substring, 1, 1), p(substring, 2)) %|>%
     lp(do.call, paste0)
 
 #' @TODO Make vectorised
-readable <- capitalize %.% lp(gsub, '_|-', ' ')
+readable = capitalize %.% lp(gsub, '_|-', ' ')

@@ -9,17 +9,17 @@
 
 # Basic helpers {{{
 
-id <- function (x) x
+id = function (x) x
 
 # This uses R's peculiarities in argument matching explained here:
 # <http://stat.ethz.ch/R-manual/R-devel/doc/manual/R-lang.html#Argument-matching>
 # `.expr` starts with a dot to allow `expr` being used in the actual
 # expression.
-let <- function (.expr, ...)
+let = function (.expr, ...)
     eval(substitute(.expr), list2env(list(...), parent = parent.frame()))
 
 #' Create a closure over a given environment for the specified formals and body.
-closure <- function (formals, body, env)
+closure = function (formals, body, env)
     eval(call('function', as.pairlist(formals), body), env)
 
 #' A shortcut to create a function
@@ -70,22 +70,22 @@ closure <- function (formals, body, env)
 #'
 #' @note This is the opposite from the (wrongly-named) \code{roxygen::Curry}:
 #'
-#'   \code{minus <- function (x, y) x - y
+#'   \code{minus = function (x, y) x - y
 #'   partial(minus, 5)(1) == -4}
 #'
 #' But:
 #'
 #'   \code{partial(minus, x = 5)(1) == 4}
 #'
-partial <- function (f, ...)
+partial = function (f, ...)
     let(capture = list(...),
         function (...) do.call(f, c(list(...), capture)))
 
-lpartial <- function(f, ...)
+lpartial = function(f, ...)
     let(capture = list(...),
         function (...) do.call(f, c(capture, list(...))))
 
-ppartial <- function (f, arg, ...)
+ppartial = function (f, arg, ...)
     let(capture = list(...), arg = as.character(substitute(arg)),
         function (x) do.call(f, c(setNames(x, arg), capture)))
 
@@ -94,9 +94,9 @@ ppartial <- function (f, arg, ...)
 # syntactic noise.
 # Not something I would normally do but there's precedence in R; consider `c`.
 
-p <- partial
-lp <- lpartial
-pp <- ppartial
+p = partial
+lp = lpartial
+pp = ppartial
 
 #' Compose functions \code{g} and \code{f}.
 #'
@@ -104,17 +104,17 @@ pp <- ppartial
 #'
 #' @note Functions are applied in the inverse order of \code{roxygen::Compose}:
 #' \url{http://tolstoy.newcastle.edu.au/R/e9/help/10/02/4529.html}
-compose <- function (g, f)
+compose = function (g, f)
     function (...) g(f(...))
 
 #' Dot operator (as in Haskell)
-`%.%` <- compose
+`%.%` = compose
 
 #' Function chaining operator (as in F#)
-`%|>%` <- function (g, f) compose(f, g)
+`%|>%` = function (g, f) compose(f, g)
 
 #' Pipe operator as in Bash
-`%|%` <- function (x, y) y(x)
+`%|%` = function (x, y) y(x)
 
 # }}}
 
@@ -122,36 +122,36 @@ compose <- function (g, f)
 
 #' Applies a list of functions to the same argument.
 #' @TODO Extend to more than one argument
-fapply <- function (x, ...)
+fapply = function (x, ...)
     lapply(list(...), function (f) f(x))
 
 # What is up with the naming of these (standard R) functions?
 
-map <- base::Map
+map = base::Map
 
-reduce <- base::Reduce
+reduce = base::Reduce
 
 # Hides `stats::filter` but I don't care.
-filter <- base::Filter
+filter = base::Filter
 
 # }}}
 
 # Helpers for working with ranges {{{
 
 #' @TODO Handle negative indices?
-boolmask <- function (indices, length)
+boolmask = function (indices, length)
     is.element(1 : length, indices)
 
-indices <- seq_along
+indices = seq_along
 
 #' Conditionally count elements.
-count <- length %.% which
+count = length %.% which
 
 #' Wrapper around \{order} that returns the ordered data rather than the index
 #' permutation.
 #'
 #' Like \code{sort}, but allows specifying multiple sort keys.
-sorted <- function (data, ..., decreasing = FALSE)
+sorted = function (data, ..., decreasing = FALSE)
     let(key = if (length(list(...)) == 0) colnames(data) else list(...),
         data[do.call(order, c(lapply(key, lp(`[[`, data)), decreasing = decreasing)), ])
 
@@ -159,30 +159,30 @@ sorted <- function (data, ..., decreasing = FALSE)
 #'
 #' @examples
 #' cdict(list(a=1, b=NULL), list(a=NULL, b=2), list(c=3)) # list(a=1, b=2, c=3)
-cdict <- function (...) {
-    lists <- list(...)
-    names <- reduce(union, map(names, lists))
+cdict = function (...) {
+    lists = list(...)
+    names = reduce(union, map(names, lists))
 
-    nonnull <- function (n, a, b) if (is.null(a[[n]])) b[[n]] else a[[n]]
+    nonnull = function (n, a, b) if (is.null(a[[n]])) b[[n]] else a[[n]]
     reduce(function (a, b) map(function (n) nonnull(n, a, b), names), lists)
 }
 
 # }}}
 
 #' Create an item selector function for a given item
-item <- lp(p, `[[`)
+item = lp(p, `[[`)
 
-items <- lp(p, `[`)
+items = lp(p, `[`)
 
 #' Negate a function.
 #'
 #' Similar to \code{base::Negate}
-neg <- p(compose, `!`)
+neg = p(compose, `!`)
 
 #' @TODO Add %or% and %and% analogously
 
 #' Use the first value if present, else the second
 #'
 #' Corresponds to the null-coalesce operator \code{??} in C#
-`%else%` <- function (a, b)
+`%else%` = function (a, b)
     if(is.null(a) || is.na(a) || is.nan(a) || length(a) == 0) b else a
