@@ -22,28 +22,44 @@ let <- function (.expr, ...)
 closure <- function (formals, body, env)
     eval(call('function', as.pairlist(formals), body), env)
 
-#' Create a list of empty symbols, with names set
-symlist <- function (names)
-    setNames(Map(function (p) quote(expr = ), names), names)
-
 #' A shortcut to create a function
 #'
-#' @note Using \code{.(args = body)} is analogous to using
-#' \code{function (args) body} with one exception: \code{.} arguments do not
-#' support defaults.
-#' Since its purpose is mainly for lambdas in higher-order list functions, this
-#' functionality is not needed.
-. <- function (...) {
-    args <- match.call(expand.dots = FALSE)$...
-    last <- length(args)
-    params <- symlist(c(args[-last], names(args)[[last]]))
-    if (length(args) > 1 && length(params) != length(args))
-        stop('Must be of the form `fun(a, b = expr)`')
-    for (arg in args[-last])
-        if (! is.name(arg))
-            stop('Invalid argument specifier: ', arg)
+#' @note Using \code{.(params -> body)} is analogous to using
+#' \code{function (params) body}.
+. = function (...) {
+    params = match.call(expand.dots = FALSE)$...
+    len = length(params)
 
-    closure(params, args[[last]], parent.frame())
+    # Parameters either have default values or not. There are three cases:
+    #  1. No default values: `names(params)` is `NULL`, `params` contains
+    #   parameter names
+    #  2. Some default values: `names(params)` is a vector of appropriate length,
+    #   `names(params)[len]` is `''`; `params[i]` contains default value
+    #  3. Last parameter has default: `params[[len]]` is `default -> body`.
+
+    if (! inherits(params[[len]], '<-'))
+        stop('Must be invoked as `.(params -> expr)`')
+
+    names = if (is.null(names(params))) rep('', len) else names(params)
+
+    # Ensure that last parameter is a name
+    if (names[len] == '' && ! inherits(params[[len]][[3]], 'name'))
+        stop('Must be invoked as `.(params -> expr)`')
+
+    name_from = function (name, value)
+        if (name == '') value else name
+
+    default_from = function (name, value)
+        if (name == '') quote(expr = ) else value
+
+    param_names = c(mapply(name_from, names[-len], params[-len]),
+                    if (names[len] == '') params[[len]][[3]] else names[len])
+    param_defaults = c(mapply(default_from, names[-len], params[-len]),
+                       if (names[len] == '') quote(expr = ) else params[[len]][[3]])
+
+    formals  = setNames(param_defaults, param_names)
+    body = params[[len]][[2]]
+    closure(formals, body, parent.frame())
 }
 
 # }}}
