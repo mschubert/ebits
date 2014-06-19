@@ -131,7 +131,7 @@ map = base::Map
 
 reduce = base::Reduce
 
-# Hides `stats::filter` but I don't care.
+# Hides `stats::filter`.
 filter = base::Filter
 
 # }}}
