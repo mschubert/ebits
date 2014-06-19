@@ -114,7 +114,7 @@ compose = function (g, f)
 `%|>%` = function (g, f) compose(f, g)
 
 #' Pipe operator as in Bash
-`%|%` = function (x, y) y(x)
+`%|%` = function (x, f) f(x)
 
 # }}}
 
