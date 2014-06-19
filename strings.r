@@ -2,11 +2,11 @@
 
 import('./functional', attach = TRUE)
 
-lstrip = lp(sub, '^ +', '')
+ltrim = lp(sub, '^ +', '')
 
-rstrip = lp(sub, ' +$', '')
+rtrim = lp(sub, ' +$', '')
 
-strip = lstrip %.% rstrip
+trim = ltrim %.% rtrim
 
 # FIXME Vectorize
 rev = p(paste, collapse = '') %.% base::rev %.% item(1) %.% p(strsplit, '')
