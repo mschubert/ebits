@@ -179,10 +179,10 @@ items = lp(p, `[`)
 #' Similar to \code{base::Negate}
 neg = p(compose, `!`)
 
-#' @TODO Add %or% and %and% analogously
+#' @TODO Add `and` and `or` analogously
 
 #' Use the first value if present, else the second
 #'
 #' Corresponds to the null-coalesce operator \code{??} in C#
-`%else%` = function (a, b)
+`%or%` = function (a, b)
     if(is.null(a) || is.na(a) || is.nan(a) || length(a) == 0) b else a
