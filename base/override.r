@@ -1,7 +1,8 @@
 ###
 ### general utility functions without specific use
 ###
-source('operators.r')
+library(modules)
+import('operators', attach=T)
 
 na.filter = function(X, rowmax=1, colmax=1) {
     keepRow = rowSums(is.na(X))/dim(X)[2] <= rowmax
