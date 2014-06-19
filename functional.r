@@ -163,8 +163,8 @@ cdict = function (...) {
     lists = list(...)
     names = reduce(union, map(names, lists))
 
-    nonnull = function (n, a, b) if (is.null(a[[n]])) b[[n]] else a[[n]]
-    reduce(function (a, b) map(function (n) nonnull(n, a, b), names), lists)
+    nonnull = .(n, a, b -> if (is.null(a[[n]])) b[[n]] else a[[n]])
+    reduce(.(a, b -> map(.(n -> nonnull(n, a, b)), names)), lists)
 }
 
 # }}}
