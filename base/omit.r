@@ -1,5 +1,5 @@
 library(modules)
-ov = import('overrides')
+ov = import('override')
 
 null.list = function(x.list){
     x.list[unlist(lapply(x.list, length) != 0)]
