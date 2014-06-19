@@ -1,3 +1,6 @@
+library(modules)
+ov = import('overrides')
+
 null.list = function(x.list){
     x.list[unlist(lapply(x.list, length) != 0)]
 }   
@@ -12,9 +15,9 @@ empty = function(x) {
 
 dups = function(x, ...) {
     if (is.vector(x))
-        x[!gn$duplicated(x, ...)]
+        x[!ov$duplicated(x, ...)]
     else if (is.matrix(x) || is.data.frame(x))
-        x[!gn$duplicated(x, ...),]
+        x[!ov$duplicated(x, ...),]
     else
         stop("can only work on vector/matrix so far")
 }
