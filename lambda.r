@@ -1,4 +1,4 @@
-import('functional')
+import('./functional', attach = TRUE)
 
 #' Define a single-argument function
 #'
@@ -19,5 +19,8 @@ import('functional')
 #'      the need for concise lambdas clearly overrides a whimsical preference of
 #'      one redundant operator over another.
 #' \end{enumerate}
-`<-` = function (body, param)
-    eval(call('.', substitute(param -> body)), parent.frame())
+`<-` = function (body, param) {
+    eval(substitute(f(param -> body), list(f = f, param = substitute(param),
+                                           body = substitute(body))),
+         envir = parent.frame())
+}

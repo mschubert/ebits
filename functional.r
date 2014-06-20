@@ -24,9 +24,9 @@ closure = function (formals, body, env)
 
 #' A shortcut to create a function
 #'
-#' @note Using \code{.(params -> body)} is analogous to using
+#' @note Using \code{f(params -> body)} is analogous to using
 #' \code{function (params) body}.
-. = function (...) {
+f = function (...) {
     params = match.call(expand.dots = FALSE)$...
     len = length(params)
 
@@ -38,13 +38,13 @@ closure = function (formals, body, env)
     #  3. Last parameter has default: `params[[len]]` is `default -> body`.
 
     if (! inherits(params[[len]], '<-'))
-        stop('Must be invoked as `.(params -> expr)`')
+        stop('Must be invoked as `f(params -> expr)`')
 
     names = if (is.null(names(params))) rep('', len) else names(params)
 
     # Ensure that last parameter is a name
     if (names[len] == '' && ! inherits(params[[len]][[3]], 'name'))
-        stop('Must be invoked as `.(params -> expr)`')
+        stop('Must be invoked as `f(params -> expr)`')
 
     name_from = function (name, value)
         if (name == '') value else name
@@ -163,8 +163,8 @@ cdict = function (...) {
     lists = list(...)
     names = reduce(union, map(names, lists))
 
-    nonnull = .(n, a, b -> if (is.null(a[[n]])) b[[n]] else a[[n]])
-    reduce(.(a, b -> map(.(n -> nonnull(n, a, b)), names)), lists)
+    nonnull = f(n, a, b -> if (is.null(a[[n]])) b[[n]] else a[[n]])
+    reduce(f(a, b -> map(f(n -> nonnull(n, a, b)), names)), lists)
 }
 
 # }}}
