@@ -18,11 +18,6 @@
     )
 }
 
-`%catch%` = function(a, b) {
-    tryCatch(a,
-             error = function(cond) b)
-}
-
 `%|%` = function(x, command) {
     if (class(command) == 'function') {
         command(x)
