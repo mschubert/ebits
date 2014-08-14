@@ -1,5 +1,5 @@
 library(modules)
-import('operators')
+import('base/operators')
 
 read.vector = function(..., stringsAsFactors=F) {
     tab = read.table(..., stringsAsFactors=stringsAsFactors)
@@ -12,7 +12,7 @@ read.vector = function(..., stringsAsFactors=F) {
 }
 
 read.table = function(file, sep="\t", stringsAsFactors=F, ...) {
-    index = read.table(file, sep=sep, stringsAsFactors=stringsAsFactors, ...)
+    index = utils::read.table(file, sep=sep, stringsAsFactors=stringsAsFactors, ...)
     colnames(index) = index[1,]
     rownames(index) = index[,1]
     index[-1,-1]
@@ -22,7 +22,7 @@ read.csv = function(file, sep=",", stringsAsFactors=F) {
     read.table(file, sep=sep, stringsAsFactors=stringsAsFactors)
 }
 
-loadContents = function(filename) {
+load = function(filename) {
     lfc = function(fpath) {
         env = new.env()
         fdir = dirname(fpath)
@@ -30,7 +30,7 @@ loadContents = function(filename) {
         fname = fid[1]
         subsets = fid[-1] 
  
-        load(file.path(fdir,fname), env)
+        base::load(file.path(fdir,fname), env)
         contents = as.list(env)
         if (length(contents)==1)
             contents[[1]] 
@@ -41,6 +41,10 @@ loadContents = function(filename) {
         lapply(filename, lfc)
     else
         lfc(filename)
+}
+loadContents = function(...) {
+    warning("deprecated, use io$load()")
+    load(...)
 }
 
 data = function(id, name=names(id) %or% id, data.dir=options('data.dir')) {
