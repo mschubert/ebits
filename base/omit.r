@@ -9,7 +9,12 @@ zero = function(x) {
 }   
 
 empty = function(x) {
-    x[apply(x, 1, function(r) all(nchar(r)>0)),]
+    if (is.character(x) && is.matrix(x))
+        x[apply(x, 1, function(r) all(nchar(r)>0)),]
+    else if (is.list(x))
+        x[sapply(x, length) != 0]
+    else
+        stop("need character matrix or list")
 }
 
 dups = function(x, ...) {
