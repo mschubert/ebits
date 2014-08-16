@@ -21,6 +21,13 @@ dups = function(x, ...) {
         stop("can only work on vector/matrix so far")
 }
 
+na = function(x) {
+    if (is.list(x))
+        x[!is.na(x)]
+    else
+        na.omit(x)
+}
+
 na.col = function(x, ...) {
     t(na.omit(t(x), ...))
 }
