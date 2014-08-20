@@ -56,20 +56,14 @@ data = function(id, name=names(id) %or% id, data.dir=options('data.dir')) {
                    full.names=T,
                    pattern=paste0(fname, "(.ro|.RData)"))[1]
     }
-    loadContents(sapply(id, id2fname))
+    load(sapply(id, id2fname))
 }
 
-loadFilesByRegex = function(path, regex, names=NULL, FUN=loadContents) {
+loadFilesByRegex = function(regex, path=".", FUN=load) {
     library(gtools) # mixedsort
+    bu = import('base/util', attach_operators=F)
     files = mixedsort(list.files(path=path, pattern=regex))
     files = sapply(files, function(f) file.path(path,f))
-
-    if (!is.null(names))
-        stopifnot(length(files) == length(names))
-    
-    # load files and stack to array
-    objList = lapply(files, FUN)
-    names(objList) = names
-    return(objList)
-}   
+    setNames(lapply(files, FUN), bu$grepo(regex, files))
+}
 

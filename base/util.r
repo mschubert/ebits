@@ -1,3 +1,18 @@
+# grep only matching group '(...)'
+grepo = function(pattern, x, ...) {
+    # http://stackoverflow.com/questions/2969315
+    require(stringr)
+    if (!grepl("\\(", pattern))
+        re = function(pattern, x, ...) str_match(x, paste0("(", pattern, ")"))[, 2]
+    else
+        re = function(pattern, x, ...) str_match(x, pattern)[, 2]
+
+    if (length(pattern) == 1)
+        re(pattern, x, ...)
+    else
+        sapply(pattern, function(p) re(p, x, ...))
+}
+
 # subset a data.frame with a data.frame
 # compare everything as characters
 dfdf = function(df, subs, exact=T) {
