@@ -1,6 +1,8 @@
-library(modules)
+# I/O helper functions on R binary files
+
 b = import('base')
 
+#' Load function that returns the object(s) instead of attaching it to the global namespace
 load = function(filename) {
     lfc = function(fpath) {
         env = new.env()
@@ -22,6 +24,7 @@ load = function(filename) {
         lfc(filename)
 }
 
+#' Function to load all files that match a regular expression
 load.regex = function(regex, path=".", FUN=load) {
     library(gtools) # mixedsort
     files = mixedsort(list.files(path=path, pattern=regex))
@@ -29,6 +32,7 @@ load.regex = function(regex, path=".", FUN=load) {
     setNames(lapply(files, FUN), b$grepo(regex, files))
 }
 
+#' Function to load R files specified in \code{options('data.dir')}
 data = function(id, name=names(id) %or% id, data.dir=options('data.dir') %or% ".") {
     # look for .RData, .ro in all data.dirs
     id2fname = function(id) {
