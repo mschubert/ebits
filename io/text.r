@@ -31,3 +31,20 @@ read.table = function (file, ..., text) {
     args$file = file
     do.call(utils::read.table, args)
 }
+
+#read.vector = function(..., stringsAsFactors=F) {
+#    tab = read.table(..., stringsAsFactors=stringsAsFactors)
+#    if (dim(tab)[2] == 1)
+#        tab$V1
+#    else if (dim(tab)[2] == 2)
+#        setNames(tab$V2, tab$V1)
+#    else
+#        stop("read.vector needs either 1 or 2 columns")
+#}
+#
+#read.table = function(file, sep="\t", stringsAsFactors=F, ...) {
+#    index = utils::read.table(file, sep=sep, stringsAsFactors=stringsAsFactors, ...)
+#    colnames(index) = index[1,]
+#    rownames(index) = index[,1]
+#    index[-1,-1]
+#} 
