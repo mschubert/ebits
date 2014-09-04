@@ -1,3 +1,5 @@
+#import('./operators')
+
 # grep only matching group '(...)'
 grepo = function(pattern, x, ...) {
     # http://stackoverflow.com/questions/2969315
@@ -11,6 +13,28 @@ grepo = function(pattern, x, ...) {
         re(pattern, x, ...)
     else
         sapply(pattern, function(p) re(p, x, ...))
+}
+
+fuzzy.match = function(x, from, to) {
+    require(stringr)
+
+    # 1st iteration: exact matches
+    index1 = match(x, from)
+
+    # 2nd iteration: non-punctuation exact matches
+    FROM = str_replace_all(toupper(from), "[[:punct:]]", "")
+    x = str_replace_all(x, "[[:punct:]]", "")
+    index2 = match(x, FROM)
+
+    # 3rd iteration: closest string matches w/o punctuation
+    distances = adist(FROM, x)
+    mind = apply(distances, 2, min)
+    nmin = sapply(1:length(mind), function(i) sum(mind[i]==distances[,i]))
+    mind[nmin>1] = NA # no non-unique matches
+    index3 = sapply(1:length(mind), function(i) which(distances[,i]==mind[i]) %or% NA)
+
+    # return best match
+    to[index1 %or% index2 %or% index3]
 }
 
 # subset a data.frame with a data.frame

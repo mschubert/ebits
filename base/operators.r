@@ -8,8 +8,8 @@
                             length(a) == 0) b else a
 
     if (is.list(a))
-        mapply(cmp, a, b, SIMPLIFY=F)
-    else if (is.vector(a))
+        lapply(1:length(a), function(i) cmp(a[[i]], b[[i]]))
+    else if (length(a) > 1)
         mapply(cmp, a, b)
     else
         cmp(a, b)
