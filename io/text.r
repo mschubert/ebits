@@ -1,4 +1,4 @@
-# I/O helper functions
+# I/O helper functions on text files
 
 #' Add \code{ext}ension parameter to \link{\code{base::file.path}}
 file.path = function (..., ext = NULL, fsep = .Platform$file.sep) {
@@ -23,7 +23,8 @@ read.table = function (file, ..., text) {
 
     if (! ('sep' %in% names(args))) {
         separators = list('.csv' = ',',
-                          '.tsv' = '\t')
+                          '.tsv' = '\t',
+                          '.txt' = '\t')
         extension = rxmatch('\\.(\\w+)$', file)
         args$sep = separators[[extension]]
     }

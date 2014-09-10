@@ -184,5 +184,5 @@ neg = p(compose, `!`)
 #' Use the first value if present, else the second
 #'
 #' Corresponds to the null-coalesce operator \code{??} in C#
-`%or%` = function (a, b)
-    if(is.null(a) || is.na(a) || is.nan(a) || length(a) == 0) b else a
+#`%or%` = function (a, b)
+#    if(is.null(a) || is.na(a) || is.nan(a) || length(a) == 0) b else a
