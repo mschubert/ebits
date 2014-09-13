@@ -1,7 +1,7 @@
 ov = import('./override')
 
-null.list = function(x.list){
-    x.list[unlist(lapply(x.list, length) != 0)]
+null = function(x){
+    x[sapply(x, length) != 0]
 }   
 
 zero = function(x) {
