@@ -25,11 +25,11 @@ load = function(filename) {
 }
 
 #' Function to load all files that match a regular expression
-load.regex = function(regex, path=".", FUN=load) {
+load.regex = function(regex, path=".", FUN=load, ...) {
     library(gtools) # mixedsort
-    files = mixedsort(list.files(path=path, pattern=regex))
-    files = sapply(files, function(f) file.path(path,f))
-    setNames(lapply(files, FUN), b$grepo(regex, files))
+    fnames = mixedsort(list.files(path=path, pattern=regex, ...))
+    files = sapply(fnames, function(f) file.path(path,f))
+    setNames(lapply(files, FUN), b$grep(regex, fnames))
 }
 
 #' Function to load R files specified in \code{options('data.dir')}
@@ -40,7 +40,7 @@ data = function(id, name=names(id) %or% id, data.dir=options('data.dir') %or% ".
         fname = basename(id)
         list.files(path=file.path(data.dir, fdir),
                    full.names=T,
-                   pattern=paste0(fname, "(.ro|.RData)"))[1]
+                   pattern=paste0(fname, "(.ro|.RData|.rdata)"))[1]
     }
     load(sapply(id, id2fname))
 }

@@ -2,6 +2,7 @@
 
 # grep only matching group '(...)'
 grepo = function(pattern, x, ...) {
+    warning("this is deprecated, use b$grep instead")
     # http://stackoverflow.com/questions/2969315
     require(stringr)
     if (!grepl("\\(", pattern))
@@ -14,6 +15,21 @@ grepo = function(pattern, x, ...) {
     else
         sapply(pattern, function(p) re(p, x, ...))
 }
+
+grep = function(pattern, x, ...) {
+    # http://stackoverflow.com/questions/2969315
+    require(stringr)
+    if (grepl("[^\\]\\(", pattern) || grepl("^\\(", pattern))
+        re = function(pattern, x, ...) str_match(x, pattern)[, 2]
+    else
+        re = function(pattern, x, ...) base::grep(pattern, x, value=T, ...)
+
+    if (length(pattern) == 1)
+        re(pattern, x, ...)
+    else
+        sapply(pattern, function(p) re(p, x, ...))
+}
+
 
 fuzzy.match = function(x, from, to) {
     require(stringr)
