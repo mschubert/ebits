@@ -29,7 +29,7 @@ dups = function(x, ...) {
 }
 
 na = function(x) {
-    if (is.list(x))
+    if (is.vector(x))
         x[!is.na(x)]
     else
         na.omit(x)
