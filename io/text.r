@@ -1,4 +1,5 @@
 # I/O helper functions on text files
+import('base', attach_operators=F)
 
 #' Add \code{ext}ension parameter to \link{\code{base::file.path}}
 file.path = function (..., ext = NULL, fsep = .Platform$file.sep) {
@@ -25,10 +26,17 @@ read.table = function (file, ..., text) {
         separators = list('.csv' = ',',
                           '.tsv' = '\t',
                           '.txt' = '\t')
-        extension = rxmatch('\\.(\\w+)$', file)
+        extension = b$grep('(\\.\\w+)$', file)
         args$sep = separators[[extension]]
     }
 
     args$file = file
     do.call(utils::read.table, args)
+}
+
+read.full.table = function(file, sep="\t", stringsAsFactors=F, ...) {
+    index = utils::read.table(file, sep=sep, stringsAsFactors=stringsAsFactors, ...)
+    colnames(index) = index[1,]
+    rownames(index) = index[,1]
+    index[-1,-1]
 }

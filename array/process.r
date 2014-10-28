@@ -1,8 +1,9 @@
 # Array programming utility functions
 # Some tools to handle R^n matrices and perform operations on them
 library(abind)
+library(methods) # abind bug: relies on methods::Quote, which is not loaded from Rscript
 library(reshape2)
-library(plyr)
+library(dplyr)
 b = import('base')
 import('./util', attach=T)
 
@@ -18,6 +19,9 @@ stack = function(arrayList, along=length(dim(arrayList[[1]]))+1, fill=NA, like=N
 #TODO:? would be faster if just call abind() when there is nothing to sort
     if (!is.list(arrayList))
         stop(paste("arrayList needs to be a list, not a", class(arrayList)))
+    arrayList = arrayList[!is.null(arrayList)]
+    if (length(arrayList) == 0)
+        stop("No element remaining after removing NULL entries")
     if (length(arrayList) == 1)
         return(arrayList[[1]])
 
@@ -186,6 +190,8 @@ map = function(X, along, FUN, subsets=rep(1,dim(X)[along])) {
 #' @param subsets  Whether to split each element or keep some together
 #' @return         A list of arrays that combined make up the input array
 split = function(X, along, subsets=c(1:dim(X)[along])) {
+    if (!is.array(X) && !is.vector(X))
+        stop("X needs to be either vector, array or matrix")
     X = as.array(X)
 #TODO: check if names unique, otherwise weird error
     if (is.character(along))
@@ -240,3 +246,12 @@ intersect_list = function(x, along=1) {
     re
 }
 
+#' Converts a list of character vectors to an occurrence matrix
+#'
+#' @param vectorList  A list of character vectors
+#' @return            A logical occurrence matrix
+occurrence = function(vectorList) {
+    vectorList = lapply(vectorList,
+                        function(x) setNames(rep(T, length(x)), x))
+    ar$stack(vectorList, fill=F)
+}

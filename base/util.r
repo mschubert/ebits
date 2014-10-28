@@ -2,6 +2,7 @@
 
 # grep only matching group '(...)'
 grepo = function(pattern, x, ...) {
+    warning("this is deprecated, use b$grep instead")
     # http://stackoverflow.com/questions/2969315
     require(stringr)
     if (!grepl("\\(", pattern))
@@ -14,6 +15,21 @@ grepo = function(pattern, x, ...) {
     else
         sapply(pattern, function(p) re(p, x, ...))
 }
+
+grep = function(pattern, x, ...) {
+    # http://stackoverflow.com/questions/2969315
+    require(stringr)
+    if (grepl("[^\\]\\(", pattern) || grepl("^\\(", pattern))
+        re = function(pattern, x, ...) str_match(x, pattern)[, 2]
+    else
+        re = function(pattern, x, ...) base::grep(pattern, x, value=T, ...)
+
+    if (length(pattern) == 1)
+        re(pattern, x, ...)
+    else
+        sapply(pattern, function(p) re(p, x, ...))
+}
+
 
 fuzzy.match = function(x, from, to) {
     require(stringr)
@@ -39,13 +55,15 @@ fuzzy.match = function(x, from, to) {
 
 # subset a data.frame with a data.frame
 # compare everything as characters
-dfdf = function(df, subs, exact=T) {
+dfdf = function(df, subs, exact=F, add.cols=F) {
     oldDf = df
 
-    if (identical(colnames(df), NULL))
-        colnames(df) = c(1:ncol(df))
-    if (identical(colnames(subs), NULL))
-        colnames(subs) = c(1:ncol(subs))
+    if (add.cols) {
+        subsFull = subs
+        subs = subsFull[intersect(colnames(subsFull), colnames(df))]
+        subsAdd = subsFull[setdiff(colnames(subsFull), colnames(df))]
+        idxAdd = c()
+    }
 
     for (cn in colnames(subs)) {
         subs[[cn]] = as.character(subs[[cn]])
@@ -60,9 +78,15 @@ dfdf = function(df, subs, exact=T) {
         if (exact && sum(mask) != 1)
             stop("exact=T needs exactly one match per row in subsetting df")
         idx = c(idx, which(mask))
+
+        if (add.cols)
+            idxAdd = c(idxAdd, rep(i, sum(mask)))
     }
 
-    oldDf[idx,]
+    if (add.cols)
+        cbind(oldDf[idx,,drop=F], subsAdd[idxAdd,,drop=F])
+    else
+        oldDf[idx,,drop=F]
 }
 
 num.unique = function(x) {
