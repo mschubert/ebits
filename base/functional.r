@@ -147,8 +147,8 @@ indices = seq_along
 #' Conditionally count elements.
 count = length %.% which
 
-#' Wrapper around \{order} that returns the ordered data rather than the index
-#' permutation.
+#' Wrapper around \code{order} that returns the ordered data rather than the
+#' index permutation.
 #'
 #' Like \code{sort}, but allows specifying multiple sort keys.
 sorted = function (data, ..., decreasing = FALSE)
