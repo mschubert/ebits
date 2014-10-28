@@ -1,4 +1,4 @@
-import('./functional', attach = TRUE)
+fun = import('./functional')
 
 #' Define a single-argument function
 #'
@@ -23,5 +23,5 @@ import('./functional', attach = TRUE)
     vars = all.vars(substitute(params))
     formals = as.pairlist(setNames(replicate(length(vars), quote(expr = )),
                                    vars))
-    closure(formals, substitute(body), parent.frame())
+    fun$closure(formals, substitute(body), parent.frame())
 }
