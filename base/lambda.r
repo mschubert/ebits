@@ -19,8 +19,9 @@ import('./functional', attach = TRUE)
 #'      the need for concise lambdas clearly overrides a whimsical preference of
 #'      one redundant operator over another.
 #' \end{enumerate}
-`<-` = function (body, param) {
-    eval(substitute(f(param -> body), list(f = f, param = substitute(param),
-                                           body = substitute(body))),
-         envir = parent.frame())
+`<-` = function (body, params) {
+    vars = all.vars(substitute(params))
+    formals = as.pairlist(setNames(replicate(length(vars), quote(expr = )),
+                                   vars))
+    closure(formals, substitute(body), parent.frame())
 }
