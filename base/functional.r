@@ -9,8 +9,6 @@ NULL
 # Once I manage to put proper name isolation into place, this decision should
 # be revisited.
 
-# Basic helpers {{{
-
 #' Do not change the argument
 #'
 #' The function is used as a placeholder argument in a higher-order when no
@@ -106,25 +104,54 @@ f = function (...) {
     closure(formals, body, parent.frame())
 }
 
-# }}}
-
 # Tools for function composition and chaining {{{
 
-#' Partial function application from right to left.
+#' Partial function application
 #'
-#' @note This is the opposite from the (wrongly-named) \code{roxygen::Curry}:
+#' \code{partial} and \code{p} apply a function patially over some arguments,
+#' matching them from right to left; \code{lpartial} and \code{lp} match them
+#' from left to right.
 #'
-#'   \code{minus = function (x, y) x - y
-#'   partial(minus, 5)(1) == -4}
+#' @param f a function
+#' @param ... partial arguments to the function \code{f}
+#' @return A function calling \code{f}, with the provided arguments bound to
+#' \code{f}’s parameters, and having as parameters the remaining, un-specified
+#' arguments.
 #'
-#' But:
+#' @note \code{partial} applies the arguments in the opposite order to the
+#' (somewhat misnamed) \code{\link{functional::Curry}}.
+#' See \link{Examples} for a code comparison.
+#' @note \code{p} and \code{lp} are shortcuts for \code{partial} and
+#' \code{lpartial}, respectively.
 #'
-#'   \code{partial(minus, x = 5)(1) == 4}
+#' @examples
+#' # Use partial application to create a function which adds 5 to its argument
 #'
+#' add5 = p(`+`, 5)
+#' # or: add5 = partial(`+`, 5)
+#'
+#' add5(1 : 4)
+#' # 6 7 8 9
+#'
+#' # The difference between partial and lpartial
+#'
+#' minus = function (x, y) x - y
+#' p(minus, 5)(1)
+#' # -4
+#'
+#' # But:
+#'
+#' lp(minus, 5)(1)
+#' # 4
+#' p(minus, x = 5)(1)
+#' # 4
+#' \dontrun{functional::Curry(minus, 5)(1)}
+#' # 4
 partial = function (f, ...)
     let(capture = list(...),
         function (...) do.call(f, c(list(...), capture)))
 
+#' @rdname partial
 lpartial = function(f, ...)
     let(capture = list(...),
         function (...) do.call(f, c(capture, list(...))))
@@ -138,7 +165,9 @@ ppartial = function (f, arg, ...)
 # syntactic noise.
 # Not something I would normally do but there's precedence in R; consider `c`.
 
+#' @rdname partial
 p = partial
+#' @rdname partial
 lp = lpartial
 pp = ppartial
 
