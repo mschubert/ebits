@@ -9,15 +9,6 @@ NULL
 # Once I manage to put proper name isolation into place, this decision should
 # be revisited.
 
-#' Do not change the argument
-#'
-#' The function is used as a placeholder argument in a higher-order when no
-#' further action is required.
-#'
-#' @param x an object
-#' @return The object, unchanged.
-id = function (x) x
-
 #' Create a local binding for one or more names
 #'
 #' @usage let(..., .expr)
