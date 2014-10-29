@@ -1,15 +1,42 @@
-# Functional tools
+#' Functional programming helpers
+#' @name functional
+NULL
 
-#' This module re-creates quite a few fundamental tools from `pryr`. Why not
-#' `require(pryr)` instead? The only reason is that pryr contains many more
-#' utilities which have no place at all in this module. In addition, it does
-#' some things subtly different.
-#' Once I manage to put proper name isolation into place, this decision should
-#' be revisited.
+# This module re-creates quite a few fundamental tools from `pryr`. Why not
+# `require(pryr)` instead? The only reason is that pryr contains many more
+# utilities which have no place at all in this module. In addition, it does
+# some things subtly different.
+# Once I manage to put proper name isolation into place, this decision should
+# be revisited.
 
 # Basic helpers {{{
 
+#' Do not change the argument
+#'
+#' The function is used as a placeholder argument in a higher-order when no
+#' further action is required.
+#'
+#' @param x an object
+#' @return The object, unchanged.
 id = function (x) x
+
+#' Create a local binding for one or more names
+#'
+#' @usage let(..., .expr)
+#' @param ... one or more variable assignments of the form \code{name = value},
+#'  where \code{value} can be an arbitrary expression
+#' @param .expr an expression to evaluate in a local environment consisting of
+#'  the provided variables
+#' @return The result of evaluating \code{.expr}.
+#'
+#' @examples
+#' result = let(x = 1, x + 2)
+#'
+#' # equivalent to
+#' result = local({
+#'     x = 1
+#'     x + 2
+#' })
 
 # This uses R's peculiarities in argument matching explained here:
 # <http://stat.ethz.ch/R-manual/R-devel/doc/manual/R-lang.html#Argument-matching>
@@ -19,11 +46,28 @@ let = function (.expr, ...)
     eval(substitute(.expr), list2env(list(...), parent = parent.frame()))
 
 #' Create a closure over a given environment for the specified formals and body.
+#'
+#' Helper function to facilitate the creation of functions from quoted
+#' expressions at runtime.
+#'
+#' @param formals list of formal arguments; list names correspond to parameter
+#'  names, list values correspond to quoted parameter defaults
+#' @param body quoted expression to use as function body
+#' @param env the environment in which to define the function
+#' @return A function defined in \code{env}.
+#'
+#' @examples
+#' x = new.env()
+#' closure(list(a = quote(expr = )), call('+', quote(a), 1), x)
+#' # function (a)
+#' # a + 1
+#' # <environment: 0x7feec6390b8>
 closure = function (formals, body, env)
     eval(call('function', as.pairlist(formals), body), env)
 
 #' A shortcut to create a function
 #'
+#' @usage f(params -> body)
 #' @note Using \code{f(params -> body)} is analogous to using
 #' \code{function (params) body}.
 f = function (...) {
