@@ -177,8 +177,9 @@ compose = function (g, f)
 #' Function chaining operator (as in F#)
 `%|>%` = function (g, f) compose(f, g)
 
-#' Pipe operator as in Bash
-`%|%` = function (x, f) f(x)
+#' Pipe operator like in F#, Bash …
+#' @seealso \code{\link{magrittr::\%>\%}}
+`%>%` = magrittr::`%>%`
 
 # }}}
 
