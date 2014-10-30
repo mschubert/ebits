@@ -213,8 +213,20 @@ filter = base::Filter
 
 # Helpers for working with ranges {{{
 
-#' TODO Handle negative indices?
-boolmask = function (indices, length)
+#' Create a logical vector from a numeric index vector
+#'
+#' Compute the inverse of \code{\link{base::which}}: given an index vector and
+#' the output length, create a logical vector of the output length, with the
+#' specified elements set to \code{TRUE}.
+#'
+#' @param indices numeric vector of selected indices
+#' @param length of the output vecotr
+#' @return A logical vector of length \code{length} with the elements specified
+#'  by \code{indices} set to \code{TRUE}.
+#' @seealso \code{\link{base::which}}
+# TODO Handle negative indices?
+# TODO handle factors, equivalent to unname(apply(model.matrix(~0 + factir), 2, as.logical))
+index_mask = function (indices, length)
     is.element(1 : length, indices)
 
 indices = seq_along
