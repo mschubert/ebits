@@ -164,18 +164,30 @@ pp = ppartial
 
 #' Compose functions \code{g} and \code{f}.
 #'
+#' @param g a function taking as its argument the return value from \code{f}
+#' @param f a function with arbitrary arguments
+#' @return A fuction which takes the same arguments as \code{f} and returns the
+#' same return type as \code{g}
+#'
+#' @note Functions are applied in the inverse order of
+#' \code{\link{functional::Compose}}:
+#' \url{http://tolstoy.newcastle.edu.au/R/e9/help/10/02/4529.html}
+#'
+#' @note The semantics of \code{compose} are given by the equivalence
 #' \code{compose(g, f)(...) = g(f(...))}.
 #'
-#' @note Functions are applied in the inverse order of \code{roxygen::Compose}:
-#' \url{http://tolstoy.newcastle.edu.au/R/e9/help/10/02/4529.html}
+#' @note All three forms of this function (\code{compose}, \code{\%.\%} and
+#' \code{\%|>\%}) are exactly identical. The only difference is the order of the
+#' arguments, which is reversed in \code{\%|>\%}. \code{\%|>\%} is thus the
+#' higher-order function counterpart to \code{\link{\%>\%}}.
 compose = function (g, f)
     function (...) g(f(...))
 
-#' Dot operator (as in Haskell)
+#' @rdname compose
 `%.%` = compose
 
-#' Function chaining operator (as in F#)
-`%|>%` = function (g, f) compose(f, g)
+#' @rdname compose
+`%|>%` = function (f, g) compose(g, f)
 
 #' Pipe operator like in F#, Bash …
 #' @seealso \code{\link{magrittr::\%>\%}}
