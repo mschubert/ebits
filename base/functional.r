@@ -197,11 +197,6 @@ compose = function (g, f)
 
 # Higher-order list functions {{{
 
-#' Applies a list of functions to the same argument.
-#' TODO Extend to more than one argument
-fapply = function (x, ...)
-    lapply(list(...), function (f) f(x))
-
 # What is up with the naming of these (standard R) functions?
 
 map = base::Map
