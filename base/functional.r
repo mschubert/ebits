@@ -229,8 +229,6 @@ filter = base::Filter
 index_mask = function (indices, length)
     is.element(1 : length, indices)
 
-indices = seq_along
-
 #' Conditionally count elements.
 count = length %.% which
 
