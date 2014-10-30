@@ -121,7 +121,7 @@ compose = function (g, f)
 # Higher-order list functions {{{
 
 #' Applies a list of functions to the same argument.
-#' @TODO Extend to more than one argument
+#' TODO Extend to more than one argument
 fapply = function (x, ...)
     lapply(list(...), function (f) f(x))
 
@@ -138,7 +138,7 @@ filter = base::Filter
 
 # Helpers for working with ranges {{{
 
-#' @TODO Handle negative indices?
+#' TODO Handle negative indices?
 boolmask = function (indices, length)
     is.element(1 : length, indices)
 
@@ -147,8 +147,8 @@ indices = seq_along
 #' Conditionally count elements.
 count = length %.% which
 
-#' Wrapper around \{order} that returns the ordered data rather than the index
-#' permutation.
+#' Wrapper around \code{order} that returns the ordered data rather than the
+#' index permutation.
 #'
 #' Like \code{sort}, but allows specifying multiple sort keys.
 sorted = function (data, ..., decreasing = FALSE)
@@ -179,7 +179,7 @@ items = lp(p, `[`)
 #' Similar to \code{base::Negate}
 neg = p(compose, `!`)
 
-#' @TODO Add `and` and `or` analogously
+#' TODO Add `and` and `or` analogously
 
 #' Use the first value if present, else the second
 #'
