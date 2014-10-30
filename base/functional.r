@@ -197,13 +197,16 @@ compose = function (g, f)
 
 # Higher-order list functions {{{
 
-# What is up with the naming of these (standard R) functions?
-
+#' @rdname functional
+#' @seealso \code{\link{base::Map}}
 map = base::Map
 
+#' @rdname functional
+#' @seealso \code{\link{base::Reduce}}
 reduce = base::Reduce
 
-# Hides `stats::filter`.
+#' @rdname functional
+#' @seealso \code{\link{base::Filter}}
 filter = base::Filter
 
 # }}}
