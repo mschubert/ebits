@@ -248,7 +248,7 @@ items = lp(p, `[`)
 #' @seealso \code{\link{base::Negate}}
 neg = p(compose, `!`)
 
-#' TODO Add `and` and `or` analogously
+# TODO: Add `and` and `or` analogously
 
 # }}}
 
@@ -265,8 +265,8 @@ neg = p(compose, `!`)
 #' @return A logical vector of length \code{length} with the elements specified
 #'  by \code{indices} set to \code{TRUE}.
 #' @seealso \code{\link{base::which}}
-# TODO Handle negative indices?
-# TODO handle factors, equivalent to unname(apply(model.matrix(~0 + factir), 2, as.logical))
+# TODO: Handle negative indices?
+# TODO: handle factors, equivalent to unname(apply(model.matrix(~0 + factir), 2, as.logical))
 index_mask = function (indices, length)
     is.element(1 : length, indices)
 
