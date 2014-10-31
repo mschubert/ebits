@@ -266,7 +266,7 @@ neg = p(compose, `!`)
 #'  by \code{indices} set to \code{TRUE}.
 #' @seealso \code{\link{base::which}}
 # TODO: Handle negative indices?
-# TODO: handle factors, equivalent to unname(apply(model.matrix(~0 + factir), 2, as.logical))
+# TODO: handle factors, equivalent to unname(apply(model.matrix(~0 + factor), 2, as.logical))
 index_mask = function (indices, length)
     is.element(1 : length, indices)
 
