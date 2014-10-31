@@ -242,9 +242,10 @@ item = lp(p, `[[`)
 #' @usage items(i)
 items = lp(p, `[`)
 
-#' Negate a function.
+#' Negate a function
 #'
-#' Similar to \code{base::Negate}
+#' @usage neg(f)
+#' @seealso \code{\link{base::Negate}}
 neg = p(compose, `!`)
 
 #' TODO Add `and` and `or` analogously
