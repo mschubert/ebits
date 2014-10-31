@@ -213,9 +213,33 @@ filter = base::Filter
 
 # Function objects {{{
 
-#' Create an item selector function for a given item
+#' Higher-order variant of \code{[} and \code{[[}
+#'
+#' Create a function which, given a list or vector, extracts a given element.
+#'
+#' @param i index which to extract
+#' @return A function taking a vector or list.
+#'
+#' @note \code{item} corresponds to the extraction operator \code{[[}.
+#' \code{items} corresponds to \code{[}.
+#' @note The semantics are such that writing \code{item(i)(x)} is the same as
+#' \code{x[[i]]}.
+#'
+#' @examples
+#' values = replicate(5, rpois(5, 1), simplify = FALSE)
+#' # Get the third value from each generated Poisson distribution:
+#' unlist(map(item(3), values))
+#' # [1] 1 1 0 3 1
+#'
+#' # Same as unlist(map(function (x) x[[3]], values))
+#'
+#' @name Extract
+#' @rdname Extract
+#' @usage item(i)
 item = lp(p, `[[`)
 
+#' @rdname Extract
+#' @usage items(i)
 items = lp(p, `[`)
 
 #' Negate a function.
