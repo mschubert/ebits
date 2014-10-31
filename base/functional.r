@@ -211,6 +211,22 @@ filter = base::Filter
 
 # }}}
 
+# Function objects {{{
+
+#' Create an item selector function for a given item
+item = lp(p, `[[`)
+
+items = lp(p, `[`)
+
+#' Negate a function.
+#'
+#' Similar to \code{base::Negate}
+neg = p(compose, `!`)
+
+#' TODO Add `and` and `or` analogously
+
+# }}}
+
 # Helpers for working with ranges {{{
 
 #' Create a logical vector from a numeric index vector
@@ -241,15 +257,3 @@ sorted = function (data, ..., decreasing = FALSE)
         data[do.call(order, c(lapply(key, lp(`[[`, data)), decreasing = decreasing)), ])
 
 # }}}
-
-#' Create an item selector function for a given item
-item = lp(p, `[[`)
-
-items = lp(p, `[`)
-
-#' Negate a function.
-#'
-#' Similar to \code{base::Negate}
-neg = p(compose, `!`)
-
-#' TODO Add `and` and `or` analogously
