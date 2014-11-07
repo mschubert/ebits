@@ -1,5 +1,5 @@
 # I/O helper functions on text files
-import('base', attach_operators=F)
+b = import('base', attach_operators=F)
 
 #' Add \code{ext}ension parameter to \link{\code{base::file.path}}
 file.path = function (..., ext = NULL, fsep = .Platform$file.sep) {
@@ -17,7 +17,7 @@ file.path = function (..., ext = NULL, fsep = .Platform$file.sep) {
 #' For the moment, only separators are handled based on the file extension.
 #' This might change in the future to be more powerful, think Python’s
 #' \code{csv.Sniffer} class.
-read.table = function (file, ..., text) {
+read.table = function (file, ..., text, stringsAsFactors=F) {
     args = list(...)
     if (missing(file))
         return(do.call(utils::read.table, c(args, text = text)))
@@ -31,7 +31,12 @@ read.table = function (file, ..., text) {
     }
 
     args$file = file
-    do.call(utils::read.table, args)
+    args$stringsAsFactors = stringsAsFactors
+
+    if (extension == ".xlsx")
+        do.call(xlsx::read.xlsx, args)
+    else
+        do.call(utils::read.table, args)
 }
 
 read.full.table = function(file, sep="\t", stringsAsFactors=F, ...) {
