@@ -26,7 +26,7 @@ read.table = function (file, ..., text, stringsAsFactors=F) {
         separators = list('.csv' = ',',
                           '.tsv' = '\t',
                           '.txt' = '\t')
-        extension = b$grep('(\\.\\w+)$', file)
+        extension = b$grep('(\\.\\w+)(\\.gz)?$', file)[1]
         args$sep = separators[[extension]]
     }
 
