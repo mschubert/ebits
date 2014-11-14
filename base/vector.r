@@ -23,9 +23,9 @@ count = length %.% which
 #'
 #' Apply an \code{order} directly to a target.
 #'
-#' @param data a vector, matrix or \code{data.frame} to sort
-#' @param ... one or more keys to sort by; if missing, use the \code{names} or
-#'  \code{colnames}
+#' @param data a vector or \code{data.frame} to sort
+#' @param ... one or more keys to sort by; if missing, use the values themselves
+#'  (for a vector), or the values of the first column
 #' @param decreasing logical value indicating whether to invert the sort order
 #'  (default: \code{FALSE})
 #' @return The sorted data in the same format (preserving names, etc).
@@ -33,11 +33,9 @@ sort_by = function (data, ..., decreasing = FALSE)
     UseMethod('sort_by')
 
 sort_by.data.frame = function (data, ..., decreasing = FALSE)
-    let(key = if (length(list(...)) == 0) colnames(data) else list(...),
-        data[do.call(order, c(lapply(key, lp(`[[`, data)),
-                              decreasing = decreasing)), ])
+    let(key = if (length(list(...)) == 0) list(data[, 1]) else list(...),
+        data[do.call(order, c(key, decreasing = decreasing)), ])
 
 sort_by.default = function (data, ..., decreasing = FALSE)
-    let(key = if (length(list(...)) == 0) names(data) else list(...),
-        data[do.call(order, c(lapply(key, lp(`[[`, data)),
-                              decreasing = decreasing))])
+    let(key = if (length(list(...)) == 0) list(data) else list(...),
+        data[do.call(order, c(key, decreasing = decreasing))])
