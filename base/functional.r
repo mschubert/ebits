@@ -251,34 +251,3 @@ neg = p(compose, `!`)
 # TODO: Add `and` and `or` analogously
 
 # }}}
-
-# Helpers for working with ranges {{{
-
-#' Create a logical vector from a numeric index vector
-#'
-#' Compute the inverse of \code{\link{base::which}}: given an index vector and
-#' the output length, create a logical vector of the output length, with the
-#' specified elements set to \code{TRUE}.
-#'
-#' @param indices numeric vector of selected indices
-#' @param length of the output vecotr
-#' @return A logical vector of length \code{length} with the elements specified
-#'  by \code{indices} set to \code{TRUE}.
-#' @seealso \code{\link{base::which}}
-# TODO: Handle negative indices?
-# TODO: handle factors, equivalent to unname(apply(model.matrix(~0 + factor), 2, as.logical))
-index_mask = function (indices, length)
-    is.element(1 : length, indices)
-
-#' Conditionally count elements.
-count = length %.% which
-
-#' Wrapper around \code{order} that returns the ordered data rather than the
-#' index permutation.
-#'
-#' Like \code{sort}, but allows specifying multiple sort keys.
-sorted = function (data, ..., decreasing = FALSE)
-    let(key = if (length(list(...)) == 0) colnames(data) else list(...),
-        data[do.call(order, c(lapply(key, lp(`[[`, data)), decreasing = decreasing)), ])
-
-# }}}
