@@ -20,7 +20,7 @@ grep = function(pattern, x, ...) {
     # http://stackoverflow.com/questions/2969315
     require(stringr)
     if (grepl("[^\\]\\(", pattern) || grepl("^\\(", pattern))
-        re = function(pattern, x, ...) str_match(x, pattern)[, 2]
+        re = function(pattern, x, ...) str_match(x, pattern)[,-1]
     else
         re = function(pattern, x, ...) base::grep(pattern, x, value=T, ...)
 
