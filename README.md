@@ -22,19 +22,8 @@ devtools::install_github('klmr/modules')
 
 This command requires `devtools to be installed`.
 
-The following R libraries are currently required to run `ebits`:
-
- * stringr
- * BatchJobs
- * gtools
- * plyr
- * dplyr
- * abind
- * magrittr
- * reshape2
- * xlsx
-
-You can install all of them by executing:
+The following R libraries are currently required to run `ebits`,
+you can install all of them by executing:
 
 ```r
 install.packages(c('strings','BatchJobs','gtools','plyr','dplyr','abind',
