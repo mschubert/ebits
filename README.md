@@ -20,7 +20,7 @@ This collection of tools requires `modules`, install using:
 devtools::install_github('klmr/modules')
 ```
 
-This command requires `devtools to be installed`.
+This command requires `devtools` to be installed.
 
 The following R libraries are currently required to run `ebits`,
 you can install all of them by executing:
