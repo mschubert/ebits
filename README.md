@@ -4,6 +4,13 @@ ebits: R modules for general reuse
 This repository is meant as a collection of bioinformatics-related R
 code that simplify workflows and can be shared with other people.
 
+We currently provide the following modules:
+
+ * [base](base) - some basic functionality, in part overwriting R's `base` functions
+ * [io](io) - file reading and writing
+ * [array](array) - functions to simplify array programming in R.
+ * [hpc](hpc) - functions to send R function calls as LSF jobs.
+
 Requirements
 ------------
 
@@ -30,7 +37,8 @@ The following R libraries are currently required to run `ebits`:
 You can install all of them by executing:
 
 ```r
-install.packages(c('strings','BatchJobs','gtools','plyr','dplyr','abind','magrittr','reshape2','xlsx'))
+install.packages(c('strings','BatchJobs','gtools','plyr','dplyr','abind',
+                   'magrittr','reshape2','xlsx'))
 ```
 
 Setup
@@ -52,26 +60,10 @@ options(import.path=c("/path/to/ebits",
 Usage
 -----
 
-We currently provide the modules listed below. Each of them can be
-loaded using the `import` command:
+Modules can be imported and used as described in the
+[`modules` documentation](https://github.com/klmr/modules)
 
 ```r
 mod = import('module') # imports the module
 mod$func(x=5)          # calls the module function
 ```
-
-#### [base](base)
-
-Some basic functionality, in part overwriting R's `base` functions.
-
-#### [io](io)
-
-File reading and writing.
-
-#### [array](array)
-
-Functions to simplify array programming in R.
-
-#### [hpc](hpc)
-
-Functions to send R function calls as LSF jobs.
