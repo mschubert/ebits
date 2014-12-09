@@ -26,8 +26,8 @@ The following R libraries are currently required to run `ebits`,
 you can install all of them by executing:
 
 ```r
-install.packages(c('strings','BatchJobs','gtools','plyr','dplyr','abind',
-                   'magrittr','reshape2','xlsx'))
+install.packages(c('BatchJobs','gtools','plyr','dplyr','abind','reshape2','xlsx'))
+# implicitly installed: stringr, magrittr
 ```
 
 Setup
