@@ -28,13 +28,3 @@
         error = function(e) b
     )
 }
-
-`%|%` = function(x, command) {
-    if (class(command) == 'function') {
-        command(x)
-    } else {
-        stopifnot(class(x) %in% c('character', 'numeric', 'integer'))
-        system(command, input=as.character(x), intern=TRUE)
-    }
-}
-
