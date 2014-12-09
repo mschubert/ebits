@@ -2,7 +2,7 @@
 b = import('base', attach_operators=F)
 
 #' Add \code{ext}ension parameter to \link{\code{base::file.path}}
-file.path = function (..., ext = NULL, fsep = .Platform$file.sep) {
+file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
     dots = list(...)
     if (! is.null(ext)) {
         ilast = length(dots)
@@ -17,7 +17,7 @@ file.path = function (..., ext = NULL, fsep = .Platform$file.sep) {
 #' For the moment, only separators are handled based on the file extension.
 #' This might change in the future to be more powerful, think Python’s
 #' \code{csv.Sniffer} class.
-read.table = function (file, ..., text, stringsAsFactors=F) {
+read_table = function (file, ..., text, stringsAsFactors=F) {
     args = list(...)
     if (missing(file))
         return(do.call(utils::read.table, c(args, text = text)))
@@ -39,7 +39,7 @@ read.table = function (file, ..., text, stringsAsFactors=F) {
         do.call(utils::read.table, args)
 }
 
-read.full.table = function(file, sep="\t", stringsAsFactors=F, ...) {
+read_full_table = function(file, sep="\t", stringsAsFactors=F, ...) {
     index = utils::read.table(file, sep=sep, stringsAsFactors=stringsAsFactors, ...)
     colnames(index) = index[1,]
     rownames(index) = index[,1]

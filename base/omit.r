@@ -35,7 +35,7 @@ na = function(x) {
         na.omit(x)
 }
 
-na.col = function(x, ...) {
+na_col = function(x, ...) {
     t(na.omit(t(x), ...))
 }
 
