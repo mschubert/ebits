@@ -16,9 +16,6 @@ import('./functional', attach = TRUE)
 index_mask = function (indices, length)
     is.element(1 : length, indices)
 
-#' Conditionally count elements.
-count = length %.% which
-
 #' Sort by a one or more given keys
 #'
 #' Apply an \code{order} directly to a target.
