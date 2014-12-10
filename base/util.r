@@ -1,4 +1,4 @@
-#import('./operators')
+import('./operators')
 
 grep = function(pattern, x, ...) {
     # http://stackoverflow.com/questions/2969315
@@ -97,3 +97,4 @@ maxN <- function(x, N=2){
 minN = function(x, N=2) {
     -maxN(-x, N) 
 }   
+
