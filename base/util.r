@@ -96,5 +96,4 @@ maxN <- function(x, N=2){
 
 minN = function(x, N=2) {
     -maxN(-x, N) 
-}   
-
+}
