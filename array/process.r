@@ -1,11 +1,10 @@
 # Array programming utility functions
 # Some tools to handle R^n matrices and perform operations on them
-library(abind)
 library(methods) # abind bug: relies on methods::Quote, which is not loaded from Rscript
-library(reshape2)
 library(dplyr)
-b = import('base')
+.b = import('base')
 import('./util', attach=T)
+.check = import('./checks')
 
 #' Stacks arrays while respecting names in each dimension
 #'
@@ -76,7 +75,8 @@ stack = function(arrayList, along=length(dim(arrayList[[1]]))+1, fill=NA, like=N
 #' @return           A joined array
 bind = function(arrayList, along=length(dim(arrayList[[1]]))+1) {
 #TODO: check names?, call bind when no stacking needed automatically?
-    do.call(function(f) abind(f, along=along), arrayList)
+#TODO: data.table::rbindlist?
+    do.call(function(f) abind::abind(f, along=along), arrayList)
 }
 
 #' Function to discard subsets of an array (NA or drop)
@@ -88,9 +88,11 @@ bind = function(arrayList, along=length(dim(arrayList[[1]]))+1) {
 #' @param na.rm    Whether to omit columns and rows with \code{NA}s
 #' @return         An array where filtered values are \code{NA} or dropped
 filter = function(X, along, FUN, subsets=rep(1,dim(X)[along]), na.rm=F) {
+    .check$all(X, along, subsets)
+
     X = as.array(X)
     # apply the function to get a subset mask
-    mask = map(X, along, function(x) FUN(x), subsets)
+    mask = as.array(map(X, along, function(x) FUN(x), subsets)) #FIXME: map should have drop=T/F
     if (mode(mask) != 'logical' || dim(mask)[1] != length(unique(subsets)))
         stop("FUN needs to return a single logical value")
 
@@ -100,19 +102,39 @@ filter = function(X, along, FUN, subsets=rep(1,dim(X)[along]), na.rm=F) {
                 X[subsets==msub] = NA #FIXME: work for matrices as well
 
     if (na.rm)
-        b$omit$na.col(na.omit(X))
+        .b$omit$na.col(na.omit(X))
     else
         X
 }
 
-#' The opposite of \code{melt()} for n-dimensional arrays
+#' A wrapper around reshape2::acast using a more intuitive formula syntax
 #'
-#' @param X      A \code{melt()}ed array
-#' @param value  Name of the field which contains the value
-#' @param axes   Names of the axes to reconstruct
-#' @return       An array with structure before \code{melt()}
-unmelt = function(X, value, axes) {
-    acast(as.data.frame(X), formula=as.formula(paste(axes, collapse = "~")), value.var=value)
+#' @param X              A data frame
+#' @param formula        A formula: value [+ value2 ..] ~ axis1 [+ axis2 + axis n ..]
+#' @param fill           Value to fill array with if undefined
+#' @param fun.aggregate  Function to aggregate multiple values for the same position
+#' @param ...            Additional arguments passed to reshape2::acast
+#' @return               A structured array
+construct = function(X, formula, fill=NULL, fun.aggregate=aggr_error, ...) {
+    if (!is.data.frame(X) && is.list(X)) #TODO: check, names at level 1 = '.id'
+        X = plyr::ldply(X, data.frame)
+#TODO: convert nested list to data.frame first as well?
+    dep_str = as.character(formula)[[2]]
+    indep_str = as.character(formula)[[3]]
+    vars = all.vars(formula)
+
+    dep_vars = vars[sapply(vars, function(v) grepl(v, dep_str))]
+    indep_vars = vars[sapply(vars, function(v) grepl(v, indep_str))]
+
+    form = as.formula(paste(indep_vars, collapse = "~"))
+    res = sapply(dep_vars, function(v) reshape2::acast(
+        as.data.frame(X), formula=form, value.var=v,
+        fill=fill, fun.aggregate=fun.aggregate, ...
+    ), simplify=FALSE)
+    if (length(res) == 1) #TODO: drop_list in base?
+        res[[1]]
+    else
+        res
 }
 
 #' Subsets an array using a list with indices or names
@@ -120,8 +142,8 @@ unmelt = function(X, value, axes) {
 #' @param X   The array to subset
 #' @param ll  The list to use for subsetting
 #' @return    The subset of the array
-subset = function(X, ll) {
-    asub(X, ll)
+subset = function(X, ll, drop=F) {
+    abind::asub(X, ll, drop=drop)
 }
 
 #' Apply function that preserves order of dimensions
@@ -145,7 +167,10 @@ map_simple = function(X, along, FUN) { #TODO: replace this by alply?
         }
         array(Y, dim=newdim, dimnames=newdimnames)
     } else {
-        aperm(Y, c(along, preserveAxes))
+        if (length(dim(Y)) < length(dim(X)))
+            Y
+        else
+            aperm(Y, c(along, preserveAxes))
     }
 }
 
@@ -157,9 +182,8 @@ map_simple = function(X, along, FUN) { #TODO: replace this by alply?
 #' @param subsets  Whether to apply \code{FUN} along the whole axis or subsets thereof
 #' @return         An array where \code{FUN} has been applied
 map = function(X, along, FUN, subsets=rep(1,dim(X)[along])) {
-    stopifnot(length(subsets) == dim(X)[along])
+    .check$all(X, along, subsets, x.to.array=TRUE)
 
-    X = as.array(X)
     subsets = as.factor(subsets)
     lsubsets = as.character(unique(subsets)) # levels(subsets) changes order!
     nsubsets = length(lsubsets)
@@ -175,11 +199,11 @@ map = function(X, along, FUN, subsets=rep(1,dim(X)[along])) {
 #    resultList = lapply(subsetIndices, function(x) alply(subset(X, f), along, FUN)) FIXME:
 
     # assemble results together
-    Y = do.call(function(...) abind(..., along=along), resultList)
-    if (dim(Y)[along] == dim(X)[along])
-        base::dimnames(Y)[[along]] = base::dimnames(X)[[along]]
-    else if (dim(Y)[along] == nsubsets)
+    Y = do.call(function(...) abind::abind(..., along=along), resultList)
+    if (dim(Y)[along] == nsubsets)
         base::dimnames(Y)[[along]] = lsubsets
+    else if (dim(Y)[along] == dim(X)[along])
+        base::dimnames(Y)[[along]] = base::dimnames(X)[[along]]
     drop(Y)
 }
 
@@ -189,15 +213,10 @@ map = function(X, along, FUN, subsets=rep(1,dim(X)[along])) {
 #' @param along    Along which axis to split
 #' @param subsets  Whether to split each element or keep some together
 #' @return         A list of arrays that combined make up the input array
-split = function(X, along, subsets=c(1:dim(X)[along])) {
+split = function(X, along, subsets=c(1:dim(X)[along]), drop=F) {
     if (!is.array(X) && !is.vector(X))
         stop("X needs to be either vector, array or matrix")
-    X = as.array(X)
-#TODO: check if names unique, otherwise weird error
-    if (is.character(along))
-        along = which(names(dim(X)) == along)
-
-    stopifnot(length(subsets)==dim(X)[along])
+    .check$all(X, along, subsets, x.to.array=TRUE)
 
     usubsets = unique(subsets)
     lus = length(usubsets)
@@ -206,11 +225,11 @@ split = function(X, along, subsets=c(1:dim(X)[along])) {
     for (i in 1:lus)
         idxList[[i]][[along]] = subsets==usubsets[i]
 
-    if (length(usubsets)==dim(X)[along])
-        lnames = base::dimnames(X)[[along]]
-    else
+    if (length(usubsets)!=dim(X)[along] || !is.numeric(subsets))
         lnames = usubsets
-    setNames(lapply(idxList, function(ll) subset(X, ll)), lnames)
+    else
+        lnames = base::dimnames(X)[[along]]
+    setNames(lapply(idxList, function(ll) subset(X, ll, drop=drop)), lnames)
 }
 
 #' Intersects all passed arrays along a give dimension, and modifies them in place
@@ -221,11 +240,13 @@ intersect = function(..., along=1) { #TODO: accept along=c(1,2,1,1...)
     l. = list(...)
     varnames = match.call(expand.dots=FALSE)$...
     namesalong = lapply(l., function(f) dimnames(as.array(f))[[along]])
-    common = do.call(b$intersect, namesalong)
+    common = do.call(.b$intersect, namesalong)
     for (i in seq_along(l.)) {
         dims = as.list(rep(T, length(dim(l.[[i]]))))
         dims[[along]] = common
-        assign(as.character(varnames[[i]]), value=asub(l.[[i]], dims), envir=parent.frame())
+        assign(as.character(varnames[[i]]),
+               value = abind::asub(l.[[i]], dims),
+               envir = parent.frame())
     }
 }
 
@@ -237,11 +258,11 @@ intersect = function(..., along=1) { #TODO: accept along=c(1,2,1,1...)
 intersect_list = function(x, along=1) {
     re = list()
     namesalong = lapply(x, function(f) base::dimnames(as.array(f))[[along]])
-    common = do.call(b$intersect, namesalong)
+    common = do.call(.b$intersect, namesalong)
     for (i in seq_along(x)) {
         dims = as.list(rep(T, length(dim(x[[i]]))))
         dims[[along]] = common
-        re[[names(x)[i]]] = asub(x[[i]], dims)
+        re[[names(x)[i]]] = abind::asub(x[[i]], dims)
     }
     re
 }
@@ -256,4 +277,41 @@ mask = function(x) {
 
     vectorList = lapply(x, function(xi) setNames(rep(T, length(xi)), xi))
     t(stack(vectorList, fill=F))
+}
+
+#' Summarize a matrix analogous to a grouped df in dplyr
+#'
+#' @param x      A matrix
+#' @param from   Names that match the dimension `along`
+#' @param to     Names that this dimension should be summarized to
+#' @param along  Along which axis to summarize
+#' @param FUN    Which function to apply, default is `mean`
+#' @return       A summarized matrix as defined by `from`, `to`
+summarize = function(x, to, from=rownames(x), along=1, FUN=aggr_error) {
+    if (!is.matrix(x))
+        stop('currently only matrices supported')
+    if (along!=1)
+        stop('currently only rows supported')
+
+    if (length(from) != length(to))
+        stop("arguments from and to need to be of the same length")
+
+    index = data.frame(from=from, to=to) %>%
+        .b$omit$dups() %>%
+        .b$omit$empty()
+    index = index[!.b$duplicated(index[,1], all=T),]
+
+    # subset x to where 'from' available
+    x = x[dimnames(x)[[along]] %in% index$from,]
+
+    # subset object to where 'to' is available
+    names_idx = match(dimnames(x)[[along]], index$from)
+    newnames = index$to[names_idx]
+    x = x[!is.na(newnames),] #TODO: better to remove NAs when creating index?
+    newnames = newnames[!is.na(newnames)]
+
+    # aggregate the rest using fun
+    split(x, along=along, subsets=newnames) %>%
+        lapply(function(x) map(x, along, FUN)) %>%
+        do.call(rbind, .)
 }

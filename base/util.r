@@ -1,20 +1,4 @@
-#import('./operators')
-
-# grep only matching group '(...)'
-grepo = function(pattern, x, ...) {
-    warning("this is deprecated, use b$grep instead")
-    # http://stackoverflow.com/questions/2969315
-    require(stringr)
-    if (!grepl("\\(", pattern))
-        re = function(pattern, x, ...) str_match(x, paste0("(", pattern, ")"))[, 2]
-    else
-        re = function(pattern, x, ...) str_match(x, pattern)[, 2]
-
-    if (length(pattern) == 1)
-        re(pattern, x, ...)
-    else
-        sapply(pattern, function(p) re(p, x, ...))
-}
+import('./operators')
 
 grep = function(pattern, x, ...) {
     # http://stackoverflow.com/questions/2969315
@@ -31,7 +15,7 @@ grep = function(pattern, x, ...) {
 }
 
 
-fuzzy.match = function(x, from, to) {
+fuzzy_match = function(x, from, to) {
     require(stringr)
 
     # 1st iteration: exact matches
@@ -89,12 +73,12 @@ dfdf = function(df, subs, exact=F, add.cols=F) {
         oldDf[idx,,drop=F]
 }
 
-num.unique = function(x) {
+num_unique = function(x) {
     x = as.factor(x)
     sapply(x, function(y) sum(y==x))
 }
 
-na.filter = function(X, rowmax=1, colmax=1) {
+na_filter = function(X, rowmax=1, colmax=1) {
     keepRow = rowSums(is.na(X))/dim(X)[2] <= rowmax
     keepCol = colSums(is.na(X))/dim(X)[1] <= colmax
     X[keepRow, keepCol]
@@ -112,5 +96,4 @@ maxN <- function(x, N=2){
 
 minN = function(x, N=2) {
     -maxN(-x, N) 
-}   
-
+}
