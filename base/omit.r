@@ -13,7 +13,7 @@ empty = function(x) {
         x[apply(x, 1, function(r) all(nchar(r)>0)),]
     else if (is.character(x) && is.vector(x))
         x[sapply(x, nchar) != 0]
-    else if (is.data.frame(x) && all(sapply(x, function(col) is.character(col))))
+    else if (is.data.frame(x))
         x[apply(x, 1, function(r) all(nchar(r)>0)),]
     else if (is.list(x))
         x[sapply(x, length) != 0]
