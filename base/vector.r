@@ -16,6 +16,45 @@ import('./functional', attach = TRUE)
 index_mask = function (indices, length)
     is.element(1 : length, indices)
 
+
+#' Like \code{table}, but allows specifying a vector of labels
+#'
+#' \code{table} does not know what values to expect; as a consequence, it does
+#' not tabulate non-existent values (see Examples). \code{table_of} amends this,
+#' and yields complete count tables, which are sometimes more useful.
+#' @param data vector to tabulate, which is internally passed to \code{table}
+#' @param labels complete vector of all possible values being counted
+#' @return A complete count table of the \code{data}, where the possible values
+#' are in the order specified by \code{labels}. Values which do not occur in
+#' \code{data} are set to \code{0}.
+#' @examples
+#' \dontrun{
+#' a = c(TRUE, FALSE, FALSE, FALSE, TRUE, FALSE)
+#' b = rep(TRUE, 4)
+#' table(a)
+#' # a
+#' # FALSE  TRUE
+#' #     4     2
+#' table(b)
+#' # b
+#' # TRUE
+#' #    4
+#' table_of(a, c(TRUE, FALSE))
+#' # TRUE FALSE
+#' #    2     4
+#' table_of(b, c(TRUE, FALSE))
+#' # TRUE FALSE
+#' #    4     0
+#' }
+table_of = function (data, labels) {
+    tbl = table(data)
+    label_pos = match(labels, names(tbl))
+    tbl = tbl[label_pos]
+    names(tbl) = labels
+    tbl[is.na(tbl)] = 0
+    `class<-`(tbl, 'table')
+}
+
 #' Sort by a one or more given keys
 #'
 #' Apply an \code{order} directly to a target.
