@@ -22,11 +22,12 @@ read_table = function (file, ..., text, stringsAsFactors=F) {
     if (missing(file))
         return(do.call(utils::read.table, c(args, text = text)))
 
+    extension = b$grep('(\\.\\w+)(\\.gz)?$', file)[1]
+
     if (! ('sep' %in% names(args))) {
         separators = list('.csv' = ',',
                           '.tsv' = '\t',
                           '.txt' = '\t')
-        extension = b$grep('(\\.\\w+)(\\.gz)?$', file)[1]
         args$sep = separators[[extension]]
     }
 
