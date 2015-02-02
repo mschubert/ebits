@@ -30,6 +30,7 @@ match = function(x, from, to, fuzzy_level=0, table=FALSE) {
     }
 
     # return best match
+    from = from[index[[1]]]
     index = lapply(index, function(i) to[i])
     b = import('./operators', attach_operators=FALSE)
     re = Reduce(b$`%or%`, index)
@@ -37,7 +38,7 @@ match = function(x, from, to, fuzzy_level=0, table=FALSE) {
     if (table && fuzzy_level == 0)
         cbind(x=x, to=re)
     else if (table && fuzzy_level > 0)
-        cbind(x=x, to=re, as.data.frame(index))
+        cbind(x=x, from=from, to=re, as.data.frame(index))
     else
         re
 }
