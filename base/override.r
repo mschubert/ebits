@@ -32,9 +32,11 @@ match = function(x, from, to, fuzzy_level=0, table=FALSE) {
     # return best match
     index = lapply(index, function(i) to[i])
     b = import('./operators', attach_operators=FALSE)
-    re = Reduce(b$`%or%`, index) #TODO: support table here?
+    re = Reduce(b$`%or%`, index)
 
-    if (table)
+    if (table && fuzzy_level == 0)
+        cbind(x=x, to=re)
+    else if (table && fuzzy_level > 0)
         cbind(x=x, to=re, as.data.frame(index))
     else
         re
