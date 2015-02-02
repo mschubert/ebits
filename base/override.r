@@ -2,6 +2,49 @@
 ### general utility functions without specific use
 ###
 
+#' match() function with extended functionality
+#'
+#' @param x            Vector of identifiers that should be mapped
+#' @param from         Vector of identifiers that can be mapped
+#' @param to           Matched mapping for all identifiers
+#' @param fuzzy_level  0 for exact, 1 punctuation, and 2 closest character
+#' @param table        Return a matching table instead of just the matches
+match = function(x, from, to, fuzzy_level=0, table=FALSE) {
+    # 1st iteration: exact matches
+    index = list(level0 = base::match(x, from))
+
+    # 2nd iteration: non-punctuation exact matches
+    if (fuzzy_level > 0) {
+        FROM = stringr::str_replace_all(toupper(from), "[[:punct:]]", "")
+        x = stringr::str_replace_all(x, "[[:punct:]]", "")
+        index$level1 = base::match(x, FROM)
+    }
+
+    # 3rd iteration: closest string matches w/o punctuation
+    if (fuzzy_level > 1) {
+        distances = adist(FROM, x)
+        mind = apply(distances, 2, min)
+        nmin = sapply(1:length(mind), function(i) sum(mind[i]==distances[,i]))
+        mind[nmin>1] = NA # no non-unique matches
+        index$level2 = sapply(1:length(mind), function(i) which(distances[,i]==mind[i]) %or% NA)
+    }
+
+    # return best match
+    index = lapply(index, function(i) to[i])
+    b = import('./operators', attach_operators=FALSE)
+    re = Reduce(b$`%or%`, index) #TODO: support table here?
+
+    if (table)
+        cbind(x=x, to=re, as.data.frame(index))
+    else
+        re
+}
+
+#' duplicated() function with extended functionality
+#'
+#' @param ...     Arguments to be passed to R's `duplicated()`
+#' @param all     Return all instances of duplicated entries
+#' @param random  Randomly select with entry is marked as duplicate
 duplicated = function(x, ..., all=F, random=F) {
     if (all && random)
         stop("Can not return all and randomly selected duplicates")
@@ -32,17 +75,10 @@ duplicated = function(x, ..., all=F, random=F) {
         base::duplicated(x, ...)
 }
 
+#' intersect() function that takes an arbitrary number of elements
+#'
+#' @param ...  Arbitrary elements that `base::intersect` should be called on
 intersect = function(...) {
-    intsct = list(...)
-    if (length(intsct)==1 && is.list(intsct[[1]]))
-        intsct = intsct[[1]]
-
-    result = intsct[[1]]
-
-    if (length(intsct) > 1) {
-        for (i in 2:length(intsct))
-            result = base::intersect(result, intsct[[i]])
-    }
-    result
+    Reduce(base::intersect, list(...))
 }
 
