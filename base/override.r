@@ -40,7 +40,7 @@ match = function(x, from, to, fuzzy_level=0, table=FALSE) {
     else if (table && fuzzy_level > 0)
         cbind(x=x, from=from, to=re, as.data.frame(index))
     else
-        re
+        setNames(re, from)
 }
 
 #' duplicated() function with extended functionality
