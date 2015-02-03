@@ -12,15 +12,24 @@ file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
     do.call(base::file.path, c(dots, fsep = fsep))
 }
 
+.set_defaults = function (call, .formals = formals(sys.function(sys.parent()))) {
+    for (n in names(.formals))
+        if (n != '...' && ! (n %in% names(call)))
+            call[[n]] = .formals[[n]]
+
+    call
+}
+
 #' Augment \code{\link{utils::read.table}} by a mechanism to guess the file format.
 #'
 #' For the moment, only separators are handled based on the file extension.
 #' This might change in the future to be more powerful, think Python’s
 #' \code{csv.Sniffer} class.
-read_table = function (file, ..., text, stringsAsFactors=F) {
-    args = list(...)
+read_table = function (file, ..., stringsAsFactors = FALSE) {
+    call = .set_defaults(match.call(expand.dots = TRUE))
+
     if (missing(file))
-        return(do.call(utils::read.table, c(args, text = text)))
+        return(eval.parent(call))
 
     extension = .b$grep('\\.(\\w+)(\\.gz)?$', file)[1]
 
@@ -31,13 +40,10 @@ read_table = function (file, ..., text, stringsAsFactors=F) {
         call$sep = separators[[extension]]
     }
 
-    args$file = file
-    args$stringsAsFactors = stringsAsFactors
 
-    if (extension == ".xlsx")
-        do.call(xlsx::read.xlsx, args)
-    else
-        do.call(utils::read.table, args)
+    call[[1]] = if (extension == 'xlsx')
+        quote(xlsx::read.xlsx) else quote(read.table)
+    eval.parent(call)
 }
 
 read_full_table = function(file, sep="\t", stringsAsFactors=F, ...) {
