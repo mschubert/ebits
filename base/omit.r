@@ -3,9 +3,9 @@
 #' Removes NULL (length 0) objects from lists
 #'
 #' @param x     A list
-#' @param null  Whether or not to perform action
-null = function(x, null=TRUE){
-    if (!null)
+#' @param omit  Whether or not to perform action
+null = function(x, omit=TRUE){
+    if (!omit)
         x
     else
         x[sapply(x, length) != 0]
@@ -14,9 +14,9 @@ null = function(x, null=TRUE){
 #' Removes `0` elements from an object
 #'
 #' @param x     A vector, matrix, or data.frame
-#' @param zero  Whether or not to perform action
-zero = function(x, zero=TRUE) {
-    if (!zero)
+#' @param omit  Whether or not to perform action
+zero = function(x, omit=TRUE) {
+    if (!omit)
         x
     else if (is.vector(x))
         x[x!=0]
@@ -29,9 +29,9 @@ zero = function(x, zero=TRUE) {
 #' Remove empty entries in character objects
 #'
 #' @param x      A vector, matrix, or data.frame
-#' @param empty  Whether or not to perform action
-empty = function(x, empty=TRUE) {
-    if (!empty)
+#' @param omit  Whether or not to perform action
+empty = function(x, omit=TRUE) {
+    if (!omit)
         x
     else if (is.matrix(x) || is.data.frame(x))
         x[apply(x, 1, function(r) all(nchar(r)>0)),]
@@ -47,9 +47,9 @@ empty = function(x, empty=TRUE) {
 #'
 #' @param x     Object to drop duplicates from
 #' @param ...   Arguments to pass to b$duplicated
-#' @param dups  Whether or not to perform action
-dups = function(x, ..., dups=TRUE) {
-    if (!dups)
+#' @param omit  Whether or not to perform action
+dups = function(x, ..., omit=TRUE) {
+    if (!omit)
         x
     else if (is.vector(x))
         x[!.ov$duplicated(x, ...)]
