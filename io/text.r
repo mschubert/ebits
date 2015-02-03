@@ -1,5 +1,5 @@
 # I/O helper functions on text files
-b = import('../base', attach_operators=F)
+.b = import('../base', attach_operators=F)
 
 #' Add \code{ext}ension parameter to \link{\code{base::file.path}}
 file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
@@ -22,13 +22,13 @@ read_table = function (file, ..., text, stringsAsFactors=F) {
     if (missing(file))
         return(do.call(utils::read.table, c(args, text = text)))
 
-    extension = b$grep('(\\.\\w+)(\\.gz)?$', file)[1]
+    extension = .b$grep('\\.(\\w+)(\\.gz)?$', file)[1]
 
-    if (! ('sep' %in% names(args))) {
-        separators = list('.csv' = ',',
-                          '.tsv' = '\t',
-                          '.txt' = '\t')
-        args$sep = separators[[extension]]
+    if (! ('sep' %in% names(call))) {
+        separators = list(csv = ',',
+                          tsv = '\t',
+                          txt = '\t')
+        call$sep = separators[[extension]]
     }
 
     args$file = file
