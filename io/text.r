@@ -40,9 +40,26 @@ read_table = function (file, ..., stringsAsFactors = FALSE) {
         call$sep = separators[[extension]]
     }
 
-
     call[[1]] = if (extension == 'xlsx')
         quote(xlsx::read.xlsx) else quote(read.table)
+    eval.parent(call)
+}
+
+write_table = function (x, file = '', quote = FALSE, row.names = FALSE) {
+    call = .set_defaults(match.call(expand.dots = TRUE))
+
+    if (file == '')
+        return(eval.parent(call))
+
+    if (! ('sep' %in% names(call))) {
+        extension = .b$grep('\\.(\\w+)(\\.gz)?$', file)[1]
+        separators = list(csv = ',',
+                          tsv = '\t',
+                          txt = '\t')
+        call$sep = separators[[extension]]
+    }
+
+    call[[1]] = quote(write.table)
     eval.parent(call)
 }
 
