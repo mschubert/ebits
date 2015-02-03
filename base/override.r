@@ -1,6 +1,7 @@
 ###
 ### general utility functions without specific use
 ###
+.op = import('./operators', attach_operators=FALSE)
 .omit = import('./omit')
 
 #' match() function with extended functionality
@@ -38,22 +39,20 @@ match = function(x, from, to, filter_from=NULL, filter_to=NULL,
         nmin = sapply(1:length(mind), function(i) sum(mind[i]==distances[,i]))
         mind[nmin>1] = NA # no non-unique matches
         index$level2 = sapply(1:length(mind), function(i)
-            which(distances[,i]==mind[i]) %or% NA)
+            .op$`%or%`(which(distances[,i]==mind[i]), NA))
     }
 
     # return best match
-    from = from[index[[1]]]
-    index = lapply(index, function(i) to[i])
-    b = import('./operators', attach_operators=FALSE)
-    re = Reduce(b$`%or%`, index)
+    re = Reduce(.op$`%or%`, index)
+    from = from[re]
+    to = to[re]
 
     if (table && fuzzy_level == 0)
-        .omit$na(cbind(x=x, to=re), omit=na_rm)
+        .omit$na(data_frame(x=x, to=to), omit=na_rm)
     else if (table && fuzzy_level > 0)
-        .omit$na(cbind(x=x, from=from, to=re, as.data.frame(index)),
-                 cols=c('x','to'), omit=na_rm)
+        .omit$na(data_frame(x=x, from=from, to=to), cols=c('x','to'), omit=na_rm)
     else
-        .omit$na(setNames(re, from), omit=na_rm)
+        .omit$na(setNames(to, from), omit=na_rm)
 }
 
 #' duplicated() function with extended functionality
