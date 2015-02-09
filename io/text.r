@@ -1,5 +1,5 @@
 # I/O helper functions on text files
-b = import('base', attach_operators=F)
+.b = import('../base', attach_operators=F)
 
 #' Add \code{ext}ension parameter to \link{\code{base::file.path}}
 file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
@@ -12,32 +12,55 @@ file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
     do.call(base::file.path, c(dots, fsep = fsep))
 }
 
+.set_defaults = function (call, .formals = formals(sys.function(sys.parent()))) {
+    for (n in names(.formals))
+        if (n != '...' && ! (n %in% names(call)))
+            call[[n]] = .formals[[n]]
+
+    call
+}
+
 #' Augment \code{\link{utils::read.table}} by a mechanism to guess the file format.
 #'
 #' For the moment, only separators are handled based on the file extension.
 #' This might change in the future to be more powerful, think Python’s
 #' \code{csv.Sniffer} class.
-read_table = function (file, ..., text, stringsAsFactors=F) {
-    args = list(...)
+read_table = function (file, ..., stringsAsFactors = FALSE) {
+    call = .set_defaults(match.call(expand.dots = TRUE))
+
     if (missing(file))
-        return(do.call(utils::read.table, c(args, text = text)))
+        return(eval.parent(call))
 
-    extension = b$grep('(\\.\\w+)(\\.gz)?$', file)[1]
+    extension = .b$grep('\\.(\\w+)(\\.gz)?$', file)[1]
 
-    if (! ('sep' %in% names(args))) {
-        separators = list('.csv' = ',',
-                          '.tsv' = '\t',
-                          '.txt' = '\t')
-        args$sep = separators[[extension]]
+    if (! ('sep' %in% names(call))) {
+        separators = list(csv = ',',
+                          tsv = '\t',
+                          txt = '\t')
+        call$sep = separators[[extension]]
     }
 
-    args$file = file
-    args$stringsAsFactors = stringsAsFactors
+    call[[1]] = if (extension == 'xlsx')
+        quote(xlsx::read.xlsx) else quote(read.table)
+    eval.parent(call)
+}
 
-    if (extension == ".xlsx")
-        do.call(xlsx::read.xlsx, args)
-    else
-        do.call(utils::read.table, args)
+write_table = function (x, file = '', quote = FALSE, row.names = FALSE) {
+    call = .set_defaults(match.call(expand.dots = TRUE))
+
+    if (file == '')
+        return(eval.parent(call))
+
+    if (! ('sep' %in% names(call))) {
+        extension = .b$grep('\\.(\\w+)(\\.gz)?$', file)[1]
+        separators = list(csv = ',',
+                          tsv = '\t',
+                          txt = '\t')
+        call$sep = separators[[extension]]
+    }
+
+    call[[1]] = quote(write.table)
+    eval.parent(call)
 }
 
 read_full_table = function(file, sep="\t", stringsAsFactors=F, ...) {

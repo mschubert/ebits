@@ -1,15 +1,27 @@
 ###
 ### general utility functions without specific use
 ###
+.op = import('./operators', attach_operators=FALSE)
+.omit = import('./omit')
 
 #' match() function with extended functionality
 #'
 #' @param x            Vector of identifiers that should be mapped
 #' @param from         Vector of identifiers that can be mapped
 #' @param to           Matched mapping for all identifiers
+#' @param filter_from  Restrict matching to a subset from `from`
+#' @param filter_to    Restrict matching to a subset from `to`
 #' @param fuzzy_level  0 for exact, 1 punctuation, and 2 closest character
 #' @param table        Return a matching table instead of just the matches
-match = function(x, from, to, fuzzy_level=0, table=FALSE) {
+#' @param na_rm        Flag to remove items that can not be mapped
+match = function(x, from, to, filter_from=NULL, filter_to=NULL,
+                 fuzzy_level=0, table=FALSE, na_rm=FALSE) {
+    # filter matching table
+    if (!is.null(filter_from))
+        to[!from %in% filter_from] = NA
+    if (!is.null(filter_to))
+        to[!to %in% filter_to] = NA
+
     # 1st iteration: exact matches
     index = list(level0 = base::match(x, from))
 
@@ -26,21 +38,21 @@ match = function(x, from, to, fuzzy_level=0, table=FALSE) {
         mind = apply(distances, 2, min)
         nmin = sapply(1:length(mind), function(i) sum(mind[i]==distances[,i]))
         mind[nmin>1] = NA # no non-unique matches
-        index$level2 = sapply(1:length(mind), function(i) which(distances[,i]==mind[i]) %or% NA)
+        index$level2 = sapply(1:length(mind), function(i)
+            .op$`%or%`(which(distances[,i]==mind[i]), NA))
     }
 
     # return best match
-    from = from[index[[1]]]
-    index = lapply(index, function(i) to[i])
-    b = import('./operators', attach_operators=FALSE)
-    re = Reduce(b$`%or%`, index)
+    re = Reduce(.op$`%or%`, index)
+    from = from[re]
+    to = to[re]
 
     if (table && fuzzy_level == 0)
-        cbind(x=x, to=re)
+        .omit$na(data_frame(x=x, to=to), omit=na_rm)
     else if (table && fuzzy_level > 0)
-        cbind(x=x, from=from, to=re, as.data.frame(index))
+        .omit$na(data_frame(x=x, from=from, to=to), cols=c('x','to'), omit=na_rm)
     else
-        setNames(re, from)
+        .omit$na(setNames(to, from), omit=na_rm)
 }
 
 #' duplicated() function with extended functionality
