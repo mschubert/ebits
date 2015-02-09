@@ -5,7 +5,8 @@
                             is.null(a) || 
                             is.na(a) || 
                             is.nan(a) || 
-                            length(a) == 0) b else a
+                            length(a) == 0 ||
+                            nchar(a) == 0) b else a
 
     if (is.list(a))
         lapply(1:length(a), function(i) cmp(a[[i]], b[[i]]))
