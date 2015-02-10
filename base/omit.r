@@ -1,5 +1,3 @@
-.ov = import('./override')
-
 #' Removes NULL (length 0) objects from lists
 #'
 #' @param x     A list
@@ -49,12 +47,14 @@ empty = function(x, omit=TRUE) {
 #' @param ...   Arguments to pass to b$duplicated
 #' @param omit  Whether or not to perform action
 dups = function(x, ..., omit=TRUE) {
+    ov = import('./override')
+
     if (!omit)
         x
     else if (is.vector(x))
-        x[!.ov$duplicated(x, ...)]
+        x[!ov$duplicated(x, ...)]
     else if (is.matrix(x) || is.data.frame(x))
-        x[!.ov$duplicated(x, ...),]
+        x[!ov$duplicated(x, ...),]
     else
         stop("can only work on vector/matrix so far")
 }
