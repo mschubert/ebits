@@ -62,11 +62,11 @@ na_filter = function(X, rowmax=1, colmax=1) {
 }
 
 ### n-th max value
-maxN <- function(x, N=2){
-    len <- length(x)
+maxN = function(x, N=2){
+    len = length(x)
     if(N>len){
         warning('N greater than length(x).  Setting N=length(x)')
-        N <- length(x)
+        N = length(x)
     }
     sort(x, decreasing=T)[N]
 }
