@@ -13,6 +13,17 @@ grep = function(pattern, x, ...) {
         sapply(pattern, function(p) re(p, x, ...))
 }
 
+descriptive_index = function(x) {
+    if (!is.null(names(x)))
+        names(x)
+    else if ((is.character(x) || is.numeric(x)) &&
+             (is.vector(x) || length(dim(x))==1))
+        x
+    else if (is.list(x)) # list and data.frame
+        seq_along(x)
+    else
+        stop("Not sure how to get indices on that object")
+}
 
 # subset a data.frame with a data.frame
 # compare everything as characters
