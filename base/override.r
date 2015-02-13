@@ -16,11 +16,22 @@
 #' @param na_rm        Flag to remove items that can not be mapped
 match = function(x, from, to, filter_from=NULL, filter_to=NULL,
                  fuzzy_level=0, table=FALSE, na_rm=FALSE) {
+
+    if (length(from) != length(to))
+        stop("arguments `from` and `to` need to be of the same length")
+
     # filter matching table
     if (!is.null(filter_from))
         to[!from %in% filter_from] = NA
     if (!is.null(filter_to))
         to[!to %in% filter_to] = NA
+
+    # remove identical mappings, then map ambivalent to NA
+    df = data.frame(from=from, to=to) %>% .omit$dups()
+    df$to[duplicated(df$from, all=TRUE)] = NA
+    df = .omit$dups(df)
+    from = df$from
+    to = df$to
 
     # 1st iteration: exact matches
     index = list(level0 = base::match(x, from))
