@@ -2,9 +2,8 @@ import('./operators')
 
 grep = function(pattern, x, ...) {
     # http://stackoverflow.com/questions/2969315
-    require(stringr)
     if (grepl("[^\\]\\(", pattern) || grepl("^\\(", pattern))
-        re = function(pattern, x, ...) str_match(x, pattern)[,-1]
+        re = function(pattern, x, ...) stringr::str_match(x, pattern)[,-1]
     else
         re = function(pattern, x, ...) base::grep(pattern, x, value=T, ...)
 
@@ -14,27 +13,16 @@ grep = function(pattern, x, ...) {
         sapply(pattern, function(p) re(p, x, ...))
 }
 
-
-fuzzy_match = function(x, from, to) {
-    require(stringr)
-
-    # 1st iteration: exact matches
-    index1 = match(x, from)
-
-    # 2nd iteration: non-punctuation exact matches
-    FROM = str_replace_all(toupper(from), "[[:punct:]]", "")
-    x = str_replace_all(x, "[[:punct:]]", "")
-    index2 = match(x, FROM)
-
-    # 3rd iteration: closest string matches w/o punctuation
-    distances = adist(FROM, x)
-    mind = apply(distances, 2, min)
-    nmin = sapply(1:length(mind), function(i) sum(mind[i]==distances[,i]))
-    mind[nmin>1] = NA # no non-unique matches
-    index3 = sapply(1:length(mind), function(i) which(distances[,i]==mind[i]) %or% NA)
-
-    # return best match
-    to[index1 %or% index2 %or% index3]
+descriptive_index = function(x) {
+    if (!is.null(names(x)))
+        names(x)
+    else if ((is.character(x) || is.numeric(x)) &&
+             (is.vector(x) || length(dim(x))==1))
+        x
+    else if (is.list(x)) # list and data.frame
+        seq_along(x)
+    else
+        stop("Not sure how to get indices on that object")
 }
 
 # subset a data.frame with a data.frame
@@ -85,16 +73,15 @@ na_filter = function(X, rowmax=1, colmax=1) {
 }
 
 ### n-th max value
-maxN <- function(x, N=2){
-    len <- length(x)
+maxN = function(x, N=2){
+    len = length(x)
     if(N>len){
         warning('N greater than length(x).  Setting N=length(x)')
-        N <- length(x)
+        N = length(x)
     }
     sort(x, decreasing=T)[N]
 }
 
 minN = function(x, N=2) {
     -maxN(-x, N) 
-}   
-
+}
