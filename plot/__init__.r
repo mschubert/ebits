@@ -1,3 +1,7 @@
 export_submodule('./box')
 export_submodule('./volcano')
 export_submodule('./linear_fit')
+export_submodule('./heatmap')
+export_submodule('./matrix')
+export_submodule('./venn')
+export_submodule('./color')
