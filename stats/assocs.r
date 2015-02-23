@@ -1,6 +1,7 @@
 # linear associations (anova-like)
 .b = import('../base', attach_operators=FALSE)
 .ar = import('../array')
+`%catch%` = .b$`%catch%`
 
 assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") {
     # get data from parent.env
@@ -17,11 +18,14 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") 
     if (length(diff) > 0)
         stop(paste("Grouped iterations only make sense for matrix vars:", diff))
 
-    data
-#    .ar$map(.assocs_subset) # get all subset dfs, merge w/ additional column
+    if (!is.null(subsets))
+        stop("subsets not implemented yet")
+
+    .assocs_subset(formula, data, group, min_pts)
+    # p-adjust: group by term, adjust for each
 }
 
-assocs_subset = function(formula, data, group=NULL, min_pts=3, p_adjust="fdr") {
+.assocs_subset = function(formula, data, group=NULL, min_pts=3) {
     formula_vars = all.vars(formula)
     matrix_vars = formula_vars[sapply(formula_vars, function(x) ncol(data[[x]]) > 1)]
 
@@ -42,15 +46,14 @@ assocs_subset = function(formula, data, group=NULL, min_pts=3, p_adjust="fdr") {
         cur_data = data[setdiff(formula_vars, matrix_vars)]
         for (var in matrix_vars)
             cur_data[[var]] = data[[var]][,i]
-        .lm(formula, data=cur_data)
+        .lm(formula, data=cur_data, params=index_row)
     }
-    lapply(1:nrow(index), irow2result)
+    do.call(rbind, lapply(1:nrow(index), irow2result))
 }
 
-.lm = function(formula, data) {
-    fit = lm(formula, data=data) %catch% NA
-# effect/pvalue for all variables in there?
-# could just return (tidy) result object and let user filter it after
+.lm = function(formula, data, params) {
+    rownames(params) = NULL
+    cbind(params, broom::tidy(lm(formula, data=data))) %catch% NULL
 }
 
 .cox = function(formula) {
