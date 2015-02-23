@@ -28,6 +28,8 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") 
 }
 
 assocs_subset = function(formula, data, group=NULL, min_pts=3, p_adjust="fdr") {
+#TODO: could convert all vars into matrices
+#  then use the index for all columns everywhere (maybe drop=T/F for unused result df cols)
     formula_vars = all.vars(formula)
     matrix_vars = formula_vars[sapply(formula_vars, function(x) is.matrix(data[[x]]))]
 
@@ -43,18 +45,17 @@ assocs_subset = function(formula, data, group=NULL, min_pts=3, p_adjust="fdr") {
         index[[var]] = index[[anchor]]
 
     # replace data by their subsets, call assocs function with all of them
-    if (nrow(index) == 0) {
-        .lm(formula, data=data)
-    } else {
-        for (index_i in 1:nrow(index)) {
-            index_row = index[index_i,,drop=TRUE] # named list
-            cur_data = data[setdiff(formula_vars, matrix_vars)]
-            for (var in matrix_vars)
-                cur_data[[var]] = data[[var]][,index_i]
-#            .lm(formula, data=cur_data)
-            print(cur_data)
-        }
+    irow2result = function(i) {
+        index_row = index[index_i,,drop=TRUE] # named list
+        cur_data = data[setdiff(formula_vars, matrix_vars)]
+        for (var in matrix_vars)
+            cur_data[[var]] = data[[var]][,index_i]
+        .lm(formula, data=cur_data)
     }
+    if (nrow(index) == 0)
+        list(.lm(formula, data=data))
+    else
+        lapply(1:nrow(index), irow2result)
 }
 
 # formula should contain single vars here, no matrices
