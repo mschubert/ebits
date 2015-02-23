@@ -8,8 +8,8 @@ import('./helpers', attach=T)
 color = import('./color')
 label = import('./label')
 
-drawVolcano = function(df, base.size=1, p=0.05, ylim=c(NA,NA)) {
-    df = df %>% #TODO: warn if removing points
+volcano = function(df, base.size=1, p=0.05, ylim=c(NA,NA)) {
+    df = df %>% #TODO: warn if removing points?
         filter(pvalue < p | abs(effect)<max(abs(effect[pvalue<p]), na.rm=T)) %>%
         mutate(size = size*base.size)
 

@@ -42,11 +42,11 @@ matrix = function(data, row="row", col="col", value="value",
 #    M = data.frame(row = names(data), M)
 #    M = melt(M, id.vars = "row")
 #    M$value[M$value == 0] = NA
-    M$value = cut(M$value, breaks = s, include.lowest = TRUE,
-                  label = cut(s, breaks = s)[-1])
+#    M$value = cut(M$value, breaks = s, include.lowest = TRUE,
+#                  label = cut(s, breaks = s)[-1])
     M$row = factor(M$row, levels = unique(as.character(M$variable)))
-    M$num = as.numeric(M$value)
-    diag  = subset(M, row == variable)
+#    M$num = as.numeric(M$value)
+#    diag  = subset(M, row == variable)
 
     # clean plot panel
     po.nopanel = list(theme(
@@ -86,7 +86,8 @@ matrix = function(data, row="row", col="col", value="value",
 
     # add diagonal and options
     p  +
-        geom_text(data = diag, aes(label = variable), ...) +
+#       geom_text(data = diag, aes(label = variable), ...) +
+        geom_text(data = M, aes(label = variable), ...) +
         scale_x_discrete(breaks = NULL) +
         scale_y_discrete(breaks = NULL) +
         labs(x = NULL, y = NULL) +

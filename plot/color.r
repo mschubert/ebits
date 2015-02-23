@@ -37,12 +37,15 @@ palettes = function() {
 #' @param color     Field name of variable to save colours to
 #' @param palette   ColorBrewer palette to use
 #' @param na        Colour to use if value is NA
-#' @param quantize  Sequence of breaks - e.g.: `seq(-1,1,by=0.25)` or `FALSE`
+#' @param quantize  Number of colours or sequence of breaks - e.g.: `seq(-1,1,by=0.25)`
 #TODO: alpha?
-brew = function(df, value="value", color="color", palette="RdYlBu", na=NA, quantize=FALSE) {
-    if (identical(quantize, FALSE)) {
-        n_col = 100
-        quantize = do.call(seq.int, c(as.list(range(df[[value]])), list(length.out=n_col)))
+#TODO: handle categorical, mix between categorical+continuous [subsets=]
+brew = function(df, value="value", color="color", palette="RdYlBu", na=NA, quantize=100) {
+    if (length(quantize) == 1) {
+        n_col = quantize
+        quantize = seq(from = min(df[[value]], na.rm=TRUE),
+                       to = max(df[[value]], na.rm=TRUE),
+                       length.out = n_col)
     } else
         n_col = length(quantize)
 
@@ -59,6 +62,3 @@ brew = function(df, value="value", color="color", palette="RdYlBu", na=NA, quant
     df[[color]][is.na(df[[color]])] = na
     df
 }
-
-#gradient = function(df, value="value", color="color", low=, mid=, high=, na=NA) {
-#}
