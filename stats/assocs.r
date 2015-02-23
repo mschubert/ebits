@@ -3,20 +3,14 @@
 .ar = import('../array')
 
 assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") {
-    # check if all referenced variables are either matrix or vector
     # get data from parent.env
     formula_vars = all.vars(formula)
     data = sapply(formula_vars, function(x)
-        base::get(x, envir=parent.env(environment())),
+        as.matrix(base::get(x, envir=parent.env(environment()))),
         USE.NAMES=TRUE, simplify=FALSE
     )
 
-    vector_vars = formula_vars[sapply(formula_vars, function(x) is.vector(data[[x]]))]
-    matrix_vars = formula_vars[sapply(formula_vars, function(x) is.matrix(data[[x]]))]
-
-    diff = setdiff(formula_vars, c(vector_vars, matrix_vars))
-    if (length(diff) > 0)
-        stop(paste("All variables need to be vector or matrix:", diff))
+    matrix_vars = formula_vars[sapply(formula_vars, function(x) ncol(data[[x]] > 1))]
 
     # check groups
     diff = setdiff(group, matrix_vars)
@@ -24,19 +18,17 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") 
         stop(paste("Grouped iterations only make sense for matrix vars:", diff))
 
     data
-#    .ar$map(.assocs_subset) # how?
+#    .ar$map(.assocs_subset) # get all subset dfs, merge w/ additional column
 }
 
 assocs_subset = function(formula, data, group=NULL, min_pts=3, p_adjust="fdr") {
-#TODO: could convert all vars into matrices
-#  then use the index for all columns everywhere (maybe drop=T/F for unused result df cols)
     formula_vars = all.vars(formula)
-    matrix_vars = formula_vars[sapply(formula_vars, function(x) is.matrix(data[[x]]))]
+    matrix_vars = formula_vars[sapply(formula_vars, function(x) ncol(data[[x]]) > 1)]
 
     # create a data.frame that provides indices for formula data given
     anchor = group[1]
     grouped = group[2:length(group)]
-    ungrouped = setdiff(matrix_vars, grouped)
+    ungrouped = setdiff(formula_vars, grouped)
     index = do.call(expand.grid, sapply(ungrouped, function(x)
         .b$descriptive_index(data[[x]], along=2),
         USE.NAMES=TRUE, simplify=FALSE)
@@ -46,19 +38,15 @@ assocs_subset = function(formula, data, group=NULL, min_pts=3, p_adjust="fdr") {
 
     # replace data by their subsets, call assocs function with all of them
     irow2result = function(i) {
-        index_row = index[index_i,,drop=TRUE] # named list
+        index_row = index[i,,drop=TRUE] # named list
         cur_data = data[setdiff(formula_vars, matrix_vars)]
         for (var in matrix_vars)
-            cur_data[[var]] = data[[var]][,index_i]
+            cur_data[[var]] = data[[var]][,i]
         .lm(formula, data=cur_data)
     }
-    if (nrow(index) == 0)
-        list(.lm(formula, data=data))
-    else
-        lapply(1:nrow(index), irow2result)
+    lapply(1:nrow(index), irow2result)
 }
 
-# formula should contain single vars here, no matrices
 .lm = function(formula, data) {
     fit = lm(formula, data=data) %catch% NA
 # effect/pvalue for all variables in there?
