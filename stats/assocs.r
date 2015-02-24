@@ -10,10 +10,11 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") 
         as.matrix(base::get(x, envir=parent.env(environment()))),
         USE.NAMES=TRUE, simplify=FALSE
     )
-
-    matrix_vars = formula_vars[sapply(formula_vars, function(x) ncol(data[[x]] > 1))]
+    matrix_vars = formula_vars[sapply(data, ncol) > 1]
 
     # check groups
+    if (!is.null(group) && !is.character(group))
+        stop("group needs to be NULL or a character vector")
     diff = setdiff(group, matrix_vars)
     if (length(diff) > 0)
         stop(paste("Grouped iterations only make sense for matrix vars:", diff))
@@ -21,8 +22,9 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") 
     if (!is.null(subsets))
         stop("subsets not implemented yet")
 
-    .assocs_subset(formula, data, group, min_pts)
+    #TODO: add 'subset' to data?
     # p-adjust: group by term, adjust for each
+    .assocs_subset(formula, data, group, min_pts)
 }
 
 .assocs_subset = function(formula, data, group=NULL, min_pts=3) {
@@ -53,7 +55,7 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") 
 
 .lm = function(formula, data, params) {
     rownames(params) = NULL
-    cbind(params, broom::tidy(lm(formula, data=data)), size=nrow(data)) %catch% NULL
+    cbind(params, broom::tidy(lm(formula, data=data)), size=nrow(data)) #%catch% NULL
 #TODO: handle num_pts
 #TODO: NA better?
 }
