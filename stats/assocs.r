@@ -33,7 +33,7 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") 
     anchor = group[1]
     grouped = group[2:length(group)]
     ungrouped = setdiff(formula_vars, grouped)
-    index = do.call(expand.grid, sapply(ungrouped, function(x)
+    index = do.call(.b$expand_grid, sapply(ungrouped, function(x)
         .b$descriptive_index(data[[x]], along=2),
         USE.NAMES=TRUE, simplify=FALSE)
     )
@@ -45,15 +45,17 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") 
         index_row = index[i,,drop=TRUE] # named list
         cur_data = data[setdiff(formula_vars, matrix_vars)]
         for (var in matrix_vars)
-            cur_data[[var]] = data[[var]][,i]
-        .lm(formula, data=cur_data, params=index_row)
+            cur_data[[var]] = data[[var]][,index_row[[var]]]
+        .lm(formula, data=na.omit(as.data.frame(cur_data)), params=index_row)
     }
     do.call(rbind, lapply(1:nrow(index), irow2result))
 }
 
 .lm = function(formula, data, params) {
     rownames(params) = NULL
-    cbind(params, broom::tidy(lm(formula, data=data))) %catch% NULL
+    cbind(params, broom::tidy(lm(formula, data=data)), size=nrow(data)) %catch% NULL
+#TODO: handle num_pts
+#TODO: NA better?
 }
 
 .cox = function(formula) {
