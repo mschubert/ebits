@@ -1,7 +1,7 @@
 library(ggplot2)
 library(reshape2)
-b = import('base')
-an = import('anova')
+.b = import('../base')
+.st = import('../stats')
 
 #' Plots a given data.frame as a linear fit with optional subsets
 #'
@@ -13,11 +13,11 @@ an = import('anova')
 #' @param pt.size   Size of the points indicating the samples
 #' @param fit.size  Width of the line(s) used for indicating the fit
 linear_fit = function(df, x="x", y="y", label="label", drop=T, pt.size=4, fit.size=5) {
-    result = an$calcAssocs(df[[y]], df[[x]], subsets=df[[label]], sumsq=T)
-    print(result$pvalue)
+    result = st$assocs(df[[y]], df[[x]], subsets=df[[label]], sumsq=T)
+    print(result$p.value)
 
     if (length(unique(df[[label]])) > 1)
-        df = df[df[[label]] %in% result$subset[result$pvalue<0.05],]
+        df = df[df[[label]] %in% result$subset[result$p.value<0.05],]
 
 #    rsq = round(result$main*1000) / 10
 #    if (drop)
