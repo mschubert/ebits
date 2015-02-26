@@ -5,3 +5,4 @@ export_submodule('./functional')
 export_submodule('./lambda')
 
 omit = import('./omit')
+list = import('./list')
