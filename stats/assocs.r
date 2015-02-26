@@ -19,12 +19,19 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") 
     if (length(diff) > 0)
         stop(paste("Grouped iterations only make sense for matrix vars:", diff))
 
-    if (!is.null(subsets))
-        stop("subsets not implemented yet")
+    #TODO: p-adjust: group by term, adjust for each (or do this in subsets func)
 
-    #TODO: add 'subset' to data?
-    # p-adjust: group by term, adjust for each
-    .assocs_subset(formula, data, group, min_pts)
+    if (!is.null(subsets))
+        # split in subsets, calc assocs for each of them, and rbind results
+        data %>%
+            lapply(function(d) .ar$split(d, along=1, subsets=subsets)) %>%
+            .b$list$transpose(simplify=FALSE) %>%
+            lapply(function(d) .assocs_subset(formula, d, group, min_pts)) %>%
+            mapply(function(x,n) mutate(x, subset=n), x=., n=names(.), SIMPLIFY=FALSE) %>%
+            unname() %>%
+            do.call(rbind, .)
+    else
+        .assocs_subset(formula, data, group, min_pts)
 }
 
 .assocs_subset = function(formula, data, group=NULL, min_pts=3) {
