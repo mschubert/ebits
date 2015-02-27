@@ -26,10 +26,9 @@ linear_fit = function(formula, subsets=NULL, data=parent.frame(),
         stop("can only take multiple cols in one matrix or subsets")
     if (ncol(x) > 1) {
         subsets = c(sapply(colnames(x), function(i) rep(i, nrow(x))))
-        x = c(x)
         y = rep(y, ncol(x))
-    }
-    if (ncol(y) > 1) {
+        x = c(x)
+    } else if (ncol(y) > 1) {
         subsets = c(sapply(colnames(y), function(i) rep(i, nrow(y))))
         x = rep(x, ncol(y))
         y = c(y)

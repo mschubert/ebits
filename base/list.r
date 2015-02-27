@@ -21,7 +21,7 @@ llapply = function(x, fun, vectors=FALSE) {
 }
 
 transpose = function(x, simplify=TRUE) {
-    re = as.list(data.frame(do.call(rbind, x)))
+    re = as.list(data.frame(do.call(rbind, x), check.names=FALSE))
     if (simplify)
         lapply(re, function(r) sapply(r, function(x) x))
     else
