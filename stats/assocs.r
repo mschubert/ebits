@@ -1,16 +1,14 @@
 # linear associations (anova-like)
 .b = import('../base', attach_operators=FALSE)
 .ar = import('../array')
+.spf = import('./process_formula')
 `%catch%` = .b$`%catch%`
 
-assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr") {
-    # get data from parent.env
-    formula_vars = all.vars(formula)
-    data = sapply(formula_vars, function(x)
-        as.matrix(base::get(x, envir=parent.env(environment()))),
-        USE.NAMES=TRUE, simplify=FALSE
-    )
-    matrix_vars = formula_vars[sapply(data, ncol) > 1]
+assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", data=parent.frame()) {
+    pp = .spf$process_formula(formula, data)
+    data = lapply(pp$data, as.matrix)
+    formula = pp$form
+    matrix_vars = names(data)[sapply(data, ncol) > 1]
 
     # check groups
     if (!is.null(group) && !is.character(group))
