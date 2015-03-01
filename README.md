@@ -14,20 +14,20 @@ We currently provide the following modules:
 Requirements
 ------------
 
-This collection of tools requires `modules`, install using:
+The following R libraries are currently required to run `ebits`,
+you can install all the missing packages by executing:
+
+```r
+req = c('devtools','BatchJobs','gtools','plyr','dplyr','abind','reshape2','xlsx')
+# implicit dependencies: stringr, magrittr
+new = req[!(req %in% installed.packages()[,"Package"])]
+if(length(new)) install.packages(new)
+```
+
+This collection of tools requires `modules`, install using using `devtools`:
 
 ```r
 devtools::install_github('klmr/modules')
-```
-
-This command requires `devtools` to be installed.
-
-The following R libraries are currently required to run `ebits`,
-you can install all of them by executing:
-
-```r
-install.packages(c('BatchJobs','gtools','plyr','dplyr','abind','reshape2','xlsx'))
-# implicitly installed: stringr, magrittr
 ```
 
 Setup
