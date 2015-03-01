@@ -1,7 +1,7 @@
 High performance computing / LSF jobs
 =====================================
 
-This script uses the [BatchJobs package](bj) to run functions either locally, on
+This script uses the [BatchJobs package](https://github.com/tudo-r/BatchJobs) to run functions either locally, on
 multiple cores, or LSF, depending on your configuration. It has a simpler
 interface, does more error checking than the library itself, and is able to
 queue different function calls before waiting for the results. The function
@@ -45,5 +45,3 @@ Deletes all registries in the current working directory.
 ### `Qregs()`
 
 Lists all registries in the current working directory.
-
-[bj]: https://github.com/tudo-r/BatchJobs
