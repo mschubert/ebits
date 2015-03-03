@@ -31,42 +31,6 @@ descriptive_index = function(x, along=NULL) {
         stop("Not sure how to get indices on that object")
 }
 
-# subset a data.frame with a data.frame
-# compare everything as characters
-dfdf = function(df, subs, exact=F, add.cols=F) {
-    oldDf = df
-
-    if (add.cols) {
-        subsFull = subs
-        subs = subsFull[intersect(colnames(subsFull), colnames(df))]
-        subsAdd = subsFull[setdiff(colnames(subsFull), colnames(df))]
-        idxAdd = c()
-    }
-
-    for (cn in colnames(subs)) {
-        subs[[cn]] = as.character(subs[[cn]])
-        df[[cn]] = as.character(df[[cn]])
-    }
-
-    idx = c()
-    for (i in 1:nrow(subs)) {
-        mask = rep(TRUE, nrow(df))
-        for (name in colnames(subs))
-            mask = mask & (subs[[i,name]] == df[[name]])
-        if (exact && sum(mask) != 1)
-            stop("exact=T needs exactly one match per row in subsetting df")
-        idx = c(idx, which(mask))
-
-        if (add.cols)
-            idxAdd = c(idxAdd, rep(i, sum(mask)))
-    }
-
-    if (add.cols)
-        cbind(oldDf[idx,,drop=F], subsAdd[idxAdd,,drop=F])
-    else
-        oldDf[idx,,drop=F]
-}
-
 num_unique = function(x) {
     x = as.factor(x)
     sapply(x, function(y) sum(y==x))
