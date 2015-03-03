@@ -1,25 +1,27 @@
 #' Removes NULL (length 0) objects from lists
 #'
-#' @param x     A list
+#' @param x     A list  
+#' @param drop  Whether to drop unused dimensions after removing NAs
 #' @param omit  Whether or not to perform action
-null = function(x, omit=TRUE){
+null = function(x, drop=FALSE, omit=TRUE){
     if (!omit)
         x
     else
-        x[sapply(x, length) != 0]
+        x[sapply(x, length) != 0, drop=drop]
 }   
 
 #' Removes `0` elements from an object
 #'
 #' @param x     A vector, matrix, or data.frame
+#' @param drop  Whether to drop unused dimensions after removing NAs
 #' @param omit  Whether or not to perform action
-zero = function(x, omit=TRUE) {
+zero = function(x, drop=FALSE, omit=TRUE) {
     if (!omit)
         x
     else if (is.vector(x))
-        x[x!=0]
+        x[x!=0, drop=drop]
     else if (is.matrix(x) || is.data.frame(x))
-        x[apply(x, 1, function(r) all(r!=0)),]
+        x[apply(x, 1, function(r) all(r!=0)),, drop=drop]
     else
         stop("Need vector, matrix, or data.frame")
 }   
@@ -27,16 +29,17 @@ zero = function(x, omit=TRUE) {
 #' Remove empty entries in character objects
 #'
 #' @param x      A vector, matrix, or data.frame
+#' @param drop  Whether to drop unused dimensions after removing NAs
 #' @param omit  Whether or not to perform action
-empty = function(x, omit=TRUE) {
+empty = function(x, drop=FALSE, omit=TRUE) {
     if (!omit)
         x
     else if (is.matrix(x) || is.data.frame(x))
-        x[apply(x, 1, function(r) all(nchar(r)>0)),]
+        x[apply(x, 1, function(r) all(nchar(r)>0)),,drop=drop]
     else if (is.vector(x))
-        x[sapply(x, nchar) != 0]
+        x[sapply(x, nchar) != 0, drop=drop]
     else if (is.list(x))
-        x[sapply(x, length) != 0]
+        x[sapply(x, length) != 0, drop=drop]
     else
         stop("need vector, matrix or list")
 }
@@ -45,16 +48,17 @@ empty = function(x, omit=TRUE) {
 #'
 #' @param x     Object to drop duplicates from
 #' @param ...   Arguments to pass to b$duplicated
+#' @param drop  Whether to drop unused dimensions after removing NAs
 #' @param omit  Whether or not to perform action
-dups = function(x, ..., omit=TRUE) {
+dups = function(x, ..., drop=FALSE, omit=TRUE) {
     ov = import('./override')
 
     if (!omit)
         x
     else if (is.vector(x))
-        x[!ov$duplicated(x, ...)]
+        x[!ov$duplicated(x, ...), drop=drop]
     else if (is.matrix(x) || is.data.frame(x))
-        x[!ov$duplicated(x, ...),]
+        x[!ov$duplicated(x, ...),,drop=drop]
     else
         stop("can only work on vector/matrix so far")
 }
