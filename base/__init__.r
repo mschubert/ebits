@@ -6,4 +6,3 @@ export_submodule('./lambda')
 
 omit = import('./omit')
 list = import('./list')
-df = import('./df')
