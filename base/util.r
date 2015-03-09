@@ -16,9 +16,11 @@ grep = function(pattern, x, ...) {
 descriptive_index = function(x, along=NULL) {
     if (!is.null(names(x)))
         names(x)
-    else if ((is.character(x) || is.numeric(x)) &&
+    else if ((is.character(x) || is.numeric(x) || is.logical(x)) &&
              (is.vector(x) || length(dim(x))==1))
         x
+    else if (is.factor(x))
+        as.character(x)
     else if (!is.null(along) && (is.matrix(x) || is.data.frame(x))) {
         dn = dimnames(x)[[along]]
         if (is.null(dn))

@@ -13,6 +13,8 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", 
     # check groups
     if (!is.null(group) && !is.character(group))
         stop("group needs to be NULL or a character vector")
+    if (!all(group %in% all.vars(formula)))
+        stop("group is referencing a variable not present in the formula")
     diff = setdiff(group, matrix_vars)
     if (length(diff) > 0)
         stop(paste("Grouped iterations only make sense for matrix vars:", diff))
@@ -60,9 +62,11 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", 
 
 .lm = function(formula, data, params) {
     rownames(params) = NULL
-    cbind(params, broom::tidy(lm(formula, data=data)), size=nrow(data)) #%catch% NULL
-#TODO: handle num_pts
-#TODO: NA better?
+    if (nrow(data) < 3) #TODO: handle num_pts
+#        cbind(params, term=NA, estimate=NA, std.error=NA, statistic=NA, p.value=NA, size=nrow(data)) #TODO: NA or NULL?
+        NULL
+    else
+        cbind(params, broom::tidy(lm(formula, data=data)), size=nrow(data))
 }
 
 .cox = function(formula) {
