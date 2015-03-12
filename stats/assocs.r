@@ -36,7 +36,7 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", 
     if (include_intercept)
         re
     else
-        select(re, term != "(Intercept)")
+        dplyr::filter(re, term != "(Intercept)")
 }
 
 .assocs_subset = function(formula, data, group=NULL, min_pts=3) {
