@@ -4,7 +4,7 @@
 .spf = import('./process_formula')
 `%catch%` = .b$`%catch%`
 
-assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", data=parent.frame()) {
+assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", include_intercept=FALSE, data=parent.frame()) {
     pp = .spf$process_formula(formula, data)
     data = lapply(pp$data, as.matrix)
     formula = pp$form
@@ -23,7 +23,7 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", 
 
     if (!is.null(subsets))
         # split in subsets, calc assocs for each of them, and rbind results
-        data %>%
+        re = data %>%
             lapply(function(d) .ar$split(d, along=1, subsets=subsets)) %>%
             .b$list$transpose(simplify=FALSE) %>%
             lapply(function(d) .assocs_subset(formula, d, group, min_pts)) %>%
@@ -31,7 +31,12 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", 
             unname() %>%
             do.call(rbind, .)
     else
-        .assocs_subset(formula, data, group, min_pts)
+        re = .assocs_subset(formula, data, group, min_pts)
+
+    if (include_intercept)
+        re
+    else
+        select(re, term != "(Intercept)")
 }
 
 .assocs_subset = function(formula, data, group=NULL, min_pts=3) {
@@ -55,18 +60,16 @@ assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", 
         cur_data = data[setdiff(formula_vars, matrix_vars)]
         for (var in matrix_vars)
             cur_data[[var]] = data[[var]][,index_row[[var]]]
-        .lm(formula, data=na.omit(as.data.frame(cur_data)), params=index_row)
+        cur_data = na.omit(as.data.frame(cur_data))
+        if (nrow(cur_data) >= min_pts)
+            .lm(formula, data=cur_data, params=index_row)
     }
     do.call(rbind, lapply(1:nrow(index), irow2result))
 }
 
 .lm = function(formula, data, params) {
     rownames(params) = NULL
-    if (nrow(data) < 3) #TODO: handle num_pts
-#        cbind(params, term=NA, estimate=NA, std.error=NA, statistic=NA, p.value=NA, size=nrow(data)) #TODO: NA or NULL?
-        NULL
-    else
-        cbind(params, broom::tidy(lm(formula, data=data)), size=nrow(data))
+    cbind(params, broom::tidy(lm(formula, data=data)), size=nrow(data))
 }
 
 .cox = function(formula) {
