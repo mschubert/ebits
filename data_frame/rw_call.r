@@ -1,4 +1,4 @@
-process = function(df, fun, args=list(), keep_params=TRUE, tidy=TRUE) {
+rw_call = function(df, fun, args=list(), keep_params=TRUE, tidy=TRUE) {
     irow2result = function(i) {
         index_row = df[i,,drop=TRUE] # named list
         re = do.call(fun, c(index_row, args))
