@@ -8,12 +8,13 @@
 lm = function(formula, data=parent.frame(), min_pts=3, ...) {
     subs = list(...)
     for (i in seq_along(subs))
-        data[[names(subs)[i]]] = data[[names(subs)[i]]][,subs[i]]
+        data[[names(subs)[i]]] = data[[names(subs)[i]]][,subs[[i]]]
+    data = as.data.frame(data)
 
     if (nrow(data) < min_pts)
         NULL
     else
-        cbind(broom::tidy(lm(formula, data=data)), size=nrow(data))
+        cbind(broom::tidy(stats::lm(formula, data=data)), size=nrow(data))
 }
 
 #.cox = function(formula) {

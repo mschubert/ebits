@@ -42,8 +42,7 @@ from_formula = function(formula, data=parent.frame(), group=NULL) {
     for (var in grouped)
         index[[var]] = index[[anchor]]
 
-    attr(index, "data") = data
-    attr(index, "formula") = formula
-    class(index) = append(class(index),"attrs_as_args")
+    attr(index, "args") = list(data=data, formula=formula)
+    class(index) = append(class(index),"attr_args")
     index
 }

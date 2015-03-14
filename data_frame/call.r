@@ -21,8 +21,9 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE) {
     }
 
     args = list(...)
-    if("attrs_as_args" %in% class(df))
-        args = c(args, attributes(df))
+    if("attr_args" %in% class(df))
+        args = c(args, attr(df, "args"))
+    attr(df, "args") = NULL # do not copy for each row
 
     result = lapply(seq_len(nrow(df)), irow2result)
 
@@ -40,8 +41,8 @@ call_hpc = function(df, ` fun`, ...) {
     hpc = import('../hpc')
     args = list(...)
 
-    if ("attrs_as_args" %in% class(df))
-        args$more.args = append(args$more.args, attributes(df))
+    if ("attr_args" %in% class(df))
+        args$more.args = append(args$more.args, attr(df, "args"))
 
     do.call(hpc$Q, c(args, df, list(` fun`=` fun`)))
 }
