@@ -1,11 +1,11 @@
 # linear associations (anova-like)
 .b = import('../base', attach_operators=FALSE)
 .ar = import('../array')
-.spf = import('./process_formula')
+.gfd = import('../data_frame/get_formula_data')
 `%catch%` = .b$`%catch%`
 
 assocs = function(formula, subsets=NULL, group=NULL, min_pts=3, p_adjust="fdr", data=parent.frame()) {
-    pp = .spf$process_formula(formula, data)
+    pp = .gfd$process_formula(formula, data)
     data = lapply(pp$data, as.matrix)
     formula = pp$form
     matrix_vars = names(data)[sapply(data, ncol) > 1]
