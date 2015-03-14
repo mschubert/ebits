@@ -21,6 +21,9 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE) {
     }
 
     args = list(...)
+    if("attrs_as_args" %in% class(df))
+        args = c(args, attributes(df))
+
     result = lapply(seq_len(nrow(df)), irow2result)
 
     if (tidy)
@@ -31,6 +34,14 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE) {
 
 #' Use hpc$Q to process data.frame on a cluster
 #'
-#' ..same args as above..
-call_hpc = function() {
+#' @param df   A data.frame that should be processed
+#' @param ...  Arguments to be passed to hpc$Q
+call_hpc = function(df, ` fun`, ...) {
+    hpc = import('../hpc')
+    args = list(...)
+
+    if ("attrs_as_args" %in% class(df))
+        args$more.args = append(args$more.args, attributes(df))
+
+    do.call(hpc$Q, c(args, df, list(` fun`=` fun`)))
 }

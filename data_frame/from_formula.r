@@ -43,5 +43,7 @@ from_formula = function(formula, data=parent.frame(), group=NULL) {
         index[[var]] = index[[anchor]]
 
     attr(index, "data") = data
+    attr(index, "formula") = formula
+    class(index) = append(class(index),"attrs_as_args")
     index
 }
