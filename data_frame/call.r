@@ -8,16 +8,16 @@
 #' @return             A data frame with the function call results
 call = function(df, fun, ..., result_only=FALSE, tidy=TRUE) {
     irow2result = function(i) {
-        index_row = df[i,,drop=TRUE] # named list
-        re = do.call(fun, c(index_row, args))
+        index_row = as.list(df[i,,drop=FALSE])
+        result = do.call(fun, c(index_row, args))
 
         if (tidy)
-            re = as.data.frame(re)
+            result = as.data.frame(result)
 
         if (result_only)
-            re
+            c(result)
         else
-            cbind(index_row, re)
+            cbind(index_row, result)
     }
 
     args = list(...)
