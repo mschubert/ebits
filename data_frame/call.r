@@ -21,9 +21,10 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE) {
     }
 
     args = list(...)
-    if("attr_args" %in% class(df))
+    if("attr_args" %in% class(df)) {
         args = c(args, attr(df, "args"))
-    attr(df, "args") = NULL # do not copy for each row
+        attr(df, "args") = NULL # do not copy for each row
+    }
 
     result = lapply(seq_len(nrow(df)), irow2result)
 
@@ -36,13 +37,26 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE) {
 #' Use hpc$Q to process data.frame on a cluster
 #'
 #' @param df   A data.frame that should be processed
-#' @param ...  Arguments to be passed to hpc$Q
-call_hpc = function(df, ` fun`, ...) {
+#' @param ...  Arguments to be passed to `hpc$Q`
+call_hpc = function(df, ` fun`, ..., result_only=FALSE, tidy=TRUE) {
     hpc = import('../hpc')
     args = list(...)
 
-    if ("attr_args" %in% class(df))
+    if ("attr_args" %in% class(df)) {
         args$more.args = append(args$more.args, attr(df, "args"))
+        attr(df, "args") = NULL
+    }
 
-    do.call(hpc$Q, c(args, df, list(` fun`=` fun`)))
+    result = do.call(hpc$Q, c(args, df, list(` fun`=` fun`)))
+
+    if (!result_only) {
+        rownames(df) = as.character(1:nrow(df))
+        result = lapply(names(result), function(i)
+            cbind(as.list(df[i,,drop=FALSE]), result[[i]])
+        )
+    }
+    if (tidy)
+        result = do.call(rbind, result)
+
+    result
 }
