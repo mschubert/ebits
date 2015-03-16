@@ -11,8 +11,12 @@
 #' @return         A data.frame with the associations
 lm = function(formula, data=parent.frame(), min_pts=3, subsets=NULL, return_intercept=FALSE, ...) {
     # subset as specified in `...`
+    if (is.environment(data))
+        data = mget(all.vars(formula), envir=data)
+    else
+        data = data[all.vars(formula)]
+
     subs = list(...)
-    data = data[all.vars(formula)]
     for (i in seq_along(subs))
         data[[names(subs)[i]]] = .b$subset(data[[names(subs)[i]]], index=subs[[i]])
     data = na.omit(as.data.frame(data))
