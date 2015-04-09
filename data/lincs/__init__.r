@@ -44,10 +44,9 @@ get_z = function(cid, rid=landmarks, map.genes=FALSE) {
     fname = file.path(.p$path("lincs"), "zspc_n1328098x22268.gctx")
     re = parse_gctx(fname=fname, cid=cid, rid=rid)
 
-    if (is.character(map.genes)) {
-        idmap = import('idmap')
-        idmap$gene(re, from='probe_id', to=map.genes, fun.aggregate=mean)
-    } else
+    if (is.character(map.genes))
+        import('../../idmap')$gene(re, from='probe_id', to=map.genes, fun.aggregate=mean)
+    else
         re
 }
 
