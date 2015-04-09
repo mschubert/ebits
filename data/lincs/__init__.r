@@ -1,5 +1,5 @@
 .b = import('../../base') # %or%
-.io = import('io')
+.io = import('../../io')
 .p = import('../path')
 
 #' Landmark probes
@@ -39,9 +39,10 @@ parse_gctx = function(fname, rid=NULL, cid=NULL) {
 #' @param cid        Vector of experiment IDs to subset
 #' @param rid        Vector of probe IDs to subset
 #' @param map.genes  BioMart identifier (eg. 'hgnc_symbol') of IDs to map to, or FALSE
-get_z = function(cid, rid=landmarks, map.genes=FALSE, file=.p$path("lincs")) {
-#TODO: handle transpose better?
-    re = parse_gctx(fname=file, cid=cid, rid=rid)
+get_z = function(cid, rid=landmarks, map.genes=FALSE) {
+    #TODO: handle transpose better?
+    fname = file.path(.p$path("lincs"), "zspc_n1328098x22268.gctx")
+    re = parse_gctx(fname=fname, cid=cid, rid=rid)
 
     if (is.character(map.genes)) {
         idmap = import('idmap')
@@ -50,6 +51,10 @@ get_z = function(cid, rid=landmarks, map.genes=FALSE, file=.p$path("lincs")) {
         re
 }
 
-get_index = function(file = getOption('lincs_index') %or% stop("need option 'lincs_index'")) {
-    .io$read_table(file, quote="", header=TRUE, sep="\t")
+#' Returns the LINCS metadata
+#'
+#' @return  A data.frame containing the experimental metadata
+get_index = function() {
+    fname = file.path(.p$path("lincs"), "inst.info")
+    .io$read_table(fname, quote="", header=TRUE, sep="\t")
 }
