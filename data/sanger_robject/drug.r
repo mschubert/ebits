@@ -1,5 +1,5 @@
-.b = import('base')
-.io = import('io')
+.b = import('../../base')
+.io = import('../../io')
 
 DRUG_PROPS = .io$data('DATA/R_objects/Drugs/props_public') # v18
 

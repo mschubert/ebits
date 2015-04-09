@@ -1,5 +1,5 @@
-.b = import('base')
-.io = import('io')
+.b = import('../../base')
+.io = import('../../io')
 
 #MASTER_LIST = .io$data('DATA/R_objects/cell_lines/MASTER_LIST_03112013')
 MASTER_LIST = .io$data('DATA/R_objects/cell_lines/20140320_MASTER_LIST')
