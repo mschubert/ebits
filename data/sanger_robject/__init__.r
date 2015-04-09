@@ -1,18 +1,19 @@
 library(modules)
-b = import('base')
-io = import('io')
-ar = import('array')
+.b = import('base')
+.io = import('io')
+.ar = import('array')
+.p = import('../path')
 cosmic = import('./cosmic')
 drug = import('./drug')
 MASTER_LIST = cosmic$MASTER_LIST
 DRUG_PROPS = drug$DRUG_PROPS
 
 getNGS_BEM = function() {
-    io$data('DATA/R_objects/Genomic/NGS_BEM_FATHMM_29052013v2')
+    .io$data('DATA/R_objects/Genomic/NGS_BEM_FATHMM_29052013v2')
 }
 
 getMutatedGenes = function(frequency=0, intogen=F, tissue=NULL) {
-    mut = t(io$data('DATA/R_objects/Genomic/NGS_BEM_FATHMM_29052013v2')$logical)
+    mut = t(.io$data('DATA/R_objects/Genomic/NGS_BEM_FATHMM_29052013v2')$logical)
 
     if (!is.null(tissue))
         mut = mut[rownames(mut) %in% names(getTissues(tissue)),]
@@ -30,19 +31,19 @@ getMutatedGenes = function(frequency=0, intogen=F, tissue=NULL) {
 }
 
 getDrivers = function(tissue=NULL) {
-    ig = io$data('DATA/R_objects/intoGen_Cancer_Drivers/cancer_drivers_5_2_2014')
+    ig = .io$data('DATA/R_objects/intoGen_Cancer_Drivers/cancer_drivers_5_2_2014')
     if (!is.null(tissue))
         ig = dplyr::filter(ig, Tumor_Type %in% tissue)
     transmute(ig, HGNC=ActingDriver_Symbol, tissue=Tumor_Type)
 }
 
 getEncodedMutations = function(get=c('AMPL', 'DEL', 'FUSION', 'MS', 'miRNA', 'missenseMut', 'truncMut')) {
-    objs = lapply(get, function(f) io$data(paste0('DATA/R_objects/Genomic/ML_encoding_mut_070414/', f)))
+    objs = lapply(get, function(f) .io$data(paste0('DATA/R_objects/Genomic/ML_encoding_mut_070414/', f)))
     t(do.call(rbind, objs))
 }
 
 getBASAL_EXPRESSION = function() {
-    obj = io$data('DATA/R_objects/Transcriptomic/BASAL_EXPRESSION_12062013v2')
+    obj = .io$data('DATA/R_objects/Transcriptomic/BASAL_EXPRESSION_12062013v2')
     rownames(obj$DATA) = obj$GENE_SYMBOLS
 #    library(limma)
 #    limma::avereps(obj$DATA)
@@ -51,7 +52,7 @@ getBASAL_EXPRESSION = function() {
 
 getMutationsForCellLines = function(validCosmicIds=TRUE) {
     # cell line, gene, mutation type
-    io$data("DATA/R_objects/Genomic/MUTATION_ARRAY")[validCosmicIds,,]
+    .io$data("DATA/R_objects/Genomic/MUTATION_ARRAY")[validCosmicIds,,]
 }
 
 # top: top x% in sensitivity range
@@ -64,12 +65,12 @@ filterDrugResponse = function(X, tissues, top=0.1, abs=0, delta=2) {
               min(x, na.rm=T)+delta))
     }
     sensThresh = apply(X, 2, minFunc)
-    drugList = ar$split(X, along=2)
+    drugList = .ar$split(X, along=2)
 
     index2filtered = function(i) {
         st = sensThresh[i]
         d = drugList[[i]]
-        ar$filter(d, along=1, function(f) sum(f<st, na.rm=T)>1, subsets=tissues) # min 2 lines
+        .ar$filter(d, along=1, function(f) sum(f<st, na.rm=T)>1, subsets=tissues) # min 2 lines
     }
     do.call(cbind, setNames(lapply(1:length(drugList), index2filtered), names(drugList)))
 }
@@ -81,7 +82,7 @@ getDrugResponseForCellLines = function(metric='IC50s', validCosmicIds=T, public.
     } else if (version == 16) {
         stop('invalid version')
     } else if (version == 17) {
-        SCREENING = io$data('DATA/R_objects/Drugs/djv17_public') # v17
+        SCREENING = .io$data('DATA/R_objects/Drugs/djv17_public') # v17
     } else stop('invalid version')
 
     validDrugIndex = DRUG_PROPS$DRUG_ID %in% colnames(SCREENING[[metric]])
@@ -99,12 +100,12 @@ getDrugResponseForCellLines = function(metric='IC50s', validCosmicIds=T, public.
 #    if (min.real.IC50s > 0) {
 #        tissues = getTissues(minN=3)
 #        maxc = SCREENING[['maxConc']][validCosmicIds, validDrugIds]
-#        ar$intersect(tissues, Ys, maxc, along=1)
+#        .ar$intersect(tissues, Ys, maxc, along=1)
 #        idx = Ys
 #        idx[] = 1:length(idx)
 #        Ysc = c(Ys)
 #        maxc = c(maxc)
-#        Ysi = ar$map(idx, along=1, function(x) 
+#        Ysi = .ar$map(idx, along=1, function(x) 
 #                    if (sum(Ysc[idx]<maxc[idx], na.rm=T) > min.real.IC50s) T # direct->explodes
 #                    else F, subsets=tissues)
 #        Ys[!Ysi] = NA # yields all tissues
