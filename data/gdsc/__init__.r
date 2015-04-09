@@ -7,11 +7,11 @@ MASTER_LIST = cosmic$MASTER_LIST
 DRUG_PROPS = drug$DRUG_PROPS
 
 getNGS_BEM = function() {
-    .p$load('gdsc', 'Genomic/NGS_BEM_FATHMM_29052013v2')
+    .p$load('gdsc', 'Genomic/NGS_BEM_FATHMM_29052013v2.ro')
 }
 
 getMutatedGenes = function(frequency=0, intogen=F, tissue=NULL) {
-    mut = t(.p$load('gdsc', 'Genomic/NGS_BEM_FATHMM_29052013v2')$logical)
+    mut = t(.p$load('gdsc', 'Genomic/NGS_BEM_FATHMM_29052013v2.ro')$logical)
 
     if (!is.null(tissue))
         mut = mut[rownames(mut) %in% names(getTissues(tissue)),]
@@ -29,7 +29,7 @@ getMutatedGenes = function(frequency=0, intogen=F, tissue=NULL) {
 }
 
 getDrivers = function(tissue=NULL) {
-    ig = .p$load('gdsc', 'intoGen_Cancer_Drivers/cancer_drivers_5_2_2014')
+    ig = .p$load('gdsc', 'intoGen_Cancer_Drivers/cancer_drivers_5_2_2014.ro')
     if (!is.null(tissue))
         ig = dplyr::filter(ig, Tumor_Type %in% tissue)
     transmute(ig, HGNC=ActingDriver_Symbol, tissue=Tumor_Type)
@@ -41,7 +41,7 @@ getEncodedMutations = function(get=c('AMPL', 'DEL', 'FUSION', 'MS', 'miRNA', 'mi
 }
 
 getBASAL_EXPRESSION = function() {
-    obj = .p$load('gdsc', 'Transcriptomic/BASAL_EXPRESSION_12062013v2')
+    obj = .p$load('gdsc', 'Transcriptomic/BASAL_EXPRESSION_12062013v2.ro')
     rownames(obj$DATA) = obj$GENE_SYMBOLS
 #    library(limma)
 #    limma::avereps(obj$DATA)
@@ -50,7 +50,7 @@ getBASAL_EXPRESSION = function() {
 
 getMutationsForCellLines = function(validCosmicIds=TRUE) {
     # cell line, gene, mutation type
-    .p$load('gdsc', "Genomic/MUTATION_ARRAY")[validCosmicIds,,]
+    .p$load('gdsc', "Genomic/MUTATION_ARRAY.ro")[validCosmicIds,,]
 }
 
 # top: top x% in sensitivity range
@@ -80,7 +80,7 @@ getDrugResponseForCellLines = function(metric='IC50s', validCosmicIds=T, public.
     } else if (version == 16) {
         stop('invalid version')
     } else if (version == 17) {
-        SCREENING = .p$load('gdsc', 'Drugs/djv17_public') # v17
+        SCREENING = .p$load('gdsc', 'Drugs/djv17_public.RData') # v17
     } else stop('invalid version')
 
     validDrugIndex = DRUG_PROPS$DRUG_ID %in% colnames(SCREENING[[metric]])

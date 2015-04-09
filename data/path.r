@@ -2,10 +2,9 @@
 .io = import('../io')
 
 path = function(mod_str = NULL) {
-    dir = getOption(paste("data.dir", mod_str, sep=".")) %or%
+    getOption(paste("data.dir", mod_str, sep=".")) %or%
         getOption("data.dir") %or%
         file.path(module_file(), mod_str)
-    file.path(dir, file)
 }
 
 file = function(mod_str = NULL, file = NULL) {
