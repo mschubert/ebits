@@ -1,8 +1,8 @@
 .b = import('../../base')
-.io = import('../../io')
+.p = import('../path')
 
-#MASTER_LIST = .io$data('DATA/R_objects/cell_lines/MASTER_LIST_03112013')
-MASTER_LIST = .io$data('DATA/R_objects/cell_lines/20140320_MASTER_LIST')
+#MASTER_LIST = .p$load('gdsc', 'cell_lines/MASTER_LIST_03112013')
+MASTER_LIST = .p$load('gdsc', 'cell_lines/20140320_MASTER_LIST')
 MASTER_LIST$COSMIC.ID = as.character(MASTER_LIST$COSMIC.ID)
 
 name2id = function(x, fuzzy_level=1, ...) {

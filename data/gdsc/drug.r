@@ -1,7 +1,7 @@
 .b = import('../../base')
-.io = import('../../io')
+.p = import('../path')
 
-DRUG_PROPS = .io$data('DATA/R_objects/Drugs/props_public') # v18
+DRUG_PROPS = .p$load('Drugs/props_public') # v18
 
 name2id = function(x, fuzzy_level=1, table=FALSE) {
     .b$match(x = x,

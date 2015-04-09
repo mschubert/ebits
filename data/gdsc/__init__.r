@@ -1,5 +1,4 @@
 .b = import('../../base')
-.io = import('../../io')
 .ar = import('../../array')
 .p = import('../path')
 cosmic = import('./cosmic')
@@ -8,11 +7,11 @@ MASTER_LIST = cosmic$MASTER_LIST
 DRUG_PROPS = drug$DRUG_PROPS
 
 getNGS_BEM = function() {
-    .io$data('DATA/R_objects/Genomic/NGS_BEM_FATHMM_29052013v2')
+    .p$load('gdsc', 'Genomic/NGS_BEM_FATHMM_29052013v2')
 }
 
 getMutatedGenes = function(frequency=0, intogen=F, tissue=NULL) {
-    mut = t(.io$data('DATA/R_objects/Genomic/NGS_BEM_FATHMM_29052013v2')$logical)
+    mut = t(.p$load('gdsc', 'Genomic/NGS_BEM_FATHMM_29052013v2')$logical)
 
     if (!is.null(tissue))
         mut = mut[rownames(mut) %in% names(getTissues(tissue)),]
@@ -30,19 +29,19 @@ getMutatedGenes = function(frequency=0, intogen=F, tissue=NULL) {
 }
 
 getDrivers = function(tissue=NULL) {
-    ig = .io$data('DATA/R_objects/intoGen_Cancer_Drivers/cancer_drivers_5_2_2014')
+    ig = .p$load('gdsc', 'intoGen_Cancer_Drivers/cancer_drivers_5_2_2014')
     if (!is.null(tissue))
         ig = dplyr::filter(ig, Tumor_Type %in% tissue)
     transmute(ig, HGNC=ActingDriver_Symbol, tissue=Tumor_Type)
 }
 
 getEncodedMutations = function(get=c('AMPL', 'DEL', 'FUSION', 'MS', 'miRNA', 'missenseMut', 'truncMut')) {
-    objs = lapply(get, function(f) .io$data(paste0('DATA/R_objects/Genomic/ML_encoding_mut_070414/', f)))
+    objs = lapply(get, function(f) .p$load('gdsc', paste0('Genomic/ML_encoding_mut_070414/', f)))
     t(do.call(rbind, objs))
 }
 
 getBASAL_EXPRESSION = function() {
-    obj = .io$data('DATA/R_objects/Transcriptomic/BASAL_EXPRESSION_12062013v2')
+    obj = .p$load('gdsc', 'Transcriptomic/BASAL_EXPRESSION_12062013v2')
     rownames(obj$DATA) = obj$GENE_SYMBOLS
 #    library(limma)
 #    limma::avereps(obj$DATA)
@@ -51,7 +50,7 @@ getBASAL_EXPRESSION = function() {
 
 getMutationsForCellLines = function(validCosmicIds=TRUE) {
     # cell line, gene, mutation type
-    .io$data("DATA/R_objects/Genomic/MUTATION_ARRAY")[validCosmicIds,,]
+    .p$load('gdsc', "Genomic/MUTATION_ARRAY")[validCosmicIds,,]
 }
 
 # top: top x% in sensitivity range
@@ -81,7 +80,7 @@ getDrugResponseForCellLines = function(metric='IC50s', validCosmicIds=T, public.
     } else if (version == 16) {
         stop('invalid version')
     } else if (version == 17) {
-        SCREENING = .io$data('DATA/R_objects/Drugs/djv17_public') # v17
+        SCREENING = .p$load('gdsc', 'Drugs/djv17_public') # v17
     } else stop('invalid version')
 
     validDrugIndex = DRUG_PROPS$DRUG_ID %in% colnames(SCREENING[[metric]])
