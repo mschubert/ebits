@@ -1,14 +1,15 @@
-.b = import('base', attach_operators=F)
-.idmap = import('idmap')
+.b = import('../base', attach_operators=F)
+.idmap = import('../idmap')
 
 #' Normalizes all CEL files in a given directory
-#'  directory: the directory to look for .CEL files
-#'  files    : file names, can be partial matches to .CEL
-#'  method   : which normalisation method to use (rma, gcrma, frma)
-#'  map.to   : hgnc_symbol, entrezgene, ensembl_gene_id, or NULL/FALSE
-#'  NUSE.tol : tolerance of meadian NUSE score around 1, set to NA for no QC
-#'  RLE.tol  : tolerance of meadian RLE score around 0, set to NA for no QC
-#'  @return  : a matrix of gene-level expression values
+#'
+#' @param directory  the directory to look for .CEL files
+#' @param files      file names, can be partial matches to .CEL
+#' @param method     which normalisation method to use (rma, gcrma, frma)
+#' @param map.to     hgnc_symbol, entrezgene, ensembl_gene_id, or NULL/FALSE
+#' @param NUSE.tol   tolerance of meadian NUSE score around 1, set to NA for no QC
+#' @param RLE.tol    tolerance of meadian RLE score around 0, set to NA for no QC
+#' @return           a matrix of gene-level expression values
 CELsToExpression = function(directory=".", files=NA, method="rma",
                             map.to="hgnc_symbol", NUSE.tol=0.1, RLE.tol=0.1) {
     regex = "\\.(CEL|cel)(\\.gz)?$"
@@ -59,11 +60,12 @@ CELsToExpression = function(directory=".", files=NA, method="rma",
 }
 
 #' Takes a list of GSM identifiers and returns an expression matrix
-#'  GSMs     : vector or list of GSMs
-#'  normalize: flag indicating whether to perform quantile norm [T/F]
-#'  map.genes: whether to map probe ids to HGNC ids
-#'  cachedir : directory to cache downloaded GEO files in
-#'  @return  : a matrix with probe ids in rows and GSMs in columns
+#'
+#' @param GSMs       vector or list of GSMs
+#' @param normalize  flag indicating whether to perform quantile norm [T/F]
+#' @param map.genes  whether to map probe ids to HGNC ids
+#' @param cachedir   directory to cache downloaded GEO files in
+#' @return           a matrix with probe ids in rows and GSMs in columns
 GSMsToExpression = function(GSMs, norm.quantile=T, map.to="hgnc_symbol", cachedir=tempdir()) {
     stopifnot(class(GSMs) == 'character')
     stopifnot(class(norm.quantile) == 'logical')
