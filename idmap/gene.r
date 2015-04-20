@@ -11,8 +11,8 @@
     warning("no cached file found, biomart query will take ~ 1h")
 
     mart = biomaRt::useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
-    probes = c(grep("^affy_", listAttributes(mart)$name, value=T),
-               grep("^illumina_", listAttributes(mart)$name, value=T))
+    probes = c(grep("^affy_", biomaRt::listAttributes(mart)$name, value=T),
+               grep("^illumina_", biomaRt::listAttributes(mart)$name, value=T))
 
     tablecols = c("entrezgene", "ensembl_gene_id", "hgnc_symbol")
     getPS = function(p) {
@@ -20,7 +20,7 @@
         colnames(df)[ncol(df)] = "probe_id"
         df[!is.na(df$probe_id) & df$probe_id!="",]
     }
-    psdf = lapply(affy, getPS)
+    psdf = lapply(probes, getPS)
 
     allfrom_idsets = do.call(rbind, psdf)
     allfrom_idsets$entrezgene = as.character(allfrom_idsets$entrezgene)
@@ -28,7 +28,7 @@
     allfrom_idsets[allfrom_idsets == ""] = NA
 
     save(allfrom_idsets, file=cache)
-    lookup
+    allfrom_idsets
 }
 
 #' Gene ID mapping function
