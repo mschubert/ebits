@@ -4,9 +4,9 @@ b = import('base')
 ar = import('array')
 io = import('io')
 idmap = import('idmap')
+.p = import('../path')
 
-.icgc_raw_dir = getOption('icgc_raw_dir') %or% stop("need option 'icgc_raw_dir'")
-.icgc_data_dir = getOption('icgc_data_dir') %or% stop("need option 'icgc_data_dir'")
+.icgc_raw_dir = .icgc_data_dir = .p$path('icgc')
 
 mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {
     if (!force && file.exists(file.path(.icgc_data_dir, fname)))

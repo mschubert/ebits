@@ -1,8 +1,9 @@
 .b = import('base')
 .ar = import('array')
 .io = import('io')
+.p = import('../path')
 
-.icgc_data_dir = getOption('icgc_data_dir') %or% stop("need option 'icgc_data_dir'")
+.icgc_data_dir = .p$path('icgc')
 
 .clinical = NULL
 .clinicalsample = NULL
