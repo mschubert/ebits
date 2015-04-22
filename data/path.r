@@ -1,9 +1,9 @@
 .b = import('../base')
 .io = import('../io')
 
-path = function(mod_str) {
+path = function(mod_str=NULL) {
     getOption(paste("data.dir", mod_str, sep=".")) %or%
-        getOption("data.dir") %or%
+        file.path(getOption("data.dir"), mod_str) %or%
         file.path(module_file(), mod_str)
 }
 

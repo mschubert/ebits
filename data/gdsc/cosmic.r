@@ -1,9 +1,11 @@
 .b = import('../../base')
-.p = import('../path')
+.file = import('./file')
 
-#MASTER_LIST = .p$load('gdsc', 'cell_lines/MASTER_LIST_03112013.ro')
-MASTER_LIST = .p$load('gdsc', 'cell_lines/20140320_MASTER_LIST.ro')
-MASTER_LIST$COSMIC.ID = as.character(MASTER_LIST$COSMIC.ID)
+MASTER_LIST = .file$get('MASTER_LIST')
+if (!is.character(MASTER_LIST$COSMIC.ID)) {
+    warning("COSMIC.ID listed as integer variable, converting to character")
+    MASTER_LIST$COSMIC.ID = as.character(MASTER_LIST$COSMIC.ID)
+}
 
 name2id = function(x, fuzzy_level=1, ...) {
     .b$match(x = x,

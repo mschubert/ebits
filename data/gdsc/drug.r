@@ -1,7 +1,7 @@
 .b = import('../../base')
-.p = import('../path')
+.file = import('./file')
 
-DRUG_PROPS = .p$load('gdsc', 'Drugs/props_public.RData') # v18
+DRUG_PROPS = .file$get('DRUG_PROPS')
 
 name2id = function(x, fuzzy_level=1, table=FALSE) {
     .b$match(x = x,
