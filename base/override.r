@@ -15,7 +15,7 @@
 #' @param table        Return a matching table instead of just the matches
 #' @param na_rm        Flag to remove items that can not be mapped
 match = function(x, from, to, filter_from=NULL, filter_to=NULL,
-                 fuzzy_level=0, table=FALSE, na_rm=FALSE) {
+                 fuzzy_level=0, table=FALSE, na_rm=FALSE, warn=!table && fuzzy_level>0) {
 
     if (length(from) != length(to))
         stop("arguments `from` and `to` need to be of the same length")
@@ -38,14 +38,17 @@ match = function(x, from, to, filter_from=NULL, filter_to=NULL,
 
     # 2nd iteration: non-punctuation exact matches
     if (fuzzy_level > 0) {
-        FROM = stringr::str_replace_all(toupper(from), "[[:punct:]]", "")
-        x = stringr::str_replace_all(x, "[[:punct:]]", "")
-        index$level1 = base::match(x, FROM)
+        FROM = stringr::str_replace_all(toupper(from), "[[:punct:]\\ ]", "")
+        x_match = stringr::str_replace_all(toupper(x), "[[:punct:]\\ ]", "")
+        index$level1 = base::match(x_match, FROM)
     }
+
+    #TODO: insert iteration here that does closest string matches, but does not
+    #  map two different strings to the same fuzzy match
 
     # 3rd iteration: closest string matches w/o punctuation
     if (fuzzy_level > 1) {
-        distances = adist(FROM, x)
+        distances = adist(FROM, x_match)
         mind = apply(distances, 2, min)
         nmin = sapply(1:length(mind), function(i) sum(mind[i]==distances[,i]))
         mind[nmin>1] = NA # no non-unique matches
@@ -58,12 +61,17 @@ match = function(x, from, to, filter_from=NULL, filter_to=NULL,
     from = from[re]
     to = to[re]
 
+    if (warn) {
+        warning("Non-exact matches detected")
+        print(na.omit(data.frame(x=x, from=from)[x!=from,]))
+    }
+
     if (table && fuzzy_level == 0)
         .omit$na(data_frame(x=x, to=to), omit=na_rm)
     else if (table && fuzzy_level > 0)
         .omit$na(data_frame(x=x, from=from, to=to), cols=c('x','to'), omit=na_rm)
     else
-        .omit$na(setNames(to, from), omit=na_rm)
+        .omit$na(setNames(to, x), omit=na_rm)
 }
 
 #' duplicated() function with extended functionality
