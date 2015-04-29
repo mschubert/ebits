@@ -13,26 +13,6 @@ grep = function(pattern, x, ...) {
         sapply(pattern, function(p) re(p, x, ...))
 }
 
-descriptive_index = function(x, along=NULL) {
-    if (!is.null(names(x)))
-        names(x)
-    else if ((is.character(x) || is.numeric(x) || is.logical(x)) &&
-             (is.vector(x) || length(dim(x))==1))
-        x
-    else if (is.factor(x))
-        as.character(x)
-    else if (!is.null(along) && (is.matrix(x) || is.data.frame(x))) {
-        dn = dimnames(x)[[along]]
-        if (is.null(dn))
-            1:dim(x)[along]
-        else
-            dn
-    } else if (is.list(x)) # list and data.frame
-        seq_along(x)
-    else
-        stop("Not sure how to get indices on that object")
-}
-
 num_unique = function(x) {
     x = as.factor(x)
     sapply(x, function(y) sum(y==x))
