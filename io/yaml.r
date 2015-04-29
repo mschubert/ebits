@@ -7,12 +7,12 @@
 read_yaml = function(fname, n=Inf, drop=TRUE) {
     flines = readLines(fname)
     splits = cumsum(flines == "---")
-    docs = unname(base::split(flines, splits))
 
     mask = splits <= n
     flines = flines[mask]
     splits = splits[mask]
 
+    docs = unname(base::split(flines, splits))
     parsed = lapply(docs, function(d) yaml::yaml.load(paste(d, collapse="\n")))
     if (length(parsed) == 1 && drop == TRUE)
         parsed[[1]]

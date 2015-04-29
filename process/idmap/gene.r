@@ -1,6 +1,6 @@
-.b = import('../base')
-.io = import('../io')
-.ar = import('../array')
+.b = import('../../base')
+.io = import('../../io')
+.ar = import('../../array')
 .lookup = NULL
 
 .geneTable = function() {
