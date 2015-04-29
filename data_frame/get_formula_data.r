@@ -1,4 +1,8 @@
-process_formula = function(form, data=parent.frame()) {
+#' 
+#'
+#'
+#'
+get_formula_data = function(form, data=parent.frame()) {
     extract_calls = function(f, ops=c("~","+")) {
         if (length(f) > 1 && as.character(f[[1]]) %in% ops)
             sapply(f[2:length(f)], extract_calls)
