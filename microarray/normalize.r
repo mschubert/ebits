@@ -4,19 +4,23 @@
 #' @param method   Method to use for normalization: rma, gcrma, frma
 #' @return         The normalized data
 normalize = function(rawData, method="rma") {
-    if (method == "rma")
-        expr = affy::rma(rawData)
-#        expr = oligo::rma(rawData)
-    else if (method == "gcrma") {
-#        rawData = affy::ReadAffy(filenames=files)
-        expr = gcrma::gcrma(rawData)
-    } else if (method == "frma") {
-#        if (class(rawData) != "GeneFeatureSet")
-#            rawData = affy::ReadAffy(filenames=files)
-        expr = frma::frma(rawData, target="core")
-        colnames(expr) = fnames
-    } else
-        stop("invalid method")
+    UseMethod("normalize")
+}
 
-    expr
+normalize.FeatureSet = function(rawData, method="rma") {
+    if (method == "rma")
+        oligo::rma(rawData)
+    else
+        stop("invalid method")
+}
+
+normalize.AffyBatch = function(rawData, method="rma") {
+    if (method == "rma")
+        affy::rma(rawData)
+    else if (method == "gcrma")
+        gcrma::gcrma(rawData)
+    else if (method == "frma")
+        expr = frma::frma(rawData, target="core")
+    else
+        stop("invalid method")
 }
