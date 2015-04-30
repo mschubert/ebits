@@ -5,6 +5,14 @@
 #' @param RLE      tolerance of meadian RLE score around 0, set to NA for no QC
 #' @return         `rawData` filtered for QC criteria
 qc = function(rawData, NUSE=0.1, RLE=0.1) {
+    UseMethod("qc")
+}
+
+qc.list = function(rawData, NUSE=0.1, RLE=0.1) {
+    lapply(rawData, normalize)
+}
+
+qc.FeatureSet = function(rawData, NUSE=0.1, RLE=0.1) {
     plmFit = oligo::fitProbeLevelModel(rawData, target='core')
 
     discard = F
