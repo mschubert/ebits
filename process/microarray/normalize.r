@@ -1,10 +1,14 @@
 #' Function to normalize expression objects
 #'
-#' @param rawData  A raw data object
+#' @param rawData  A raw data object, or a list thereof
 #' @param method   Method to use for normalization: rma, gcrma, frma
 #' @return         The normalized data
 normalize = function(rawData, method="rma") {
     UseMethod("normalize")
+}
+
+normalize.list = function(rawData, method="rma") {
+    lapply(rawData, normalize)
 }
 
 normalize.FeatureSet = function(rawData, method="rma") {
