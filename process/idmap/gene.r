@@ -30,7 +30,7 @@ gene.matrix = function(obj, to, from=.guess(rownames(obj)), summarize=mean) {
     .ar$summarize(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
-gene.FeatureSet = function(obj, to, from=.guess(rownames(exprs(obj))),  summarize=mean) {
+gene.ExpressionSet = function(obj, to, from=.guess(rownames(exprs(obj))),  summarize=mean) {
     df = na.omit(data.frame(from=.lookup[[from]], to=.lookup[[to]]))
     df = df[!duplicated(df),]
     exprs(obj) = .ar$summarize(exprs(obj), along=1, from=df$from, to=df$to, FUN=summarize)
