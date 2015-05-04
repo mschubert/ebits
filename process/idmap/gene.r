@@ -1,7 +1,59 @@
 .b = import('../../base')
 .io = import('../../io')
 .ar = import('../../array')
-.lookup = NULL
+
+#' Gene ID mapping function
+#'
+#' @param obj        a character vector or matrix with ids (rownames) to be mapped
+#' @param from       the type of ids to map from; if NULL will try regex matching
+#' @param to         the type of ids to map to
+#' @param summarize  the function to use to aggregate ids
+gene = function(obj, from=NULL, to, summarize=mean) {
+    UseMethod("gene")
+}
+
+gene.character = function(obj, to, from=.guess(obj), summarize=mean) {
+    df = na.omit(data.frame(from=.lookup[[from]], to=.lookup[[to]]))
+    df = df[!duplicated(df),]
+    .b$match(obj, from=df$from, to=df$to)
+}
+
+gene.numeric = function(obj, to, from=.guess(names(obj)), summarize=mean) {
+    df = na.omit(data.frame(from=.lookup[[from]], to=.lookup[[to]]))
+    df = df[!duplicated(df),]
+    .ar$summarize(obj, along=1, from=df$from, to=df$to, FUN=summarize)
+}
+
+gene.matrix = function(obj, to, from=.guess(rownames(obj)), summarize=mean) {
+    df = na.omit(data.frame(from=.lookup[[from]], to=.lookup[[to]]))
+    df = df[!duplicated(df),]
+    .ar$summarize(obj, along=1, from=df$from, to=df$to, FUN=summarize)
+}
+
+gene.FeatureSet = function(obj, to, from=.guess(rownames(exprs(obj))),  summarize=mean) {
+    df = na.omit(data.frame(from=.lookup[[from]], to=.lookup[[to]]))
+    df = df[!duplicated(df),]
+    exprs(obj) = .ar$summarize(exprs(obj), along=1, from=df$from, to=df$to, FUN=summarize)
+    obj
+}
+
+gene.list = function(obj, to, from, summarize=mean) {
+    lapply(obj, gene)
+}
+
+.guess = function(from_ids) {
+    if (sum(grepl("^ENSG", from_ids)) > length(from_ids)/2)
+        'ensembl_gene_id'
+    else if (sum(grepl("_at$", from_ids)) > length(from_ids)/2)
+        'probe_id'
+    else if (sum(grepl("^ILMN", from_ids)) > length(from_ids)/2)
+        'probe_id'
+    else if (sum(suppressWarnings(!is.na(as.numeric(from_ids)))) > length(from_ids)/2)
+        'entrezgene'
+    else
+        stop("need to specify 'from' id type")
+}
+guess = .guess
 
 .geneTable = function() {
     cache = file.path(module_file(), "geneTable.RData")
@@ -30,36 +82,21 @@
     save(allfrom_idsets, file=cache)
     allfrom_idsets
 }
+geneTable = .geneTable
+.lookup = .geneTable()
 
-#' Gene ID mapping function
-#'
-#' @param obj            a character vector or matrix with ids (rownames) to be mapped
-#' @param from           the type of ids to map from; if NULL will try regex matching
-#' @param to             the type of ids to map to
-#' @param fun.aggregate  the function to use to aggregate ids
-gene = function(obj, from=NULL, to, fun.aggregate=mean) {
-    if (!is.null(from) && from == to)
-        return(x) #TODO: where not duplicated entries?
+if (is.null(module_name())) {
+    testthat::expect_equal(gene('683_at', to="hgnc_symbol"),
+                           setNames("OTC", "683_at"))
 
-    if (is.matrix(obj)) # remove version numbers from identifiers
-        from_ids = rownames(obj) = .b$grep("^([a-zA-Z0-9_]+)", rownames(obj))
-    else
-        from_ids = obj
+    #FIXME: column name is dropped, should not be
+    #m = matrix(1, nrow=2, ncol=1, dimnames=list(c('683_at','683_at'), 'x'))
+    #gene(m, to="hgnc_symbol")
 
-    if (is.null(.lookup))
-        assign('.lookup', .geneTable(), envir=parent.env(environment()))
-
-    if (is.null(from)) {
-        if (sum(grepl("^ENSG", from_ids)) > length(from_ids)/2)
-            from = 'ensembl_gene_id'
-        else if (sum(grepl("_at|ILMN", from_ids)) > length(from_ids)/2)
-            from = 'probe_id'
-        else if (sum(suppressWarnings(!is.na(as.numeric(from_ids)))) > length(from_ids)/2)
-            from = 'entrezgene'
-        else
-            from = 'hgnc_symbol'
-    }
-
-    .ar$summarize(obj, from=.lookup[[from]],
-                  to=.lookup[[to]], FUN=fun.aggregate)
+    m = matrix(1, nrow=2, ncol=2,
+               dimnames=list(c('683_at','683_at'), c('x','y')))
+    M = gene(m, to="hgnc_symbol")
+    Mref = structure(c(1, 1), .Dim = 1:2,
+                     .Dimnames = list("OTC", c("x", "y")))
+    testthat::expect_equal(M, Mref)
 }
