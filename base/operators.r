@@ -1,5 +1,7 @@
 # some operators for R
 
+`%>%` = magrittr::`%>%`
+
 `%or%` = function(a, b) {
     cmp = function(a,b) if (identical(a, FALSE) || 
                             is.null(a) || 
