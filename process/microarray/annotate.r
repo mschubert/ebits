@@ -1,3 +1,5 @@
+.b = import('../../base')
+
 #' mapping of annotation identifier to annotation package
 #' there should be a mapping between the two available somewhere?
 .gene = list(
@@ -31,7 +33,12 @@ annotate = function(normData, summarize="hgnc_symbol") {
 }
 
 annotate.list = function(normData, summarize="hgnc_symbol") {
-    lapply(normData, annotate)
+    re = lapply(normData, function(x) annotate(x) %catch% NA)
+    if (any(is.na(re)))
+        warning("dropping ", names(re)[is.na(re)])
+    if (all(is.na(re)))
+        stop("all annotations failed")
+    re[!is.na(re)]
 }
 
 annotate.ExpressionSet = function(normData, summarize="hgnc_symbol") {
