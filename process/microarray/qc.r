@@ -30,3 +30,8 @@ qc.FeatureSet = function(rawData, NUSE=0.1, RLE=0.1) {
     }
     rawData
 }
+
+qc.NChannelSet = function(rawData, NUSE=0.1, RLE=0.1) {
+    warning("do not know how to QC NChannelSet, skipping")
+    rawData
+}
