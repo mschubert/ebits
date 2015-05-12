@@ -46,7 +46,7 @@ from_formula = function(formula, data=parent.frame(), group=NULL, subsets=NULL) 
         .b$descriptive_index(data[[x]], along=2),
         USE.NAMES=TRUE, simplify=FALSE
     )
-    index_items$subsets = unique(subsets)
+    index_items$subset = unique(subsets)
     index = do.call(.b$expand_grid, index_items)
 
     # add grouped items to be the same as the var they are grouped with

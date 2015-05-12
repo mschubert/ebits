@@ -9,42 +9,32 @@
 #' @param ...      Used as variable names and indices along columns;
 #                  this should be needed only if called from df$call
 #' @return         A data.frame with the associations
-lm = function(formula, data=parent.frame(), min_pts=3, subsets=NULL, return_intercept=FALSE, ...) {
-    # subset as specified in `...`
-    data_env = as.environment(data)
-    fvars = all.vars(formula)
-    data = c(mget(fvars[fvars %in% ls(data_env)], envir=data_env),
-             mget(fvars[!fvars %in% ls(data_env)], envir=parent.frame()))
+lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL) {
+    idf = .df$from_formula(formula, group=group, subsets=subsets)
 
-    subs = list(...)
-    for (i in seq_along(subs))
-        data[[names(subs)[i]]] = .b$subset(data[[names(subs)[i]]], index=subs[[i]])
+    # ...  row arguments of the data.frame
+    one_item = function(formula, data, subsets=NULL, ...) {
+        args = list(...)
 
-    # define what to do with one subset
-    one_lm = function(data) {
+        # subset data according to subsets
+        if (!is.null(subsets)) {
+            data = lapply(data, function(x) x[subsets == args$subset,,drop=FALSE])
+            args$subset = NULL
+        }
+
+        # subset data according to data.frame indices
+        for (name in names(data))
+            data[[name]] = data[[name]][, args[[name]], drop=TRUE]
+        stopifnot(sapply(data, is.vector))
+
+        # calculate the model
         pts = nrow(na.omit(do.call(cbind, data)))
-        if (pts >= min_pts)
-            stats::lm(formula, data=data) %>% .clean_model_result()
+        stats::lm(formula, data) %>%
+            broom::tidy() %>%
+            cbind(size = pts)
     }
 
-    # subset as specified in `subsets`
-    if (is.null(subsets))
-        one_lm(data)
-    else
-        lapply(data, function(d) .ar$split(d, along=1, subsets=subsets)) %>%
-            .b$list$transpose() %>%
-            lapply(one_lm) %>%
-            .df$rbind(add_col="subset")
-}
-
-.clean_model_result = function(model, return_intercept=FALSE, add_size=TRUE) {
-    model = model %>%
-        broom::tidy() %>%
-        cbind(size = NA) #FIXME: size
-    if (return_intercept)
-        model
-    else
-        dplyr::filter(model, term != "(Intercept)")
+    .df$call(idf, one_item)
 }
 
 #cox = function(formula) {
