@@ -21,6 +21,8 @@ p_effect = function(df, pvalue="pvalue", effect="effect", dir=1, thresh=0.05) {
     df$color[df[[effect]] < 0] = rgb(225, 0, 0, 120, maxColorValue=255) # red
     df$color[df[[pvalue]] > 0.05] = rgb(200, 200, 200, 120, maxColorValue=255) # grey
     df[[effect]] = sign(dir) * df[[effect]]
+    df$.x = df[[effect]]
+    df$.y = df[[pvalue]]
     df
 }
 
