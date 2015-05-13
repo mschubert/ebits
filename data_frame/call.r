@@ -5,8 +5,16 @@
 #' @param ...          Further arguments to pass to `fun`
 #' @param result_only  Return only the result column instead of the data.frame
 #' @param tidy         Try to convert the result into a data.frame
+#' @param hpc_args     If not NULL, arguments to be passed to `hpc$Q`
 #' @return             A data frame with the function call results
-call = function(df, fun, ..., result_only=FALSE, tidy=TRUE) {
+call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
+    if (is.null(hpc_args))
+        .serial(df=df, fun=fun, ..., result_only=result_only, tidy=tidy)
+    else
+        .hpc(df=df, ` fun`=fun, ..., result_only=result_only, tidy=tidy) #TODO: hpc_args+fun args
+}
+
+.serial = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
     irow2result = function(i) {
         index_row = as.list(df[i,,drop=FALSE])
         result = do.call(fun, c(index_row, args))
@@ -34,11 +42,7 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE) {
         result
 }
 
-#' Use hpc$Q to process data.frame on a cluster
-#'
-#' @param df   A data.frame that should be processed
-#' @param ...  Arguments to be passed to `hpc$Q`
-call_hpc = function(df, ` fun`, ..., result_only=FALSE, tidy=TRUE) {
+.hpc = function(df, ` fun`, ..., result_only=FALSE, tidy=TRUE) {
     hpc = import('../hpc')
     args = list(...)
 

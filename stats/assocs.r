@@ -9,10 +9,10 @@
 #' @param ...      Used as variable names and indices along columns;
 #                  this should be needed only if called from df$call
 #' @return         A data.frame with the associations
-lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL) {
+lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL, hpc_args=NULL) {
     idf = .df$from_formula(formula, group=group, subsets=subsets)
 
-    # ...  row arguments of the data.frame
+    # ... : row arguments of the data.frame
     one_item = function(formula, data, subsets=NULL, ...) {
         args = list(...)
 
@@ -34,7 +34,7 @@ lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL)
             cbind(size = pts)
     }
 
-    .df$call(idf, one_item)
+    .df$call(idf, one_item, hpc_args=hpc_args)
 }
 
 #cox = function(formula) {
