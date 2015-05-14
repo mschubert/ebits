@@ -19,6 +19,7 @@ get_formula_data = function(form, data=parent.frame()) {
 
     # extract all names/calls that are atomic for the formula
     vars = unlist(extract_calls(form))
+    vars = vars[!sapply(vars, is.numeric)] # exclude "0+" from parsing
 
     # go through vars, create data list w/ all evals
     processed_data = lapply(vars, function(v) base::eval(v, envir=data))

@@ -20,11 +20,12 @@
 #' @param data     Where to look for the data the `formula` references
 #' @param group    Names of variables that should be column-interated together
 #' @param subsets  How to divide each variable in `formula` along first axis
-from_formula = function(formula, data=parent.frame(), group=NULL, subsets=NULL) {
+#' @param atomic   Names of variables that should not be iterated through
+from_formula = function(formula, data=parent.frame(), group=NULL, subsets=NULL, atomic=NULL) {
     pp = .gfd$get_formula_data(formula, data)
     data = lapply(pp$data, as.matrix)
     formula = pp$form
-    formula_vars = all.vars(formula)
+    formula_vars = setdiff(all.vars(formula), atomic)
     matrix_vars = names(data)[sapply(data, ncol) > 1]
 
     # allow groups only when they make sense
