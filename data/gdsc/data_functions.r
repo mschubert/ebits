@@ -6,11 +6,11 @@ drug = import('./drug')
 MASTER_LIST = cosmic$MASTER_LIST
 DRUG_PROPS = drug$DRUG_PROPS
 
-getNGS_BEM = function() {
+ngs_bem = function() {
     .file$get('NGS_BEM_FATHMM_29052013v2.ro')
 }
 
-getMutatedGenes = function(frequency=0, intogen=F, tissue=NULL) {
+mutated_genes = function(frequency=0, intogen=F, tissue=NULL) {
     mut = t(.file$get('NGS_BEM_FATHMM_29052013v2.ro')$logical)
 
     if (!is.null(tissue))
@@ -28,20 +28,20 @@ getMutatedGenes = function(frequency=0, intogen=F, tissue=NULL) {
     mut
 }
 
-getDrivers = function(tissue=NULL) {
+drivers = function(tissue=NULL) {
     ig = .file$get('INTOGEN_DRIVERS')
     if (!is.null(tissue))
         ig = dplyr::filter(ig, Tumor_Type %in% tissue)
     transmute(ig, HGNC=ActingDriver_Symbol, tissue=Tumor_Type)
 }
 
-getBasalExpression = function() {
+basal_expression = function() {
     obj = .file$get('BASAL_EXPRESSION')
     rownames(obj$DATA) = obj$GENE_SYMBOLS
     obj$DATA
 }
 
-getDrugResponse = function(metric='IC50s', validCosmicIds=TRUE,
+drug_response = function(metric='IC50s', validCosmicIds=TRUE,
             drug_names=TRUE, cell_names=FALSE) { #, min.real.IC50s=0) {
     if (grepl("IC50", metric))
         SCREENING = .file$get('DRUG_IC50')
@@ -59,7 +59,7 @@ getDrugResponse = function(metric='IC50s', validCosmicIds=TRUE,
     SCREENING
 }
 
-getTissues = function(tissue=NULL, unknown=NA, dropUnknown=T, TCGA=T, minN=2) {
+tissues = function(tissue=NULL, unknown=NA, dropUnknown=T, TCGA=T, minN=2) {
     stopifnot(!dropUnknown || is.na(unknown)) # if dropUnknown, unknown needs to be NA
 
     if (TCGA)
