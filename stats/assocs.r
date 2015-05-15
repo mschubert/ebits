@@ -5,9 +5,9 @@
 #' @param formula  A formula that describes the data relationship
 #' @param data     The data to process, or parent.frame() by default
 #' @param min_pts  Minimum number of data points to calculate model from (TODO: each level for multi-reg)
-#' @param return_intercept  Whether or not to return the intercept
-#' @param ...      Used as variable names and indices along columns;
-#                  this should be needed only if called from df$call
+#' @param group    Variables to iterate together
+#' @param subsets  Vector whose unique set is used to split the data along rows
+#' @param atomic   Variables that should not be iterated, e.g. a coefficients matrix
 #' @return         A data.frame with the associations
 lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL, atomic=NULL, hpc_args=NULL) {
     idf = .df$from_formula(formula, data=data, group=group, subsets=subsets, atomic=atomic)
@@ -37,9 +37,16 @@ lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL,
     .df$call(idf, one_item, hpc_args=hpc_args)
 }
 
+#' @param formula  A formula of kind `time + status ~ independent variables`
+#' @param data     The data to process, or parent.frame() by default
+#' @param min_pts  Minimum number of data points to calculate model from (TODO: each level for multi-reg)
+#' @param group    Variables to iterate together
+#' @param subsets  Vector whose unique set is used to split the data along rows
+#' @param atomic   Variables that should not be iterated, e.g. a coefficients matrix
+#' @return         A data.frame with the associations
+coxph = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL, atomic=NULL, hpc_args=NULL) {
 #TODO: split out the indexing and function part
-sem = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL, atomic=NULL, hpc_args=NULL) {
-    idf = .df$from_formula(formula, group=group, subsets=subsets, atomic=atomic)
+    idf = .df$from_formula(formula, data=data, group=group, subsets=subsets, atomic=atomic)
 
     # ... : row arguments of the data.frame
     one_item = function(formula, data, subsets=NULL, ...) {
@@ -57,15 +64,11 @@ sem = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL
         stopifnot(sapply(data, is.vector))
 
         # calculate the model
-#TODO: fill in simple multiple regression using SEM
+        fstr = strsplit(sub("\\+", ",", deparse(formula)), "~")[[1]]
+        formula = formula(paste("survival::Surv(", fstr[1], ") ~", fstr[-1]))
+        survival::coxph(formula, data) %>%
+            broom::tidy()
     }
 
     .df$call(idf, one_item, hpc_args=hpc_args)
 }
-
-#cox = function(formula) {
-#}
-#
-## this will be somewhat complicated
-#sem = function(formula) {
-#}

@@ -11,7 +11,7 @@
 # could i maybe use a grouped data_frame for this?
 
 # start with st$.assocs_subset here, leave the row-wise calls to df$call
-.b = import('base')
+.b = import('../base')
 .gfd = import('./get_formula_data')
 
 #' Gathers all data required for a formula and creates a subsetting index
@@ -22,7 +22,7 @@
 #' @param subsets  How to divide each variable in `formula` along first axis
 #' @param atomic   Names of variables that should not be iterated through
 from_formula = function(formula, data=parent.frame(), group=NULL, subsets=NULL, atomic=NULL) {
-    pp = .gfd$get_formula_data(formula, data)
+    pp = .gfd$get_formula_data(form=formula, data=data)
     data = lapply(pp$data, as.matrix)
     formula = pp$form
     formula_vars = setdiff(all.vars(formula), atomic)
@@ -59,4 +59,55 @@ from_formula = function(formula, data=parent.frame(), group=NULL, subsets=NULL, 
     attr(index, "args")$subsets = subsets
     class(index) = append(class(index),"attr_args")
     index
+}
+
+if (is.null(module_name())) {
+    A = matrix(1:4, nrow=2, ncol=2, dimnames=list(c('a','b'),c('x','y')))
+    B = matrix(5:6, nrow=2, ncol=1, dimnames=list(c('b','a'),'z'))
+    C = matrix(4:5, nrow=2, ncol=2)
+    # (A)   x y    (B)   z    (C)     [,1] [,2]
+    #     a 1 3        b 5      [1,]    4    4
+    #     b 2 4        a 6      [2,]    5    5
+
+    x1 = from_formula(A ~ B + C)
+    #   A B C
+    # 1 x z 1
+    # 2 y z 1
+    # 3 x z 2
+    # 4 y z 2
+
+    x2 = from_formula(A ~ B + C, group=c("A","C"))
+    #   A B C
+    # 1 x z x
+    # 2 y z y
+
+    x3 = from_formula(A ~ B + C, group=c("A","C"), subsets=c('w','o'))
+    #   A B subset C
+    # 1 x z      w x
+    # 2 y z      w y
+    # 3 x z      o x
+    # 4 y z      o y
+
+    x1a = attr(x1, "args"); attr(x1, "args") = NULL
+    x2a = attr(x2, "args"); attr(x2, "args") = NULL
+    x3a = attr(x3, "args"); attr(x3, "args") = NULL
+
+    testthat::expect_equal(x1a$data, x2a$data)
+    testthat::expect_equal(x2a$data, x3a$data)
+
+    testthat::expect_equal(x1,
+    structure(list(A = c("x", "y", "x", "y"), B = c("z", "z", "z",
+    "z"), C = c(1L, 1L, 2L, 2L)), .Names = c("A", "B", "C"), class = c("data.frame",
+    "attr_args"), row.names = c(NA, -4L)))
+
+    testthat::expect_equal(x2,
+    structure(list(A = c("x", "y"), B = c("z", "z"), C = c("x", "y"
+    )), .Names = c("A", "B", "C"), row.names = c(NA, -2L), class = c("data.frame",
+    "attr_args")))
+
+    testthat::expect_equal(x3,
+    structure(list(A = c("x", "y", "x", "y"), B = c("z", "z", "z",
+    "z"), subset = c("w", "w", "o", "o"), C = c("x", "y", "x", "y"
+    )), .Names = c("A", "B", "subset", "C"), row.names = c(NA, -4L
+    ), class = c("data.frame", "attr_args")))
 }

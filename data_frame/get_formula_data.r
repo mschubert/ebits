@@ -1,7 +1,7 @@
-#' 
+#' Function that extracts the data a formula references
 #'
-#'
-#'
+#' @param from  The formula
+#' @param data  A superset of the data; default: calling environment
 get_formula_data = function(form, data=parent.frame()) {
     extract_calls = function(f, ops=c("~","+")) {
         if (length(f) > 1 && as.character(f[[1]]) %in% ops)
@@ -30,5 +30,34 @@ get_formula_data = function(form, data=parent.frame()) {
     for (v in vars)
         form_str = gsub(attr(v,"str"), attr(v,"name"), form_str, fixed=TRUE)
 
-    list(form=as.formula(form_str), data=processed_data)
+    list(form=formula(form_str), data=processed_data)
+}
+
+if (is.null(module_name())) {
+    time = c(4,3,1,1,2,2,3)
+    status = c(1,0,1,0,1,1,0)
+
+    # directly reference data
+    form = status ~ time
+    d1 = get_formula_data(form)
+    testthat::expect_equal(d1$form, form)
+    testthat::expect_equal(d1$data$time, time)
+    testthat::expect_equal(d1$data$status, status)
+
+    test = list(time = c(4,3,1,1,2,2,3),
+                status = c(1,1,1,0,1,1,0),
+                x = c(0,2,1,1,1,0,0),
+                sex = c(0,0,0,0,1,1,1))
+
+    # provide data
+    d2 = get_formula_data(status ~ time, data=test)
+    testthat::expect_equal(d2$form, form)
+    testthat::expect_equal(d2$data$time, test$time)
+    testthat::expect_equal(d2$data$status, test$status)
+
+    # syntax for survival fits
+    d3 = get_formula_data(status + time ~ 0 + x, data=test)
+    testthat::expect_equal(d3$form, status + time ~ 0 + x)
+    testthat::expect_equal(d3$data$time, test$time)
+    testthat::expect_equal(d3$data$status, test$status)
 }
