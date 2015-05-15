@@ -64,10 +64,12 @@ coxph = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NU
         stopifnot(sapply(data, is.vector))
 
         # calculate the model
+        pts = nrow(na.omit(do.call(cbind, data)))
         fstr = strsplit(sub("\\+", ",", deparse(formula)), "~")[[1]]
         formula = formula(paste("survival::Surv(", fstr[1], ") ~", fstr[-1]))
         survival::coxph(formula, data) %>%
-            broom::tidy()
+            broom::tidy() %>%
+            cbind(size = pts)
     }
 
     .df$call(idf, one_item, hpc_args=hpc_args)
