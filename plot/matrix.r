@@ -1,11 +1,20 @@
+.b = import('../base')
 .ar = import('../array')
 
-#' @param formula      A formula of the kind value ~ axis[, axis2] FIXME: doesn't work
-cluster = function(df, formula, cols=TRUE, rows=TRUE) {
-    mat = t(.ar$construct(df, formula, fun.aggregate=mean)) # fun.aggr should not be needed
+#' @param df       The data.frame containing the associations
+#' @param formula  A formula of the kind value ~ axis[, axis2] FIXME: doesn't work
+#' @param cols     Boolean flag indicating whether to cluster columns
+#' @param rows     Boolean flag indicating whether to cluster rows
+#' @param size     A size c(rows,cols) to limit the result clustering to
+cluster = function(df, formula, cols=TRUE, rows=TRUE, size=NULL) {
+    mat = .ar$construct(data=df, formula=formula, fun.aggregate=mean)
     indep_vars = all.vars(formula[[3]])
-    rname = indep_vars[2] #FIXME: ar$construct should order by std. axis ordering
-    cname = indep_vars[1] # order: 1,2 && remove t()
+    rname = indep_vars[1] #FIXME: ar$construct should order by std. axis ordering
+    cname = indep_vars[2] # order: 1,2 && remove t()
+
+    if (!is.null(size))
+        mat = mat[.b$top_mask(rowSums(mat), size[1]),
+                  .b$top_mask(colSums(mat), size[2])]
 
     ord_rows = rownames(mat)
     ord_cols = colnames(mat)
@@ -14,18 +23,31 @@ cluster = function(df, formula, cols=TRUE, rows=TRUE) {
     if (cols)
         ord_cols = colnames(mat)[hclust(dist(t(mat)))$order]
 
+    df = df[df[[rname]] %in% ord_rows,]
+    df = df[df[[cname]] %in% ord_cols,]
     df[[rname]] = factor(df[[rname]], ord_rows)
     df[[cname]] = factor(df[[cname]], ord_cols)
     df
 }
 
-#' @param formula      Formula of sort value ~ row + col
-matrix = function(df, formula, color="color", label=NULL, 
+#' Draws a matrix plot using ggplot::geom_tile or circle
+#'
+#' @param df       A data.frame containing the data
+#' @param formula  Formula of sort value ~ row + col
+#' @param color    Name of colour filed in df
+#' @param label    Name of label field in df
+#' @param palette  ggplot palette that should be used; default: RdYlGn
+#' @param geom     ggplot geom that should be used, 'tile' or 'circle'
+#' @param limits
+matrix = function(df, formula, color="color", label=NULL,
                   palette="RdYlGn", geom="tile", limits=NULL,
                   na_value="#f5f5f5") {
     value = all.vars(formula[[2]])
     rows = all.vars(formula[[3]])[1]
     cols = all.vars(formula[[3]])[2]
+
+    if ('label' %in% colnames(df))
+        label = 'label'
 
     po.nopanel = list(theme(
         panel.background = element_blank(),
