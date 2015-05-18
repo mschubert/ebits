@@ -19,6 +19,9 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
         index_row = as.list(df[i,,drop=FALSE])
         result = do.call(fun, c(index_row, args))
 
+        if (is.null(result))
+            return(NULL)
+
         if (tidy)
             result = as.data.frame(result)
 

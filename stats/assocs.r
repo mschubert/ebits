@@ -29,9 +29,12 @@ lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL,
 
         # calculate the model
         pts = nrow(na.omit(do.call(cbind, data)))
-        stats::lm(formula, data) %>%
-            broom::tidy() %>%
-            cbind(size = pts)
+        if (pts < min_pts)
+            NULL
+        else
+            stats::lm(formula, data) %>%
+                broom::tidy() %>%
+                cbind(size = pts)
     }
 
     .df$call(idf, one_item, hpc_args=hpc_args)
