@@ -48,8 +48,8 @@ available = function(clinical=NULL, rna_seq=NULL, rppa=NULL, map_to="specimen") 
 #' @param specimen     ICGC specimen ids
 #' @param donors       ICGC donor ids
 #' @param raw.counts   Get the raw counts (as opposed to normalized)
-#' @param map.samples  character vector to map identifiers to: 'sample', 
-#'                     'specimen', 'donor' [default: same as requested identifiers]
+#' @param map.samples  character vector to map identifiers to: 'icgc_sample_id', 
+#'                     'icgc_specimen_id', 'donor_id' [default: same as requested identifiers]
 #' @param tissues      Get only certain (TCGA) tissues
 #' @return             The requested sample matrix
 rna_seq = function(index=NULL, samples=NULL, specimen=NULL, donors=NULL,
