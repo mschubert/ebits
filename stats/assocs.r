@@ -2,6 +2,8 @@
 .ar = import('../array')
 .df = import('../data_frame')
 
+#TODO: split out the indexing and function part
+
 #' @param formula  A formula that describes the data relationship
 #' @param data     The data to process, or parent.frame() by default
 #' @param min_pts  Minimum number of data points to calculate model from (TODO: each level for multi-reg)
@@ -10,9 +12,7 @@
 #' @param atomic   Variables that should not be iterated, e.g. a coefficients matrix
 #' @return         A data.frame with the associations
 lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL, atomic=NULL, hpc_args=NULL) {
-    idf = .df$from_formula(formula, data=data, group=group, subsets=subsets, atomic=atomic)
-#FIXME: work with combination of parent.frame()+explicit data
-    # ... : row arguments of the data.frame
+    #' @param ...   Arguments as defined in the data.frame row
     one_item = function(formula, data, subsets=NULL, ...) {
         args = list(...)
 
@@ -23,9 +23,10 @@ lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL,
         }
 
         # subset data according to data.frame indices
-        for (name in names(data))
+        is_iterated = intersect(names(data), names(args))
+        for (name in is_iterated)
             data[[name]] = data[[name]][, args[[name]], drop=TRUE]
-        stopifnot(sapply(data, is.vector))
+        stopifnot(sapply(data[is_iterated], is.vector))
 
         # calculate the model
         pts = nrow(na.omit(do.call(cbind, data)))
@@ -37,6 +38,9 @@ lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL,
                 cbind(size = pts)
     }
 
+    idf = .df$from_formula(formula, data=data, group=group, subsets=subsets, atomic=atomic)
+#FIXME: work with combination of parent.frame()+explicit data
+    # ... : row arguments of the data.frame
     .df$call(idf, one_item, hpc_args=hpc_args)
 }
 
@@ -48,10 +52,7 @@ lm = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL,
 #' @param atomic   Variables that should not be iterated, e.g. a coefficients matrix
 #' @return         A data.frame with the associations
 coxph = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NULL, atomic=NULL, hpc_args=NULL) {
-#TODO: split out the indexing and function part
-    idf = .df$from_formula(formula, data=data, group=group, subsets=subsets, atomic=atomic)
-
-    # ... : row arguments of the data.frame
+    #' @param ...   Arguments as defined in the data.frame row
     one_item = function(formula, data, subsets=NULL, ...) {
         args = list(...)
 
@@ -62,18 +63,24 @@ coxph = function(formula, data=parent.frame(), min_pts=3, group=NULL, subsets=NU
         }
 
         # subset data according to data.frame indices
-        for (name in names(data))
+        is_iterated = intersect(names(data), names(args))
+        for (name in is_iterated)
             data[[name]] = data[[name]][, args[[name]], drop=TRUE]
-        stopifnot(sapply(data, is.vector))
+        stopifnot(sapply(data[is_iterated], is.vector))
 
         # calculate the model
         pts = nrow(na.omit(do.call(cbind, data)))
-        fstr = strsplit(sub("\\+", ",", deparse(formula)), "~")[[1]]
-        formula = formula(paste("survival::Surv(", fstr[1], ") ~", fstr[-1]))
-        survival::coxph(formula, data) %>%
-            broom::tidy() %>%
-            cbind(size = pts)
+        if (pts < min_pts)
+            NULL
+        else {
+            fstr = strsplit(sub("\\+", ",", deparse(formula)), "~")[[1]]
+            formula = formula(paste("survival::Surv(", fstr[1], ") ~", fstr[-1]))
+            survival::coxph(formula, data) %>%
+                broom::tidy() %>%
+                cbind(size = pts)
+        }
     }
 
+    idf = .df$from_formula(formula, data=data, group=group, subsets=subsets, atomic=atomic)
     .df$call(idf, one_item, hpc_args=hpc_args)
 }
