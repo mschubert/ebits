@@ -4,7 +4,8 @@ library(dplyr)
 .io = import('io')
 .p = import('../path')
 
-.icgc_raw_dir = .icgc_data_dir = .p$path('icgc')
+icgc_data_dir = .p$path('icgc')
+icgc_raw_dir = .p$file('icgc', 'version_17')
 
 .clinical = NULL
 .clinicalsample = NULL
@@ -17,7 +18,7 @@ library(dplyr)
 getRData = function(var, file) {
     re = base::get(var, envir=parent.env(environment()))
     if (is.null(re)) {
-        re = .io$load(.io$file_path(.icgc_data_dir, file))
+        re = .io$load(.io$file_path(icgc_data_dir, file))
         assign(var, re, envir=parent.env(environment()))
     }
     re
@@ -34,13 +35,12 @@ getHDF5 = function(fname, ...) {
     args$index = NULL
 
     if (is.null(args$samples) && is.null(args$specimen) && is.null(args$donors)) {
-        re = t(h5store::h5load(.io$file_path(.icgc_data_dir,
+        re = t(h5store::h5load(.io$file_path(icgc_data_dir,
             fname, ext=".h5"), index=index))
-        colnames(re) = idmap(colnames(re),
-            from="icgc_sample_id", to=args$map.ids)[,2]
+        colnames(re) = unname(.b$match(colnames(re), from="icgc_sample_id", to=args$map.ids))
     } else {
         f = do.call(varmap, args)
-        re = t(h5store::h5load(.io$file_path(.icgc_data_dir,
+        re = t(h5store::h5load(.io$file_path(icgc_data_dir,
             fname, ext=".h5"), index=names(f)))
         colnames(re) = unname(f)
     }
@@ -83,10 +83,11 @@ varmap = function(valid, samples=NULL, specimen=NULL, donors=NULL,
 }
 
 mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {
-    if (!force && file.exists(file.path(.icgc_data_dir, fname)))
+    if (!force && file.exists(file.path(icgc_data_dir, fname)))
         return()
 
-    efiles = list.files(.icgc_raw_dir, regex, recursive=T, full.names=T)
+    idmap = import('process/idmap')
+    efiles = list.files(icgc_raw_dir, regex, recursive=T, full.names=T)
 
     file2matrix = function(fname) {
         message(fname)
@@ -95,7 +96,7 @@ mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate
                            fun.aggregate=fun.aggregate)
         mat = mat[!rownames(mat) %in% c('?',''),] # aggr fun might handle his?
         if (map.hgnc)
-            mat = idmap$gene(mat, to='hgnc_symbol', fun.aggregate=fun.aggregate)
+            mat = idmap$gene(mat, to='hgnc_symbol', summarize=fun.aggregate)
         mat
     }
     obj = lapply(efiles, file2matrix)
@@ -103,30 +104,25 @@ mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate
     if (length(obj) == 0)
         stop("all file reads failed, something is wrong")
 
-    ids = unlist(sapply(obj, function(x) colnames(x)))
-    dups = duplicated(ids)
-    if (any(dups))
-        warning(paste("Duplicate entries will be overstacked:", ids[dups]))
-
-    mat = t(.ar$stack(obj, along=2)) # this can be done better
+    mat = t(.ar$stack(obj, along=2, fill=0))
     if (grepl("\\.h5$", fname))
-        h5store::h5save(mat, file=file.path(.icgc_data_dir, fname))
+        h5store::h5save(mat, file=file.path(icgc_data_dir, fname))
     else
-        save(mat, file=file.path(.icgc_data_dir, fname))
+        save(mat, file=file.path(icgc_data_dir, fname))
 }
 
 df = function(fname, regex, transform=function(x) x, force=FALSE) {
-    if (!force && file.exists(file.path(.icgc_data_dir, fname)))
+    if (!force && file.exists(file.path(icgc_data_dir, fname)))
         return()
 
-    files = list.files(.icgc_raw_dir, regex, recursive=T, full.names=T)
+    files = list.files(icgc_raw_dir, regex, recursive=TRUE, full.names=TRUE)
     mat = do.call(rbind, lapply(files, function(f) cbind(
         study = b$grep("/([^/]+)/[^/]+$", f),
-        read.table(f, header=T, sep="\t") #FIXME: io$read should work here
-    ))) %>% transform
+        read.table(f, header=TRUE, sep="\t") #FIXME: io$read should work here
+    ))) %>% transform()
 
     if (grepl("\\.h5$", fname))
-        h5store::h5save(mat, file=file.path(.icgc_data_dir, fname))
+        h5store::h5save(mat, file=file.path(icgc_data_dir, fname))
     else
-        save(mat, file=file.path(.icgc_data_dir, fname))
+        save(mat, file=file.path(icgc_data_dir, fname))
 }
