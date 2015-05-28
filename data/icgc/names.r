@@ -28,7 +28,7 @@
 rna_seq = function() .names('.names_expr', 'expr_seq_norm.h5')
 
 #' Returns a list containing row- and column names for mutational data
-mutation = function() .names('.names_mut', 'mutations.h5')
+mutations = function() .names('.names_mut', 'mutations.h5')
 
 #' Returns a list containing row- and column names for RPPA data
 rppa = function() .names('.names_protein', 'protein.h5')

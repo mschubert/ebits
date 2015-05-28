@@ -89,12 +89,33 @@ rppa = function(index=NULL, samples=NULL, specimen=NULL, donors=NULL, map.ids=TR
     do.call(.h$getHDF5, args)
 }
 
-mutation_types = function(bits=FALSE) {
-    tab = io$read_table(io$file_path(module_file(), 'mutation_types.txt'), header=T, sep="\t")
-    if (bits)
-        tab
-    else
-        tab$consequence_type
+#mutation_types = function(bits=FALSE) {
+#    tab = .io$read_table(.io$file_path(module_file(), 'mutation_types.txt'), header=TRUE, sep="\t")
+#    if (bits)
+#        tab
+#    else
+#        tab$consequence_type
+#}
+
+#' Function to retrieve the mutation data from the processed ICGC object
+#'
+#' Can do subsetting using either `index`, `samples`, `specimen`, or `donors`.
+#'
+#' @param index        HDF5 index, either numerical or dimension names
+#' @param samples      ICGC sample ids
+#' @param specimen     ICGC specimen ids
+#' @param donors       ICGC donor ids
+#' @param map.samples  character vector to map identifiers to: 'sample', 
+#'                     'specimen', 'donor' [default: same as requested identifiers]
+#' @return             The requested sample matrix
+mutations = function(index=NULL, samples=NULL, specimen=NULL, donors=NULL, map.ids=TRUE) {
+    args = list(index=index, samples=samples, specimen=specimen,
+                donors=donors, map.ids=map.ids)
+
+    args$valid = .n$mutations()[[1]]
+    args$fname = "mutations"
+
+    do.call(.h$getHDF5, args)
 }
 
 #getMutations = function(types=getMutationTypes()) {
