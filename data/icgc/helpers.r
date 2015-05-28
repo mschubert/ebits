@@ -34,16 +34,10 @@ getHDF5 = function(fname, ...) {
     index = args$index
     args$index = NULL
 
-    if (is.null(args$samples) && is.null(args$specimen) && is.null(args$donors)) {
-        re = t(h5store::h5load(.io$file_path(icgc_data_dir,
-            fname, ext=".h5"), index=index))
-        colnames(re) = unname(.b$match(colnames(re), from="icgc_sample_id", to=args$map.ids))
-    } else {
-        f = do.call(varmap, args)
-        re = t(h5store::h5load(.io$file_path(icgc_data_dir,
-            fname, ext=".h5"), index=names(f)))
-        colnames(re) = unname(f)
-    }
+    f = do.call(varmap, args)
+    re = t(h5store::h5load(.io$file_path(icgc_data_dir,
+        fname, ext=".h5"), index=names(f)))
+    colnames(re) = unname(f)
     re
 }
 
@@ -53,27 +47,25 @@ getHDF5 = function(fname, ...) {
 #' @param samples   ICGC sample ids
 #' @param specimen  ICGC specimen ids
 #' @param donors    ICGC donor ids
-#' @param char      Character vector: 'sample', 'specimen', or 'donor'
 #' @return          List with file index and mapped column names
-varmap = function(valid, samples=NULL, specimen=NULL, donors=NULL,
-                  char="", map.ids=TRUE) {
+varmap = function(valid, samples=NULL, specimen=NULL, donors=NULL, map.ids=TRUE) {
     nNull = is.null(samples) + is.null(specimen) + is.null(donors)
     if (nNull < 2)
         stop("can take ONE of index, samples, specimen, donors")
-    if (nchar(char)>0 && nNull > 0)
-        stop("can not map characters and variables in one go")
 
-    if (!is.null(specimen) || grepl("specimen", char)) {
+    if (!is.null(specimen)) {
         to = "icgc_specimen_id"
         filter_to = specimen
-    } else if (!is.null(donors) || grepl("donor", char)) {
+    } else if (!is.null(donors)) {
         to = "icgc_donor_id"
         filter_to = donors
-    } else if (!is.null(samples) || grepl("sample", char)) {
+    } else if (!is.null(samples) || is.logical(map.ids)) {
         to = "icgc_sample_id"
         filter_to = samples
-    } else
-        stop("invalid option. error checking before should have caught this")
+    } else {
+        to = map.ids
+        filter_to = NULL
+    }
 
     .b$match(x = valid,
              from = "icgc_sample_id",
