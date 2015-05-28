@@ -40,7 +40,14 @@ minN = function(x, N=2) {
 
 top_mask = function(x, N=2) {
     if (N > length(x))
-        rep(TRUE, length(x))
+        !is.na(x)
     else
-        seq_along(x) %in% order(x, decreasing=TRUE)[1:N]
+        seq_along(x) %in% order(x, decreasing=TRUE, na.last=NA)[1:N]
+}
+
+min_mask = function(x, N=2) {
+    if (N > length(x))
+        !is.na(x)
+    else
+        seq_along(x) %in% order(x, decreasing=FALSE, na.last=NA)[1:N]
 }
