@@ -41,33 +41,10 @@ getHDF5 = function(fname, ...) {
     } else {
         f = do.call(varmap, args)
         re = t(h5store::h5load(.io$file_path(.icgc_data_dir,
-            fname, ext=".h5"), index=f$index))
-        colnames(re) = f$cnames
+            fname, ext=".h5"), index=names(f)))
+        colnames(re) = unname(f)
     }
     re
-}
-
-#' Function to map the identifiers `x` from field `from` to field `to`
-#'
-#' @param x     Character vector with identifiers
-#' @param from  Type of the identifiers
-#' @param to    Type of the identifiers to map to
-idmap = function(x, from, to, filter_to=NULL) {
-    if (from == to || to == TRUE)
-        re = data.frame(from=x, to=x)
-    else {
-        re = getRData('.clinicalsample', 'clinicalsample.RData') %>% select_(from, to)
-        colnames(re) = c('from', 'to')
-        re = re[match(x,re$from),]
-    }
-
-    if (!is.null(filter_to))
-        re = re[re$to %in% filter_to,]
-
-    if (nrow(re) == 0)
-        stop("id mapping: no matches found")
-    else
-        re
 }
 
 #' Function to map the given variables to an HDF5 index and name mappings
@@ -98,14 +75,11 @@ varmap = function(valid, samples=NULL, specimen=NULL, donors=NULL,
     } else
         stop("invalid option. error checking before should have caught this")
 
-    lookup = idmap(x=valid, from="icgc_sample_id", to=to, filter_to=filter_to)
-
-    if (identical(map.ids, TRUE))
-        cnames = lookup[,2]
-    else if (is.character(map.ids))
-        cnames = idmap(lookup[,1], from="icgc_sample_id", to=map.ids)[,2]
-
-    list(index=lookup[,1], cnames=cnames)
+    .b$match(x = valid,
+             from = "icgc_sample_id",
+             to = to,
+             filter_to = filter_to,
+             data = getRData('.clinicalsample', 'clinicalsample.RData'))
 }
 
 mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {

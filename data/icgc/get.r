@@ -8,7 +8,16 @@
 .icgc_data_dir = .p$path('icgc')
 
 #' Returns a list containing row- and column names for clinical data
-clinical = function() .h$getRData('.clinical', 'clinical.RData')
+clinical = function(specimen=NULL, donors=NULL) {
+    re = .h$getRData('.clinical', 'clinical.RData')
+
+    if (!is.null(donors))
+        re[match(donors, re$icgc_donor_id),]
+    else if (!is.null(specimen))
+        re[match(specimen, re$icgc_specimen_id),]
+    else
+        re
+}
 
 #' Returns a list containing row- and column names for clinical sample data
 clinical_sample = function() .h$getRData('.clinicalsample', 'clinicalsample.RData')
@@ -30,11 +39,17 @@ available = function(clinical=NULL, rna_seq=NULL, rppa=NULL, map_to="specimen") 
         stop("invalid map_to, need to be 'specimen' or 'donor'")
 
     if (!is.null(clinical))
-        valid$clinical = getClinical()[[to]]
+        valid$clinical = clinical()[[to]]
     if (!is.null(rna_seq))
-        valid$RNA = .h$idmap(.n$rna_seq()[[1]], from="icgc_sample_id", to=to)[,2]
+        valid$rna_seq = .b$match(.n$rna_seq()[[1]],
+                                 from = "icgc_sample_id",
+                                 to = to,
+                                 data = clinical_sample())
     if (!is.null(rppa))
-        valid$rppa = .h$idmap(.n$rppa()[[1]], from="icgc_sample_id", to=to)[,2]
+        valid$rppa = .b$match(.n$rppa()[[1]],
+                              from = "icgc_sample_id",
+                              to = to,
+                              data = clinical_sample())
 
     do.call(.b$intersect, valid)
 }
