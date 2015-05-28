@@ -11,11 +11,17 @@
 #' @param to           Matched mapping for all identifiers
 #' @param filter_from  Restrict matching to a subset from `from`
 #' @param filter_to    Restrict matching to a subset from `to`
+#' @param data         List containing the data `from` and `to` reference
 #' @param fuzzy_level  0 for exact, 1 punctuation, and 2 closest character
 #' @param table        Return a matching table instead of just the matches
 #' @param na_rm        Flag to remove items that can not be mapped
-match = function(x, from, to, filter_from=NULL, filter_to=NULL,
+match = function(x, from, to, filter_from=NULL, filter_to=NULL, data=parent.frame(),
                  fuzzy_level=0, table=FALSE, na_rm=FALSE, warn=!table && fuzzy_level>0) {
+
+    if (is.character(from) && length(from) == 1)
+        from = data[[from]]
+    if (is.character(to) && length(to) == 1)
+        to = data[[to]]
 
     if (length(from) != length(to))
         stop("arguments `from` and `to` need to be of the same length")
