@@ -1,0 +1,3 @@
+[submodule "stats/NMFconsensus"]
+	path = stats/NMFconsensus
+	url = https://github.com/mschubert/NMFconsensus.git
