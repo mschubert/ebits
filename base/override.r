@@ -33,7 +33,7 @@ match = function(x, from, to, filter_from=NULL, filter_to=NULL, data=parent.fram
         to[!to %in% filter_to] = NA
 
     # remove identical mappings, then map ambivalent to NA
-    df = data.frame(from=from, to=to) %>% .omit$dups()
+    df = .omit$dups(data.frame(from=from, to=to))
     df$to[duplicated(df$from, all=TRUE)] = NA
     df = .omit$dups(df)
     from = df$from

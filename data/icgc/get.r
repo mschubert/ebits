@@ -1,15 +1,15 @@
 .b = import('base')
 .ar = import('array')
 .io = import('io')
-.h = import('./helpers')
+.i = import('./indexing')
 .p = import('../path')
-.n = import('./names')
 
 .icgc_data_dir = .p$path('icgc')
 
 #' Returns a list containing row- and column names for clinical data
+#TODO: give index=, infer id type from it
 clinical = function(specimen=NULL, donors=NULL) {
-    re = .h$getRData('.clinical', 'clinical.RData')
+    re = .i$getRData('clinical.RData')
 
     if (!is.null(donors))
         re[match(donors, re$icgc_donor_id),]
@@ -20,7 +20,7 @@ clinical = function(specimen=NULL, donors=NULL) {
 }
 
 #' Returns a list containing row- and column names for clinical sample data
-clinical_sample = function() .h$getRData('.clinicalsample', 'clinicalsample.RData')
+clinical_sample = function() .i$getRData('clinicalsample.RData')
 
 #' Finds identifiers where data is available
 #'
@@ -41,12 +41,12 @@ available = function(clinical=NULL, rna_seq=NULL, rppa=NULL, map_to="specimen") 
     if (!is.null(clinical))
         valid$clinical = clinical()[[to]]
     if (!is.null(rna_seq))
-        valid$rna_seq = .b$match(.n$rna_seq()[[1]],
+        valid$rna_seq = .b$match(.i$getNames('expr_seq_norm')[[1]],
                                  from = "icgc_sample_id",
                                  to = to,
                                  data = clinical_sample())
     if (!is.null(rppa))
-        valid$rppa = .b$match(.n$rppa()[[1]],
+        valid$rppa = .b$match(.i$getNames('protein')[[1]],
                               from = "icgc_sample_id",
                               to = to,
                               data = clinical_sample())
@@ -56,52 +56,33 @@ available = function(clinical=NULL, rna_seq=NULL, rppa=NULL, map_to="specimen") 
 
 #' Function to retrieve the RNA seq data from the processed ICGC object
 #'
-#' Can do subsetting using either `index`, `samples`, `specimen`, or `donors`.
-#'
-#' @param index        HDF5 index, either numerical or dimension names
-#' @param samples      ICGC sample ids
-#' @param specimen     ICGC specimen ids
-#' @param donors       ICGC donor ids
-#' @param raw.counts   Get the raw counts (as opposed to normalized)
-#' @param map.samples  character vector to map identifiers to: 'icgc_sample_id', 
+#' @param index       HDF5 index, either numerical or character;
+#'                    If a character vector ICGC ids will be matched:
+#'                    SA*: sample ID, SP*: specimen ID, SD*: donor ID
+#' @param raw_counts  Get the raw counts (as opposed to normalized)
+#' @param map_ids     character vector to map identifiers to: 'icgc_sample_id', 
 #'                     'icgc_specimen_id', 'donor_id' [default: same as requested identifiers]
-#' @param tissues      Get only certain (TCGA) tissues
 #' @return             The requested sample matrix
-rna_seq = function(index=NULL, samples=NULL, specimen=NULL, donors=NULL,
-                   raw.counts=FALSE, voom=FALSE, map.ids=TRUE) {
-    args = list(index=index, samples=samples, specimen=specimen,
-                donors=donors, map.ids=map.ids)
-    args$valid = .n$rna_seq()[[1]]
-
+rna_seq = function(index=NULL, raw_counts=FALSE, voom=FALSE, map_ids=TRUE) {
     if (voom)
-        args$fname = "expr_seq_voom"
-    else if (raw.counts)
-        args$fname = "expr_seq_raw"
+        fname = "expr_seq_voom"
+    else if (raw_counts)
+        fname = "expr_seq_raw"
     else
-        args$fname = "expr_seq_norm"
+        fname = "expr_seq_norm"
 
-    do.call(.h$getHDF5, args)
+    .i$getHDF5(index=index, map_ids=map_ids, fname=fname)
 }
 
 #' Function to retrieve the RPPA protein data from the processed ICGC object
 #'
-#' Can do subsetting using either `index`, `samples`, `specimen`, or `donors`.
-#'
-#' @param index        HDF5 index, either numerical or dimension names
-#' @param samples      ICGC sample ids
-#' @param specimen     ICGC specimen ids
-#' @param donors       ICGC donor ids
-#' @param map.samples  character vector to map identifiers to: 'sample', 
-#'                     'specimen', 'donor' [default: same as requested identifiers]
+#' @param index       HDF5 index, either numerical or character;
+#'                    If a character vector ICGC ids will be matched:
+#'                    SA*: sample ID, SP*: specimen ID, SD*: donor ID
+#' @param map_ids     character vector to map identifiers to: 'icgc_sample_id', 
 #' @return             The requested sample matrix
-rppa = function(index=NULL, samples=NULL, specimen=NULL, donors=NULL, map.ids=TRUE) {
-    args = list(index=index, samples=samples, specimen=specimen,
-                donors=donors, map.ids=map.ids)
-
-    args$valid = .n$rppa()[[1]]
-    args$fname = "protein"
-
-    do.call(.h$getHDF5, args)
+rppa = function(index, map_ids=TRUE) {
+    .i$getHDF5(index=index, map_ids=map_ids, fname="protein")
 }
 
 #mutation_types = function(bits=FALSE) {
@@ -116,21 +97,13 @@ rppa = function(index=NULL, samples=NULL, specimen=NULL, donors=NULL, map.ids=TR
 #'
 #' Can do subsetting using either `index`, `samples`, `specimen`, or `donors`.
 #'
-#' @param index        HDF5 index, either numerical or dimension names
-#' @param samples      ICGC sample ids
-#' @param specimen     ICGC specimen ids
-#' @param donors       ICGC donor ids
-#' @param map.samples  character vector to map identifiers to: 'sample', 
-#'                     'specimen', 'donor' [default: same as requested identifiers]
+#' @param index       HDF5 index, either numerical or character;
+#'                    If a character vector ICGC ids will be matched:
+#'                    SA*: sample ID, SP*: specimen ID, SD*: donor ID
+#' @param map_ids     character vector to map identifiers to: 'icgc_sample_id', 
 #' @return             The requested sample matrix
-mutations = function(index=NULL, samples=NULL, specimen=NULL, donors=NULL, map.ids=TRUE) {
-    args = list(index=index, samples=samples, specimen=specimen,
-                donors=donors, map.ids=map.ids)
-
-    args$valid = .n$mutations()[[1]]
-    args$fname = "mutations"
-
-    do.call(.h$getHDF5, args)
+mutations = function(index, map_ids=TRUE) {
+    .i$getHDF5(index=index, map_ids=map_ids, fname="mutations")
 }
 
 #getMutations = function(types=getMutationTypes()) {
