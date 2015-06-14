@@ -16,7 +16,7 @@ combat = function(X, batch, covariate=NULL) {
         mat = covariate
     else
         mat = model.matrix(~as.factor(batch), data=covariate)
-    sva::ComBat(dat=.list2mat(X), batch=batch, mod=mat, numCovs=NULL, par.prior=TRUE)
+    sva::ComBat(dat=.list2mat(X), batch=batch, mod=mat, par.prior=TRUE)
 }
 
 dwd = function(X, batch) {
