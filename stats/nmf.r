@@ -1,5 +1,6 @@
 # this should use data_frame infrastructure to calculate NMF clustering, optionally in cluster jobs
 .b = import('../base')
+.io = import('../io')
 .df = import('../data_frame')
 
 #' Wrapper function that takes k, num.clusterings and performs max_iter iterations
@@ -21,7 +22,7 @@
         H = as.double(runif(k*n, 0 ,1)) # could use libnmf's generatematrix for it
 
         # calls to add: nmf_als, mu, neals, alspg, pg
-        dyn.load("libnmf.so")
+        dyn.load(.io$file_path(module_file(), "libnmf.so"))
         re = .C("nmf_mu", a=as.double(A), w0=as.double(W), h0=as.double(H),
                  pm=as.integer(m), pn=as.integer(n), pk=as.integer(k),
                  maxiter=as.integer(max_iter), pTolX=as.double(tolerance),
@@ -46,7 +47,7 @@
                             outer(l,l, function(x,y) as.integer(x==y)))) /
                      length(clusters)
 
-    # compute cophenetic coefficient
+    # compute cophenetic coefficient TODO: how to decide if 2 clusters are better than one?
     dist.matrix = as.dist(1 - connect.matrix)
     HC = hclust(dist.matrix, method="average")
     dist.coph = cophenetic(HC)
