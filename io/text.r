@@ -25,7 +25,7 @@ file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
 #' For the moment, only separators are handled based on the file extension.
 #' This might change in the future to be more powerful, think Python’s
 #' \code{csv.Sniffer} class.
-read_table = function (file, ..., stringsAsFactors = FALSE) {
+read_table = function (file, ..., stringsAsFactors = FALSE, na.strings=c(NA, "")) {
     call = .set_defaults(match.call(expand.dots = TRUE))
 
     if (missing(file))

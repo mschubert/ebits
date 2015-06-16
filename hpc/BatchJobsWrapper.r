@@ -30,8 +30,11 @@
 
 library(stringr)
 library(BatchJobs)
+library(dplyr)
+.b = import('../base')
 
-.QLocalRegistries = list()
+#' Registry object the module is working on
+Qreg = NULL
 
 #' Submit function calls as cluster jobs
 #'
@@ -46,29 +49,27 @@ library(BatchJobs)
 #' @param ...             arguments to vectorise over
 #' @param more.args       arguments not to vectorise over
 #' @param export          objects to export to computing nodes
-#' @param name            the name of the function call if more than one are submitted
-#' @param run             submit the function on the queuing system (default:T)
 #' @param get             returns the result of the run (default:T)
 #' @param memory          how many Mb of memory should be reserved to run the job
 #' @param split.array.by  how to split matrices/arrays in \code{...} (default: last dimension)
 #' @param expand.grid     do every combination of arguments to vectorise over
-#' @param grid.sep        separator to use when assembling names from expand.grid
 #' @param seed            random seed for the function to run
 #' @param n.chunks        how much jobs to split functions calls into (default: number of calls)
 #' @param chunk.size      how many function calls in one job (default: 1)
 #' @param fail.on.error   if jobs fail, return all successful or throw overall error?
-#' @param set.names       try to name result or keep numbers? (default: \code{fail.on.error})
 #' @return                list of job results if get=T
-Q = function(` fun`, ..., more.args=list(), export=list(), name=NULL, run=T, get=T,
-             memory=NULL, n.chunks=NULL, chunk.size=NULL, split.array.by=NA,
-             expand.grid=F, grid.sep=":", seed=123, fail.on.error=T,
-             set.names=fail.on.error) {
+Q = function(` fun`, ..., more.args=list(), export=list(), get=T, expand.grid=FALSE,
+        memory=NULL, n.chunks=NULL, chunk.size=NULL, split.array.by=NA, seed=123, fail.on.error=TRUE) {
     # summarise arguments
     l. = list(...)
     fun = match.fun(` fun`)
     funargs = formals(fun)
     required = names(funargs)[unlist(lapply(funargs, function(f) class(f)=='name'))]
-    provided= names(c(l., more.args))
+
+    if (length(l.) == 1 && length(required) == 1)
+        names(l.) = required
+
+    provided = names(c(l., more.args))
 
     # perform checks that BatchJobs doesn't do
     if ('reg' %in% provided || 'fun' %in% provided)
@@ -78,14 +79,9 @@ Q = function(` fun`, ..., more.args=list(), export=list(), name=NULL, run=T, get
     if (expand.grid && length(l.) == 1)
         stop("Can not expand.grid on one vector")
 
-    if (length(provided) > 1) {
-        if (sum(nchar(provided) == 0) > 1) #TODO: check if potential issues
-            stop("At most one arugment can be unnamed in the function call")
-
-        sdiff = unlist(setdiff(required, provided))
-        if (length(sdiff) > 0 && sdiff != '...')
-            stop(paste("Argument required but not provided:", paste(sdiff, collapse=" ")))
-    }
+    sdiff = unlist(setdiff(required, provided))
+    if (length(sdiff) > 0 && sdiff != '...')
+        stop(paste("Argument required but not provided:", paste(sdiff, collapse=" ")))
 
     sdiff = unlist(setdiff(provided, names(funargs)))
     if (length(sdiff) > 0 && ! '...' %in% names(funargs))
@@ -95,7 +91,7 @@ Q = function(` fun`, ..., more.args=list(), export=list(), name=NULL, run=T, get
         stop(paste("Argument duplicated:", paste(provided[[dups]], collapse=" ")))
 
     # convert matrices to lists so they can be vectorised over
-    split_mat = function(X) {
+    split_mat = function(X) { #TODO: move this to array (with: -1=last dim)?
         if (is.array(X) && length(dim(X)) > 1) {
             if (is.na(split.array.by))
                 setNames(plyr::alply(X, length(dim(X))), dimnames(X)[[length(dim(X))]])
@@ -106,43 +102,32 @@ Q = function(` fun`, ..., more.args=list(), export=list(), name=NULL, run=T, get
     }
     l. = lapply(l., split_mat)
 
-    # name every vector so we can identify them afterwards
-    ln = lapply(l., names)
-    lnFull = lapply(1:length(ln), function(i)
-        if (is.character(l.[[i]]) && length(l.[[i]][1])==1 && is.null(ln[[i]]))
-            l.[[i]]
-        else if (is.null(ln[[i]]))
-            1:length(l.[[i]])
-        else
-            ln[[i]]
-    )
- 
     tmpdir = tempdir()
     reg = makeRegistry(id=basename(tmpdir), file.dir=tmpdir, seed=seed)
 
     # export objects to nodes if desired
     if (length(export) > 0)
-        do.call(batchExport, c(list(reg), export))
+        do.call(batchExport, c(list(reg=reg), export))
 
     # fill the registry with function calls, save names as well
-    if (expand.grid)
+    if (expand.grid) {
+        layout = do.call(.b$expand_grid, lapply(l., .b$descriptive_index))
         do.call(batchExpandGrid, c(list(reg=reg, fun=fun, more.args=more.args), l.))
-    else
+    } else {
+        layout = as.data.frame(lapply(l., .b$descriptive_index))
         do.call(batchMap, c(list(reg=reg, fun=fun, more.args=more.args), l.))
+    }
 
-    if (expand.grid || is.null(unlist(ln)))
-        resultNames = apply(expand.grid(lnFull), 1, function(x) paste(x,collapse=grid.sep))
-    else
-        resultNames = as.matrix(apply(do.call(cbind, ln), 1, unique))
-    save(resultNames, name, set.names, file=file.path(tmpdir, "names.RData"))
+    assign('Qreg', reg, envir=parent.env(environment()))
 
-    assign('.QLocalRegistries', c(.QLocalRegistries, setNames(list(reg), name)), 
-           envir=parent.env(environment()))
-
-    if (run)
-        Qrun(regs=reg, n.chunks=n.chunks, chunk.size=chunk.size, memory=memory)
-    if (run && get)
-        Qget(regs=reg, fail.on.error=fail.on.error)[[1]]
+    Qrun(n.chunks=n.chunks, chunk.size=chunk.size, memory=memory)
+    
+    if (get) {
+        layout$result = setNames(rep(list(NA),nrow(layout)), 1:nrow(layout))
+        result = Qget(fail.on.error=fail.on.error)
+        layout$result[names(result)] = result
+    }
+    layout
 }
 
 #' Run all registries if \code{run=F} in \code{Q()}
@@ -151,93 +136,48 @@ Q = function(` fun`, ..., more.args=list(), export=list(), name=NULL, run=T, get
 #' @param chunk.size  number of calls to put into one core/LSF job (do not use with n.chunks)
 #' @param memory      how many Mb of memory should be reserved to run the job
 #' @param shuffle     if chunking, shuffle the order of calls
-#' @param regs        list of registries to include; default: all local
-Qrun = function(n.chunks=NULL, chunk.size=NULL, memory=NULL, shuffle=T, regs=Qregs()) {
+Qrun = function(n.chunks=NULL, chunk.size=NULL, memory=NULL, shuffle=T) {
     if (!is.null(n.chunks) && !is.null(chunk.size))
         stop("Can not take both n.chunks and chunk.size")
 
-    if (class(regs) == 'Registry')
-        regs = list(regs)
+    reg = get('Qreg', envir=parent.env(environment()))
 
-    for (reg in regs) {
-        ids = getJobIds(reg)
-        if (!is.null(n.chunks))
-            ids = chunk(ids, n.chunks=n.chunks, shuffle=shuffle)
-        if (!is.null(chunk.size))
-            ids = chunk(ids, chunk.size=chunk.size, shuffle=shuffle)
+    ids = getJobIds(reg)
+    if (!is.null(n.chunks))
+        ids = chunk(ids, n.chunks=n.chunks, shuffle=shuffle)
+    if (!is.null(chunk.size))
+        ids = chunk(ids, chunk.size=chunk.size, shuffle=shuffle)
 
-        if (is.null(memory))
-            submitJobs(reg, ids, chunks.as.arrayjobs=F, job.delay=T, max.retries=Inf)
-        else
-            submitJobs(reg, ids, chunks.as.arrayjobs=F, job.delay=T, max.retries=Inf,
-                       resources=list(memory=memory))
-    }
+    if (is.null(memory))
+        submitJobs(reg, ids, chunks.as.arrayjobs=F, job.delay=T, max.retries=Inf)
+    else
+        submitJobs(reg, ids, chunks.as.arrayjobs=F, job.delay=T, max.retries=Inf,
+                   resources=list(memory=memory))
 }
 
 #' Get all results if \code{get=F} in \code{Q()}
 #'
 #' @param clean           delete the registry when done
-#' @param regs            list of registries to include; default: all local
 #' @param fail.on.errors  whether to get only successful results or throw overall error
 #' @return                a list of results of the function called with different arguments
-Qget = function(clean=T, regs=Qregs(), fail.on.error=T) {
-    if (class(regs) == 'Registry')
-        regs = list(regs)
+Qget = function(clean=TRUE, fail.on.error=TRUE) {
+    reg = get('Qreg', envir=parent.env(environment()))
 
-    getResult = function(reg) {
-        waitForJobs(reg, ids=getJobIds(reg))
-        print(showStatus(reg, errors=100L))
-        if (fail.on.error)
-            result = reduceResultsList(reg, ids=getJobIds(reg),
-                                       fun=function(job, res) res)
-        else
-            result = reduceResultsList(reg, fun=function(job, res) res)
-        load(file.path(reg$file.dir, 'names.RData')) # resultNames
-        if (clean)
-            Qclean(reg)
-        if (set.names)
-            setNames(result, resultNames[as.integer(names(result))])
-        else
-            result
-    }
+    waitForJobs(reg, ids=getJobIds(reg))
+    print(showStatus(reg, errors=100L))
+    if (fail.on.error)
+        result = reduceResultsList(reg, ids=getJobIds(reg), fun=function(job, res) res)
+    else
+        result = reduceResultsList(reg, fun=function(job, res) res)
 
-    setNames(lapply(regs, getResult), names(regs))
+    if (clean)
+        Qclean()
+
+    result
 }
 
-#' Delete all registries if \code{clean=F} in \code{Qget()}
-#'
-#' @param regs  list of registries to include; default: all local
-Qclean = function(regs=Qregs()) {
-    if (class(regs) == 'Registry')
-        regs = list(regs)
-
-    for (reg in regs)
-        unlink(reg$file.dir, recursive=T)
+#' Delete the registry the module is working on
+Qclean = function() {
+    reg = get('Qreg', envir=parent.env(environment()))
+    unlink(reg$file.dir, recursive=T)
 }
-
-#' Lists all registries in the current working directory
-#'
-#' @param name       regular expression specifying the registry name
-#' @param directory  regular expression specifying the directories to look for registries
-#' @param local      only return registries created in this R session
-#' @return           a list of registry objects
-Qregs = function(name=".*", directory="Rtmp[0-9a-zA-Z]+", local=T) {
-    if (local)
-        return(.QLocalRegistries)
-    
-    regdirs = list.files(pattern=directory, include.dirs=T)
-    if (length(regdirs) == 0) return(list())
-    regfun = function(path) list.files(path=path, pattern="^registry.RData$", full.names=T)
-    details = file.info(sapply(regdirs, regfun))
-    regfiles = rownames(details[with(details, order(as.POSIXct(mtime))),])
-    
-    getRegistry = function(rdir) {
-        load(file.path(rdir, 'registry.RData'))
-        load(file.path(rdir, 'names.RData'))
-        list(name, reg)
-    }
-    regs = lapply(regdirs, getRegistry)
-    regs = setNames(lapply(regs, function(x) x[[2]]), sapply(regs, function(x) x[[1]]))
-    regs[grepl(name, names(regs))]
-}   
-

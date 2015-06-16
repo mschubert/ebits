@@ -13,41 +13,24 @@ grep = function(pattern, x, ...) {
         sapply(pattern, function(p) re(p, x, ...))
 }
 
-
-# subset a data.frame with a data.frame
-# compare everything as characters
-dfdf = function(df, subs, exact=F, add.cols=F) {
-    oldDf = df
-
-    if (add.cols) {
-        subsFull = subs
-        subs = subsFull[intersect(colnames(subsFull), colnames(df))]
-        subsAdd = subsFull[setdiff(colnames(subsFull), colnames(df))]
-        idxAdd = c()
-    }
-
-    for (cn in colnames(subs)) {
-        subs[[cn]] = as.character(subs[[cn]])
-        df[[cn]] = as.character(df[[cn]])
-    }
-
-    idx = c()
-    for (i in 1:nrow(subs)) {
-        mask = rep(TRUE, nrow(df))
-        for (name in colnames(subs))
-            mask = mask & (subs[[i,name]] == df[[name]])
-        if (exact && sum(mask) != 1)
-            stop("exact=T needs exactly one match per row in subsetting df")
-        idx = c(idx, which(mask))
-
-        if (add.cols)
-            idxAdd = c(idxAdd, rep(i, sum(mask)))
-    }
-
-    if (add.cols)
-        cbind(oldDf[idx,,drop=F], subsAdd[idxAdd,,drop=F])
+descriptive_index = function(x, along=NULL) {
+    if (!is.null(names(x)))
+        names(x)
+    else if ((is.character(x) || is.numeric(x) || is.logical(x)) &&
+             (is.vector(x) || length(dim(x))==1))
+        x
+    else if (is.factor(x))
+        as.character(x)
+    else if (!is.null(along) && (is.matrix(x) || is.data.frame(x))) {
+        dn = dimnames(x)[[along]]
+        if (is.null(dn))
+            1:dim(x)[along]
+        else
+            dn
+    } else if (is.list(x)) # list and data.frame
+        seq_along(x)
     else
-        oldDf[idx,,drop=F]
+        stop("Not sure how to get indices on that object")
 }
 
 num_unique = function(x) {
@@ -62,11 +45,11 @@ na_filter = function(X, rowmax=1, colmax=1) {
 }
 
 ### n-th max value
-maxN <- function(x, N=2){
-    len <- length(x)
+maxN = function(x, N=2){
+    len = length(x)
     if(N>len){
         warning('N greater than length(x).  Setting N=length(x)')
-        N <- length(x)
+        N = length(x)
     }
     sort(x, decreasing=T)[N]
 }
