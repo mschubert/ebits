@@ -9,10 +9,10 @@
 #' @param k          the number of clusters (matrix rows)
 #' @param max_iter   number of NMF iterations to perform
 #' @param seed       the random seed
-#' @param tolerance  tolerance for convergence checks in updates
+#' @param nsame      number of iterations the class assignments need to stay the same
 #' @param num_clusterings  The number of clusterings to perform to compute consensus
 #' @return a list of the results matrices W and H, with iterations performed
-.nmf = function(A, k, max_iter, seed=1234, tolerance=1e-4, num_clusterings=10) {
+.nmf = function(A, k, max_iter, seed=1234, nsame=200, num_clusterings=10) {
     one_iter = function(seed) {
         # initialise matrices
         set.seed(seed)
@@ -22,11 +22,11 @@
         H = as.double(runif(k*n, 0 ,1)) # could use libnmf's generatematrix for it
 
         # calls to add: nmf_als, mu, neals, alspg, pg
-        dyn.load(.io$file_path(module_file(), "libnmf.so"))
+        dyn.load(.io$file_path(module_file(), "nmf_mu.so"))
         re = .C("nmf_mu", a=as.double(A), w0=as.double(W), h0=as.double(H),
                  pm=as.integer(m), pn=as.integer(n), pk=as.integer(k),
-                 maxiter=as.integer(max_iter), pTolX=as.double(tolerance),
-                 pTolFun=as.double(tolerance), DUP=FALSE, PACKAGE='libnmf')
+                 maxiter=as.integer(max_iter), nsame=as.integer(nsame),
+                 DUP=FALSE, PACKAGE='nmf_mu')
 
         # return decomposed matrices
         list(W = matrix(re$w0, nrow=m, ncol=k, dimnames=list(rownames(A), NULL)),
@@ -44,8 +44,7 @@
     # get consensus clusters and sample similarity
     clusters = lapply(result, function(x) apply(x$H, 2, order)[1,])
     connect.matrix = Reduce('+', lapply(clusters, function(l)
-                            outer(l,l, function(x,y) as.integer(x==y)))) /
-                     length(clusters)
+            outer(l,l, function(x,y) as.integer(x==y)))) / length(clusters)
 
     # compute cophenetic coefficient TODO: how to decide if 2 clusters are better than one?
     dist.matrix = as.dist(1 - connect.matrix)
@@ -64,13 +63,13 @@
 #' @param k          the number of clusters (matrix rows)
 #' @param max_iter   number of NMF iterations to perform
 #' @param seed       the random seed
-#' @param tolerance  tolerance for convergence checks in updates
+#' @param nsame      number of iterations the class assignments need to stay the same
 #' @param rep        The number of clusterings to perform to compute consensus
 #' @param hpc_args   Optional arguments to pass to hpc module
 #' @return           A data frame with sample names, cluster membership, and score
-nmf = function(A, k, max_iter=1000, seed=1234, tolerance=1e-4, rep=10, hpc_args=NULL) {
+nmf = function(A, k, max_iter=1000, seed=1234, nsame=200, rep=10, hpc_args=NULL) {
     .df$call(data.frame(k = k),
-             .nmf,
-             A=A, max_iter=max_iter, seed=seed, tolerance=tolerance,
+             .nmf, num_clusterings=rep,
+             A=A, max_iter=max_iter, seed=seed, nsame=nsame,
              hpc_args=hpc_args)
 }
