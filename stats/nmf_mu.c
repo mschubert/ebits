@@ -56,7 +56,7 @@
 //----------------------------------------------------------------------------------------
 #define ZERO_THRESHOLD 0.0
 #define DIV_BY_ZERO_AVOIDANCE 1E-09
-#define DEBUG_LEVEL 2
+//#define DEBUG_LEVEL 2
 
 #include <stdio.h>
 #include <stdlib.h>
