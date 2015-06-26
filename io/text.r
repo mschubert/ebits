@@ -28,8 +28,10 @@ file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
 read_table = function (file, ..., stringsAsFactors = FALSE, na.strings=c(NA, "")) {
     call = .set_defaults(match.call(expand.dots = TRUE))
 
-    if (missing(file))
+    if (missing(file)) {
+        call[[1]] = quote(read.table)
         return(eval.parent(call))
+    }
 
     extension = .b$grep('\\.(\\w+)(\\.gz)?$', file)[1]
 
@@ -47,11 +49,9 @@ read_table = function (file, ..., stringsAsFactors = FALSE, na.strings=c(NA, "")
 
 write_table = function (x, file = '', quote = FALSE, row.names = FALSE) {
     call = .set_defaults(match.call(expand.dots = TRUE))
+    call[[1]] = quote(write.table)
 
-    if (file == '')
-        return(eval.parent(call))
-
-    if (! ('sep' %in% names(call))) {
+    if (file != '' && ! 'sep' %in% names(call)) {
         extension = .b$grep('\\.(\\w+)(\\.gz)?$', file)[1]
         separators = list(csv = ',',
                           tsv = '\t',
@@ -59,7 +59,6 @@ write_table = function (x, file = '', quote = FALSE, row.names = FALSE) {
         call$sep = separators[[extension]]
     }
 
-    call[[1]] = quote(write.table)
     eval.parent(call)
 }
 
