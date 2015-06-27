@@ -14,3 +14,11 @@ file = function(mod_str, file) {
 load = function(mod_str, file) {
     .io$load(file(mod_str, file))
 }
+
+read = function(mod_str, file, ...) {
+    .io$read_table(file(mod_str, file), ...)
+}
+
+exists = function(mod_str, file) {
+    file.exists(file(mod_str, file))
+}
