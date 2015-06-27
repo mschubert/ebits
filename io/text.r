@@ -42,7 +42,7 @@ read_table = function (file, ..., stringsAsFactors = FALSE, na.strings=c(NA, "")
         call$sep = separators[[extension]]
     }
 
-    call[[1]] = if (extension == 'xlsx')
+    call[[1]] = if (identical(extension, 'xlsx'))
         quote(xlsx::read.xlsx) else quote(read.table)
     eval.parent(call)
 }
