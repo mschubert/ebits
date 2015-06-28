@@ -66,7 +66,7 @@ getHDF5 = function(fname, index, map_ids=TRUE) {
 #' @return           List with file index and mapped column names
 varmap = function(valid, map_ids=TRUE, filter_to=NULL) {
     if (is.character(map_ids))
-        to = map.ids
+        to = map_ids
     else if (identical(map_ids, FALSE) || all(grepl("^SA", filter_to)))
         to = "icgc_sample_id"
     else if (all(grepl("^SP", filter_to)))

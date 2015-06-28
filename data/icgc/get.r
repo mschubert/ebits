@@ -63,7 +63,7 @@ available = function(clinical=NULL, rna_seq=NULL, rppa=NULL, map_to="specimen") 
 #' @param map_ids     character vector to map identifiers to: 'icgc_sample_id', 
 #'                     'icgc_specimen_id', 'donor_id' [default: same as requested identifiers]
 #' @return             The requested sample matrix
-rna_seq = function(index=NULL, raw_counts=FALSE, voom=FALSE, map_ids=TRUE) {
+rna_seq = function(index=available(rna_seq=TRUE), raw_counts=FALSE, voom=FALSE, map_ids=TRUE) {
     if (voom)
         fname = "expr_seq_voom"
     else if (raw_counts)
@@ -81,7 +81,7 @@ rna_seq = function(index=NULL, raw_counts=FALSE, voom=FALSE, map_ids=TRUE) {
 #'                    SA*: sample ID, SP*: specimen ID, SD*: donor ID
 #' @param map_ids     character vector to map identifiers to: 'icgc_sample_id', 
 #' @return             The requested sample matrix
-rppa = function(index, map_ids=TRUE) {
+rppa = function(index=available(rppa=TRUE), map_ids=TRUE) {
     .i$getHDF5(index=index, map_ids=map_ids, fname="protein")
 }
 
