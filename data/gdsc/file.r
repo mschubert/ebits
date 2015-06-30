@@ -8,7 +8,8 @@
     DRUG_IC50 = "dfIC50v17.RData",
     DRUG_AUC = "dfAUCv17.RData",
     INTOGEN_DRIVERS = "cancer_drivers_5_2_2014.ro",
-    CONC = "screenConcentration.RData"
+    CONC = "screenConcentration.RData",
+    NGS_BEM = "NGS_BEM_COSMIC_NURIAS_26022014.ro"
 )
 
 get = function(id) .p$load('gdsc', .files[[id]])

@@ -29,7 +29,7 @@ clinical_sample = function() .i$getRData('clinicalsample.RData')
 #' @param clinical  Clinical data [T/F]
 #' @param map_to    Which identifers to map to ('specimen' or 'donor')
 #' @return          List of identifiers where all data types specified are available
-available = function(clinical=NULL, rna_seq=NULL, rppa=NULL, map_to="specimen") {
+available = function(clinical=NULL, rna_seq=NULL, rppa=NULL, mutations=NULL, map_to="icgc_specimen_id") {
     valid = list()
     if (grepl("specimen", map_to))
         to = "icgc_specimen_id"
@@ -50,6 +50,12 @@ available = function(clinical=NULL, rna_seq=NULL, rppa=NULL, map_to="specimen") 
                               from = "icgc_sample_id",
                               to = to,
                               data = clinical_sample())
+
+    if (!is.null(mutations))
+        valid$mut = .b$match(.i$getNames('mutations')[[1]],
+                             from = "icgc_sample_id",
+                             to = to,
+                             data = clinical_sample())
 
     do.call(.b$intersect, valid)
 }
@@ -85,31 +91,17 @@ rppa = function(index=available(rppa=TRUE), map_ids=TRUE) {
     .i$getHDF5(index=index, map_ids=map_ids, fname="protein")
 }
 
-#mutation_types = function(bits=FALSE) {
-#    tab = .io$read_table(.io$file_path(module_file(), 'mutation_types.txt'), header=TRUE, sep="\t")
-#    if (bits)
-#        tab
-#    else
-#        tab$consequence_type
-#}
-
 #' Function to retrieve the mutation data from the processed ICGC object
 #'
 #' Can do subsetting using either `index`, `samples`, `specimen`, or `donors`.
 #'
-#' @param index       HDF5 index, either numerical or character;
-#'                    If a character vector ICGC ids will be matched:
-#'                    SA*: sample ID, SP*: specimen ID, SD*: donor ID
-#' @param map_ids     character vector to map identifiers to: 'icgc_sample_id', 
-#' @return             The requested sample matrix
-mutations = function(index, map_ids=TRUE) {
-    .i$getHDF5(index=index, map_ids=map_ids, fname="mutations")
+#' @param index    HDF5 index, either numerical or character;
+#'                 If a character vector ICGC ids will be matched:
+#'                 SA*: sample ID, SP*: specimen ID, SD*: donor ID
+#' @param map_ids  character vector to map identifiers to: 'icgc_sample_id', 
+#' @param minN     Minimum number of mutated genes to be included
+#' @return         The requested sample matrix
+mutations = function(index, map_ids=TRUE, minN=0) {
+    re = .i$getHDF5(index=index, map_ids=map_ids, fname="mutations")
+    re[rowSums(re) > minN,]
 }
-
-#getMutations = function(types=getMutationTypes()) {
-## convert to logical matrix here
-#    bits = getMutationTypes(bits=TRUE)
-#    # load matrix here
-#    mat = ...
-#    mat[] = bitwAnd(mat, )
-#}
