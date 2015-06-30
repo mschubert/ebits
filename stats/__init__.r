@@ -1,4 +1,5 @@
 export_submodule('./assocs')
 export_submodule('./ml')
 export_submodule('./nmf')
+export_submodule('./util')
 batch = import('./batch')
