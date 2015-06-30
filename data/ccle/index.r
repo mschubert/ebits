@@ -1,4 +1,5 @@
 .p = import('../path')
+.io = import('../../io')
 .ar = import('../../array')
 .df = import('../../data_frame')
 .gdsc = import('../gdsc')
@@ -11,12 +12,19 @@ index$COSMIC = .gdsc$cosmic$name2id(index$Cell.line.primary.name, warn=FALSE)
 #' @param index_type  The column of `index` to be used for column names
 #' @return            The expression matrix
 basal_expression = function(index_type="COSMIC") {
-    if (!.p$exists("ccle"), "CCLE_Expression_2012-09-29.RData") {
-        warning("data file does not exist, creating from text")
-        lines = readLines(.p$file("ccle", "CCLE_Expression_2012-09-29.res"))
-        lines = lines[-c(2,3)]
-        expr = .p$read("ccle", textConnection(lines), header=TRUE, sep="\t")
-    }
+    fname = "CCLE_Expression.Arrays_2013-03-18"
+    if (!.p$exists("ccle", fname, ext=".RData")) {
+        warning("data file does not exist, creating raw .CEL files")
+        ma = import('process/microarray')
+        fnames = list.files(fname, full.names=TRUE)
+        expr = oligo::read.celfiles(fnames) %>%
+            ma$normalize() %>%
+            ma$annotate("hgnc_symbol")
+        save(expr, file=.p$file("ccle", fname, ext=".RData"))
+    } else
+        expr = .p$load("ccle", fname, ext=".RData")
+
+#TODO: map identifiers here and return object
 }
 
 #' Returns a drug response matrix (drugs x COSMIC IDs)
