@@ -1,0 +1,22 @@
+Tissue
+many
+brain
+lung
+ovary
+cell line control
+breast
+kidney
+colon
+liver
+lymph
+blood
+stomach
+thyroid
+bladder
+endometrial
+skin
+rectal
+cervix
+prostate
+head and neck
+fallopian tube
