@@ -16,3 +16,13 @@ median_test = function(x,y) {
     m = median(z)
     fisher.test(z<m,g)$p.value
 }
+
+#' Scales a vector setting median=0 and sd=1
+#'
+#' @param x          The vector
+#' @param ref_index  Indices to use to derive median/sd
+#' @return           A scaled vector
+median_scale = function(x, ref_index=TRUE) {
+    ref = x[ref_index]
+    (x - median(ref)) / sd(ref)
+}
