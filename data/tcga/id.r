@@ -1,5 +1,5 @@
-library(modules)
 library(dplyr)
+.p = import('../path')
 .io = import('io')
 
 # see https://tcga-data.nci.nih.gov/datareports/codeTablesReport.htm
@@ -9,8 +9,11 @@ library(dplyr)
               sampleType = 'code_tables/sample_type.txt',
               tissueSourceSite = 'code_tables/tissue_source_site.txt',
               portionAnalyte = 'code_tables/portion_analyte.txt') %>%
-    lapply(function(x) .io$read_table(x, header=TRUE, quote=NULL,
-           na.strings=NULL, colClasses='character'))
+    lapply(function(x) {
+        fname = file.path(module_file(), x)
+        .io$read_table(fname, header=TRUE, quote=NULL,
+            na.strings=NULL, colClasses='character')
+    })
 
 # eg. TCGA-02-0001-01
 #  TCGA - clinical centre - participant id - sample code
