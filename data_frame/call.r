@@ -11,7 +11,8 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
     if (is.null(hpc_args))
         .serial(df=df, fun=fun, ..., result_only=result_only, tidy=tidy)
     else
-        .hpc(df=df, ` fun`=fun, ..., result_only=result_only, tidy=tidy) #TODO: hpc_args+fun args
+        do.call(.hpc, c(list(df=df, ` fun`=fun, ...,
+                result_only=result_only, tidy=tidy), hpc_args))
 }
 
 .serial = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
@@ -59,11 +60,12 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
     if (!result_only) {
         rownames(df) = as.character(1:nrow(df))
         result = lapply(names(result), function(i)
-            cbind(as.list(df[i,,drop=FALSE]), result[[i]])
+            c(as.list(df[i,,drop=FALSE]), as.list(result[[i]]))
+            #TODO: if result only scalar, name "result" instead of V[0-9]?
         )
     }
     if (tidy)
-        result = do.call(rbind, result)
+        result = as.data.frame(do.call(rbind, result))
 
     result
 }
