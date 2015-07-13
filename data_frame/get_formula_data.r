@@ -22,7 +22,12 @@ get_formula_data = function(form, data=parent.frame()) {
     vars = vars[!sapply(vars, is.numeric)] # exclude "0+" from parsing
 
     # go through vars, create data list w/ all evals
-    processed_data = lapply(vars, function(v) base::eval(v, envir=data))
+    processed_data = lapply(vars, function(v)
+        if (as.character(v) %in% names(data))
+            base::eval(v, envir=data)
+        else
+            base::eval(v, envir=environment(form))
+    )
     names(processed_data) = sapply(vars, function(v) attr(v, "name"))
 
     # go through formula, replace every call by name
@@ -45,7 +50,6 @@ if (is.null(module_name())) {
     testthat::expect_equal(d1$data$status, status)
 
     test = list(time = c(4,3,1,1,2,2,3),
-                status = c(1,1,1,0,1,1,0),
                 x = c(0,2,1,1,1,0,0),
                 sex = c(0,0,0,0,1,1,1))
 
@@ -53,11 +57,11 @@ if (is.null(module_name())) {
     d2 = get_formula_data(status ~ time, data=test)
     testthat::expect_equal(d2$form, form)
     testthat::expect_equal(d2$data$time, test$time)
-    testthat::expect_equal(d2$data$status, test$status)
+    testthat::expect_equal(d2$data$status, status)
 
     # syntax for survival fits
     d3 = get_formula_data(status + time ~ 0 + x, data=test)
     testthat::expect_equal(d3$form, status + time ~ 0 + x)
     testthat::expect_equal(d3$data$time, test$time)
-    testthat::expect_equal(d3$data$status, test$status)
+    testthat::expect_equal(d3$data$status, status)
 }
