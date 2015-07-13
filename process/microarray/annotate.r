@@ -28,11 +28,13 @@
 #' @param normData   A normalized data object, or a list thereof
 #' @param summarize  IDs to annotate with: hgnc_symbol
 #' @return           The annotated data
-annotate = function(normData, summarize="hgnc_symbol") {
+annotate = function(normData, summarize="hgnc_symbol", ...) {
     UseMethod("annotate")
 }
 
 annotate.list = function(normData, summarize="hgnc_symbol") {
+    stopifnot(summarize == "hgnc_symbol")
+
     re = lapply(normData, function(x) annotate(x) %catch% NA)
     if (any(is.na(re)))
         warning("dropping ", names(re)[is.na(re)])
@@ -44,23 +46,28 @@ annotate.list = function(normData, summarize="hgnc_symbol") {
 annotate.ExpressionSet = function(normData, summarize="hgnc_symbol") {
     stopifnot(summarize == "hgnc_symbol")
 
+    annotation = .gene[[normData@annotation]]
+    if (is.null(annotation))
+        stop("No annotation package found for", normData@annotation)
+
+    # read metadata and replace matrix by annotated matrix
+    exprs(normData) = annotate(as.matrix(exprs(normData)),
+                               annotation = annotation,
+                               summarize = summarize)
+    normData
+}
+
+annotate.matrix = function(normData, annotation, summarize="hgnc_symbol") {
+    stopifnot(summarize == "hgnc_symbol")
+
     # load annotation package
-    pkg = .gene[[normData@annotation]]
-    if (is.null(pkg))
-        stop(paste("No annotation mapping for:", normData@annotation))
-    if (!require(pkg, character.only=TRUE)) {
+    if (!require(annotation, character.only=TRUE)) {
         source("http://bioconductor.org/biocLite.R")
-        biocLite(pkg)
-        library(pkg, character.only=TRUE)
+        biocLite(annotation)
+        library(annotation, character.only=TRUE)
     }
-    sym = annotate::getSYMBOL(featureNames(normData), pkg)
 
     # work on expression matrix, summarize using limma
-    mat = as.matrix(exprs(normData))
-    rownames(mat) = sym
-    mat = limma::avereps(mat[!is.na(rownames(mat)),])
-
-    # set matrix to be expression data of object
-    exprs(normData) = mat
-    normData
+    rownames(normData) = annotate::getSYMBOL(as.vector(rownames(normData)), annotation)
+    limma::avereps(normData[!is.na(rownames(normData)),])
 }

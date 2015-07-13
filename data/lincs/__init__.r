@@ -44,9 +44,10 @@ get_z = function(cid, rid=landmarks, map.genes=FALSE) {
     fname = .p$file("lincs", "zspc_n1328098x22268.gctx")
     re = parse_gctx(fname=fname, cid=cid, rid=rid)
 
-    if (is.character(map.genes))
-        import('../../idmap')$gene(re, from='probe_id', to=map.genes, fun.aggregate=mean)
-    else
+    if (is.character(map.genes)) {
+        ann = import('../../process/microarray/annotate')
+        ann$annotate(re, annotation="hthgu133a.db", summarize="hgnc_symbol")
+    } else
         re
 }
 
