@@ -49,11 +49,11 @@ if (is.null(module_name())) {
     testthat::expect_equal(d1$data$time, time)
     testthat::expect_equal(d1$data$status, status)
 
-    test = list(time = c(4,3,1,1,2,2,3),
+    test = list(time = c(4,3,1,1,2,2,2),
                 x = c(0,2,1,1,1,0,0),
                 sex = c(0,0,0,0,1,1,1))
 
-    # provide data
+    # provide data, prefer over formula env (fallback)
     d2 = get_formula_data(status ~ time, data=test)
     testthat::expect_equal(d2$form, form)
     testthat::expect_equal(d2$data$time, test$time)
