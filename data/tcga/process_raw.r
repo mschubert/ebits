@@ -91,9 +91,27 @@ rna_seq2_voom = function(file) {
     setNames(expr, names)
 }
 
+rppa = function(file) {
+    elist = .list_files("RPPA_AnnotateWithGene.Level_3.*\\.tar(\\.gz)?$") %>%
+        .unpack() %>%
+        .select("\\.rppa\\.txt")
+
+    rppa = elist %>%
+        lapply(function(fname) {
+            re = .io$read_table(fname, header=TRUE)
+            mat = data.matrix(re[,-1])
+            rownames(mat) = re[,1]
+            mat
+        }) %>%
+        setNames(.b$grep("gdac.broadinstitute.org_([A-Z]+)", elist))
+
+    save(rppa, file=.p$file("tcga", file))
+}
+
 # need to map clinical identifiers to sample identifiers
 
 if (is.null(module_name())) {
-    rna_seq2_voom(file="rna_seq_voom.h5")
-    cc = clinical(file="clinical_full.RData")
+    rna_seq2_voom("rna_seq_voom.h5")
+    cc = clinical("clinical_full.RData")
+    rppa("rppa.RData")
 }

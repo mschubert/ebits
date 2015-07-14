@@ -13,3 +13,7 @@ clinical = function() {
 rna_seq = function(tissue) {
     .p$load("tcga", paste0(tissue, "_voom.RData"))
 }
+
+rppa = function() {
+    .p$load("tcga", "rppa.RData")
+}
