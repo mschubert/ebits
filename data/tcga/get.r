@@ -17,3 +17,7 @@ rna_seq = function(tissue) {
 rppa = function() {
     .p$load("tcga", "rppa.RData")
 }
+
+mutations = function() {
+    .p$load("tcga", "mutations.RData")
+}

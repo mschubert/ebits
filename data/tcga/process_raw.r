@@ -77,7 +77,8 @@ rna_seq2_voom = function(file) {
             mat = data.matrix(re[,-1])
             rownames(mat) = re[,1]
 
-            # voom-specific below, separate this later
+            
+# voom-specific below, separate this later
             mat = limma::voom(mat)$E
             rownames(mat) = sub("\\|[0-9]+$", "", rownames(mat))
             mat = mat[rownames(mat) != "?",]
@@ -103,15 +104,42 @@ rppa = function(file) {
             rownames(mat) = re[,1]
             mat
         }) %>%
-        setNames(.b$grep("gdac.broadinstitute.org_([A-Z]+)", elist))
+#        setNames(.b$grep("gdac.broadinstitute.org_([A-Z]+)", elist)) %>%
+        .ar$stack( along=2)
 
     save(rppa, file=.p$file("tcga", file))
 }
 
-# need to map clinical identifiers to sample identifiers
+mutations = function(file) {
+    elist = .list_files("Mutation_Packager_Calls.Level_3.*\\.tar(\\.gz)?$") %>%
+        .unpack() %>%
+        .select("\\.maf\\.txt")
 
+    mut = elist %>%
+        lapply(function(fname) {
+            re = .io$read_table(fname, header=TRUE, quote="") %catch% NA
+            if (!identical(re, NA))
+                re$study = .b$grep("gdac.broadinstitute.org_([A-Z]+)", fname)
+            re
+        })
+
+    mut = mut[!is.na(mut)] #TODO: message
+    keep = lapply(mut, m -> colnames(m)) %>%
+        unlist() %>%
+        table()
+    keep = names(keep)[keep > 3500]
+
+    mut2 = mut %>%
+        lapply(m -> m[intersect(colnames(m), keep)]) %>%
+        plyr::rbind.fill()
+
+    save(mut2, file=.p$file("tcga", file))
+}
+
+# need to map clinical identifiers to sample identifiers
 if (is.null(module_name())) {
     rna_seq2_voom("rna_seq_voom.h5")
     cc = clinical("clinical_full.RData")
     rppa("rppa.RData")
+    mutations("mutations.RData")
 }
