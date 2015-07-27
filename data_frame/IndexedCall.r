@@ -1,5 +1,3 @@
-.b = import('../base', attach_operators=FALSE)
-
 #' Class to represent a series of function calls
 IndexedCall = setClass(
     "IndexedCall",
@@ -18,15 +16,7 @@ IndexedCall = setClass(
 #' @param index  Variables that should be indexed
 #' @param ...    Other Variables
 setMethod("initialize", signature(.Object="IndexedCall"),
-    function(.Object, ..., args=list(), expand_grid=FALSE) {
-#TODO: if ... == index df, don't process further
-        if (expand_grid)
-            index = .b$expand_grid(...)
-        else
-            index = dplyr::as_data_frame(list(...))
-
-        # set class so that our object can handle it
-        attr(index, "class") = "data.frame"
+    function(.Object, index, args=list(), expand_grid=FALSE) {
         callNextMethod(.Object, index=index, args=args)
 })
 
@@ -44,8 +34,6 @@ setMethod("show", signature(object="IndexedCall"), function(object) {
 })
 
 ##########################################################################
-
-.ff = import('./from_formula')
 
 #' Derived indexed class to handle formulas
 IndexedFormula = setClass(
@@ -66,13 +54,6 @@ IndexedFormula = setClass(
 #' @param index  Variables that should be indexed
 #' @param ...    Other Variables
 setMethod("initialize", signature(.Object="IndexedFormula"),
-    function(.Object, formula, data=environment(formula), subsets=NULL, ...) {
-        index = .ff$from_formula(formula, data, subsets=subsets)
-#        args = c(list(...), attr(index, "args"))
-        args = attr(index, "args")
-        subsets = args$subsets
-        args$subsets = NULL
-        attr(index, "args") = NULL
-        class(index) = "data.frame"
+    function(.Object, index, args, subsets=NULL) {
         callNextMethod(.Object, index=index, args=args, subsets=subsets)
 })
