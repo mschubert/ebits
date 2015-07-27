@@ -102,7 +102,7 @@ if (is.null(module_name())) {
     structure(list(A = c("x", "y"), B = c("z", "z"), C = c("x", "y"
     )), .Names = c("A", "B", "C"), row.names = c(NA, -2L), class = "data.frame"))
 
-    testthat::expect_equal(x4@index,
+    testthat::expect_equal(x3@index,
     structure(list(A = c("x", "y", "x", "y"), B = c("z", "z", "z",
     "z"), subset = c("w", "w", "o", "o"), C = c("x", "y", "x", "y"
     )), .Names = c("A", "B", "subset", "C"), row.names = c(NA, -4L
