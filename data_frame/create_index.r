@@ -20,5 +20,5 @@ create_index = function(..., args=list(), expand_grid=FALSE) {
     # set class so that our object can handle it
     attr(index, "class") = "data.frame"
 
-    new("IndexedCall", index=index, args=args, expand_grid=expand_grid)
+    new("IndexedCall", index=index, args=args)
 }
