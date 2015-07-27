@@ -90,26 +90,21 @@ if (is.null(module_name())) {
     # 3 x z      o x
     # 4 y z      o y
 
-    x1a = attr(x1, "args"); attr(x1, "args") = NULL
-    x2a = attr(x2, "args"); attr(x2, "args") = NULL
-    x3a = attr(x3, "args"); attr(x3, "args") = NULL
-
-    testthat::expect_equal(x1a@args$data, x2a@args$data)
-    testthat::expect_equal(x2a@args$data, x3a@args$data)
+    testthat::expect_equal(x1@args$data, x2@args$data)
+    testthat::expect_equal(x2@args$data, x3@args$data)
 
     testthat::expect_equal(x1@index,
     structure(list(A = c("x", "y", "x", "y"), B = c("z", "z", "z",
-    "z"), C = c(1L, 1L, 2L, 2L)), .Names = c("A", "B", "C"), class = c("data.frame",
-    "attr_args"), row.names = c(NA, -4L)))
+    "z"), C = c(1L, 1L, 2L, 2L)), .Names = c("A", "B", "C"), class = "data.frame",
+    row.names = c(NA, -4L)))
 
     testthat::expect_equal(x2@index,
     structure(list(A = c("x", "y"), B = c("z", "z"), C = c("x", "y"
-    )), .Names = c("A", "B", "C"), row.names = c(NA, -2L), class = c("data.frame",
-    "attr_args")))
+    )), .Names = c("A", "B", "C"), row.names = c(NA, -2L), class = "data.frame"))
 
-    testthat::expect_equal(x3@index,
+    testthat::expect_equal(x4@index,
     structure(list(A = c("x", "y", "x", "y"), B = c("z", "z", "z",
     "z"), subset = c("w", "w", "o", "o"), C = c("x", "y", "x", "y"
     )), .Names = c("A", "B", "subset", "C"), row.names = c(NA, -4L
-    ), class = c("data.frame", "attr_args")))
+    ), class = "data.frame"))
 }

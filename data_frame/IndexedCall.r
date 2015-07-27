@@ -4,7 +4,8 @@ IndexedCall = setClass(
 
     slots = c(
         index = "data.frame",
-        args = "list"
+        args = "list",
+        subsets = "ANY"
     )
 )
 
@@ -16,8 +17,8 @@ IndexedCall = setClass(
 #' @param index  Variables that should be indexed
 #' @param ...    Other Variables
 setMethod("initialize", signature(.Object="IndexedCall"),
-    function(.Object, index, args=list(), expand_grid=FALSE) {
-        callNextMethod(.Object, index=index, args=args)
+    function(.Object, index, args=list(), subsets=NULL) {
+        callNextMethod(.Object, index=index, args=args, subsets=subsets)
 })
 
 #' Display the contents
@@ -41,9 +42,11 @@ IndexedFormula = setClass(
 
     contains = "IndexedCall",
 
-    slots = c(
-        subsets = "character"
-    )
+#    slots = c(
+#        index = "data.frame",
+#        args = "list",
+#        subsets = "ANY"
+#    )
 )
 
 #' Function to create a call index and constant call variables
