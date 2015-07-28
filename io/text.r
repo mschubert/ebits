@@ -1,5 +1,5 @@
 # I/O helper functions on text files
-.b = import('../base', attach_operators=F)
+.b = import('../base', attach_operators = FALSE)
 
 #' Add \code{ext}ension parameter to \link{\code{base::file.path}}
 file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
@@ -12,21 +12,13 @@ file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
     do.call(base::file.path, c(dots, fsep = fsep))
 }
 
-.set_defaults = function (call, .formals = formals(sys.function(sys.parent()))) {
-    for (n in names(.formals))
-        if (n != '...' && ! (n %in% names(call)))
-            call[[n]] = .formals[[n]]
-
-    call
-}
-
 #' Augment \code{\link{utils::read.table}} by a mechanism to guess the file format.
 #'
 #' For the moment, only separators are handled based on the file extension.
 #' This might change in the future to be more powerful, think Python’s
 #' \code{csv.Sniffer} class.
-read_table = function (file, ..., stringsAsFactors = FALSE, na.strings=c(NA, "")) {
-    call = .set_defaults(match.call(expand.dots = TRUE))
+read_table = function (file, ..., stringsAsFactors = FALSE, na.strings = c(NA, '')) {
+    call = .b$match_call_defaults()
 
     if (missing(file)) {
         call[[1]] = quote(read.table)
@@ -48,7 +40,7 @@ read_table = function (file, ..., stringsAsFactors = FALSE, na.strings=c(NA, "")
 }
 
 write_table = function (x, file = '', quote = FALSE, row.names = FALSE) {
-    call = .set_defaults(match.call(expand.dots = TRUE))
+    call = .b$match_call_defaults()
     call[[1]] = quote(write.table)
 
     if (file != '' && ! 'sep' %in% names(call)) {
