@@ -28,7 +28,11 @@ wrap_formula_indexing = function(FUN) {
         }
 
         df = import('../data_frame')
-        idf = df$from_formula(formula, data=data, group=group, subsets=subsets, atomic=atomic)
+        idf = df$create_formula_index(formula,
+                                      data=data,
+                                      group=group,
+                                      subsets=subsets,
+                                      atomic=atomic)
         df$call(idf, one_item, hpc_args=hpc_args)
     }
 
