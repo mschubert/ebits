@@ -98,9 +98,11 @@ f = function (...) {
 match_call_defaults = function (call = match.call(sys.function(sys.parent()), sys.call(sys.parent())),
                                 .formals = formals(sys.function(sys.parent()))) {
     .formals = .formals[names(.formals) != '...']
-    new_call = as.call(c(call[[1]], .formals))
-    new_call[names(call[-1])] = call[-1]
-    new_call
+    missing = is.na(match(names(.formals), names(call)))
+    missing_names = names(.formals)[missing]
+    missing_values = .formals[missing]
+    call[missing_names] = missing_values
+    call
 }
 
 # Tools for function composition and chaining {{{
