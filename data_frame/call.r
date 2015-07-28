@@ -49,7 +49,7 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
     hpc = import('../hpc')
     args = c(list(...), df@args)
 
-    result = do.call(hpc$Q, c(more.args=args, df@index, list(` fun`=` fun`)))
+    result = do.call(hpc$Q, c(more.args=list(args), df@index, list(` fun`=` fun`)))
 
     if (!result_only) {
         rownames(df@index) = as.character(1:nrow(df@index))

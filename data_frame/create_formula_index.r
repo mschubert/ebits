@@ -13,7 +13,6 @@
 # start with st$.assocs_subset here, leave the row-wise calls to df$call
 .b = import('../base', attach_operators=FALSE)
 source(file.path(module_file(), "IndexedCall.r"))
-#.b = import('../base')
 .gfd = import('./get_formula_data')
 
 #' Gathers all data required for a formula and creates a subsetting index
@@ -23,7 +22,10 @@ source(file.path(module_file(), "IndexedCall.r"))
 #' @param group    Names of variables that should be column-interated together
 #' @param subsets  How to divide each variable in `formula` along first axis
 #' @param atomic   Names of variables that should not be iterated through
-create_formula_index = function(formula, data=parent.frame(), group=NULL, subsets=NULL, atomic=NULL) {
+#' @param ...      Further arguments to be stored
+#' @return         A IndexedFormula object
+create_formula_index = function(formula, data=parent.frame(), group=NULL,
+                                subsets=NULL, atomic=NULL, ...) {
     pp = .gfd$get_formula_data(form=formula, data=data)
     data = lapply(pp$data, as.matrix)
     formula = pp$form
@@ -59,7 +61,7 @@ create_formula_index = function(formula, data=parent.frame(), group=NULL, subset
     # add data as attribute
     new("IndexedFormula",
         index=index,
-        args = list(data=data, formula=formula),
+        args = c(list(data=data, formula=formula), list(...)),
         subsets=subsets)
 }
 
@@ -71,7 +73,7 @@ if (is.null(module_name())) {
     #     a 1 3        b 5      [1,]    4    4
     #     b 2 4        a 6      [2,]    5    5
 
-    x1 = create_formula_index(A ~ B + C)
+    x1 = create_formula_index(A ~ B + C, something=TRUE)
     #   A B C
     # 1 x z 1
     # 2 y z 1
@@ -91,6 +93,7 @@ if (is.null(module_name())) {
     # 4 y z      o y
 
     testthat::expect_equal(x1@args$data, x2@args$data)
+    testthat::expect_true(x1@args$something)
     testthat::expect_equal(x2@args$data, x3@args$data)
 
     testthat::expect_equal(x1@index,
