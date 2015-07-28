@@ -58,7 +58,7 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
         )
     }
     if (tidy)
-        result = as.data.frame(do.call(rbind, result))
+        result = as.data.frame(result)
 
     result
 }

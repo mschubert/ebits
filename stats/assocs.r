@@ -67,7 +67,7 @@ ml = function(formula, train_args, data=environment(formula),
     else if (models)
         result$models
     else
-        result$pred
+        result$pred$data
 }
 
 if (is.null(module_name())) {
