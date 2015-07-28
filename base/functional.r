@@ -95,6 +95,14 @@ f = function (...) {
     closure(formals, body, parent.frame())
 }
 
+match_call_defaults = function (call = match.call(sys.function(sys.parent()), sys.call(sys.parent())),
+                                .formals = formals(sys.function(sys.parent()))) {
+    .formals = .formals[names(.formals) != '...']
+    new_call = as.call(c(call[[1]], .formals))
+    new_call[names(call[-1])] = call[-1]
+    new_call
+}
+
 # Tools for function composition and chaining {{{
 
 #' Partial function application
