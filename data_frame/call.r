@@ -58,7 +58,7 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
     }
     if (tidy) {
         result = lapply(result, as.data.frame)
-        result = do.call(rbind, result)
+        result = plyr::rbind.fill(result)
     }
 
     result
