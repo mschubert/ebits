@@ -35,7 +35,7 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
             cbind(index_row, result)
     }
 
-    args = c(list(...), df@args)
+    args = c(list(...), df@args, subsets=list(df@subsets))
 
     result = lapply(seq_len(nrow(df@index)), irow2result)
 
@@ -47,7 +47,7 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
 
 .hpc = function(df, ` fun`, ..., result_only=FALSE, tidy=TRUE) {
     hpc = import('../hpc')
-    args = c(list(...), df@args)
+    args = c(list(...), df@args, subsets=list(df@subsets))
 
     result = do.call(hpc$Q, c(more.args=list(args), df@index, list(` fun`=` fun`)))
 
@@ -57,8 +57,10 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
             c(as.list(df@index[i,,drop=FALSE]), as.list(result[[i]]))
         )
     }
-    if (tidy)
-        result = as.data.frame(result)
+    if (tidy) {
+        result = lapply(result, as.data.frame)
+        result = do.call(rbind, result)
+    }
 
     result
 }

@@ -31,6 +31,12 @@ wrap_formula_indexing = function(FUN) {
 
         df = import('../data_frame')
         call_args = as.list(.func$match_call_defaults())[-1]
+        call_args = lapply(call_args, function(a) {
+            if (class(a) %in% c("name", "call"))
+                eval(a)
+            else
+                a
+        })
         call_args = call_args[names(call_args) != "hpc_args"]
         idf = do.call(df$create_formula_index, call_args)
         df$call(idf, one_item, hpc_args=hpc_args)
