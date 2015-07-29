@@ -1,3 +1,5 @@
+.func = import('../base/functional')
+
 #' Takes a function and returns a function that index-wraps the provided
 #'
 #' @param FUN  A model function to be index-wrapped
@@ -28,11 +30,15 @@ wrap_formula_indexing = function(FUN) {
         }
 
         df = import('../data_frame')
-        idf = df$create_formula_index(formula,
-                                      data=data,
-                                      group=group,
-                                      subsets=subsets,
-                                      atomic=atomic)
+        call_args = as.list(.func$match_call_defaults())[-1]
+        call_args = lapply(call_args, function(a) {
+            if (class(a) %in% c("name", "call"))
+                eval(a)
+            else
+                a
+        })
+        call_args = call_args[names(call_args) != "hpc_args"]
+        idf = do.call(df$create_formula_index, call_args)
         df$call(idf, one_item, hpc_args=hpc_args)
     }
 
