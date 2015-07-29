@@ -1,5 +1,5 @@
 .b = import('../base', attach_operators=FALSE)
-source(file.path(module_file(), "IndexedCall.r"))
+source(module_file('IndexedCall.r'))
 
 #' expand.grid() function not converting to factors
 expand_grid = function(..., KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE) {
