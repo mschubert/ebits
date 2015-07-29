@@ -47,9 +47,8 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
 
 .hpc = function(df, ` fun`, ..., result_only=FALSE, tidy=TRUE) {
     hpc = import('../hpc')
-    args = c(list(...), df@args, subsets=list(df@subsets))
-
-    result = do.call(hpc$Q, c(more.args=list(args), df@index, list(` fun`=` fun`)))
+    args = list(c(df@args, subsets=list(df@subsets)))
+    result = do.call(hpc$Q, c(list(` fun`=` fun`, ...), df@index, more.args=args))
 
     if (!result_only) {
         rownames(df@index) = as.character(1:nrow(df@index))
