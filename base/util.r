@@ -57,3 +57,11 @@ maxN = function(x, N=2){
 minN = function(x, N=2) {
     -maxN(-x, N) 
 }
+
+add_class = function (x, cls) {
+    `class<-`(x, c(cls, class(x)))
+}
+
+remove_class = function (x, cls) {
+    `class<-`(x, setdiff(class(x), cls))
+}
