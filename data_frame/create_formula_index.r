@@ -27,19 +27,9 @@ source(module_file('IndexedCall.r'))
 create_formula_index = function(formula, data=parent.frame(), group=NULL,
                                 subsets=NULL, atomic=NULL, ...) {
     pp = .gfd$get_formula_data(form=formula, data=data)
-    data = lapply(pp$data, as.matrix)
+    data = pp$data
     formula = pp$form
     formula_vars = setdiff(all.vars(formula), atomic)
-    matrix_vars = names(data)[sapply(data, ncol) > 1]
-
-    # allow groups only when they make sense
-    if (!is.null(group) && !is.character(group))
-        stop("group needs to be NULL or a character vector")
-    if (!all(group %in% all.vars(formula)))
-        stop("group is referencing a variable not present in the formula")
-    diff = setdiff(group, matrix_vars)
-    if (length(diff) > 0)
-        stop(paste("Grouped iterations only make sense for matrix vars:", diff))
 
     # define anchor to iterate only non-grouped variables first
     anchor = group[1]
