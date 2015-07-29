@@ -1,5 +1,4 @@
 .b = import('../../base')
-`%>%` = magrittr::`%>%`
 
 #' Function to normalize expression objects
 #'
