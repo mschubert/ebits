@@ -55,7 +55,7 @@ ml = function(formula, train_args, data=environment(formula),
 
     # make sure we have enough data
     if (nrow(data) < min_pts)
-        return(list(NA))
+        return(NULL)
 
     # train model, max 4 variables
     learner = do.call(mlr::makeLearner, as.list(train_args))
