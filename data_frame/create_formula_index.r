@@ -12,7 +12,7 @@
 
 # start with st$.assocs_subset here, leave the row-wise calls to df$call
 .b = import('../base', attach_operators=FALSE)
-source(file.path(module_file(), "IndexedCall.r"))
+source(module_file('IndexedCall.r'))
 .gfd = import('./get_formula_data')
 
 #' Gathers all data required for a formula and creates a subsetting index
