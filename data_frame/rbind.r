@@ -1,5 +1,3 @@
-`%<>%` = magrittr::`%<>%`
-
 #' `rbind` with option to add list names as column
 #'
 #' @param x_list    A list to bind row-wise
@@ -8,12 +6,10 @@
 #' @return          A data.frame
 rbind = function(x_list, add_col=NULL, ...) {
     if (!is.null(add_col))
-        x_list %<>%
-            mapply(function(x,s) { x[[add_col]] = s; x },
-                   x = .,
-                   s = names(x_list),
-                   SIMPLIFY = FALSE) %>%
-            unname()
+        x_list = unname(mapply(function(x,s) { x[[add_col]] = s; x },
+                               x = x_list,
+                               s = names(x_list),
+                               SIMPLIFY = FALSE))
 
     do.call(base::rbind, c(x_list, list(...)))
 }
