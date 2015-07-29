@@ -1,5 +1,3 @@
-.func = import('../base/functional')
-
 #' Takes a function and returns a function that index-wraps the provided
 #'
 #' @param FUN  A model function to be index-wrapped
@@ -10,17 +8,15 @@ wrap_formula_indexing = function(FUN) {
         one_item = function(data, subsets=NULL, ...) {
             args = list(...)
 
-            # subset data according to subsets
-            if (!is.null(subsets)) {
-                data = lapply(data, function(x) x[subsets == args$subset,,drop=FALSE])
-                args$subset = NULL
-            }
-
-            # subset data according to data.frame indices
+            # subset data according to data.frame indices, specified subsets
             is_iterated = intersect(names(data), names(args))
-            for (name in is_iterated)
-                data[[name]] = data[[name]][, args[[name]], drop=TRUE]
-            stopifnot(sapply(data[is_iterated], is.vector))
+            for (name in is_iterated) {
+                tmp = idx$subset(data[[name]], args[[name]], drop=TRUE)
+                if (is.null(subsets))
+                    data[[name]] = tmp
+                else
+                    data[[name]] = idx$subset(tmp, subsets==args$subset, along=1)
+            }
 
             # calculate the model
             call_args = as.list(match.call())
@@ -29,8 +25,10 @@ wrap_formula_indexing = function(FUN) {
             do.call(FUN, call_args)
         }
 
+        func = import('../base/functional')
+        idx = import('../base/indexing')
         df = import('../data_frame')
-        call_args = as.list(.func$match_call_defaults())[-1]
+        call_args = as.list(func$match_call_defaults())[-1]
         call_args = lapply(call_args, function(a) {
             if (class(a) %in% c("name", "call"))
                 eval(a)

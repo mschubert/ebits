@@ -16,9 +16,12 @@ descriptive_index = function(x, along=NULL) {
             1:dim(x)[along]
         else
             dn
-    } else if (is.list(x)) # list and data.frame
-        seq_along(x)
-    else
+    } else if (is.list(x)) { # list and data.frame
+        if (is.null(names(x)))
+            seq_along(x)
+        else
+            names(x)
+    } else
         stop("Not sure how to get indices on that object")
 }
 
@@ -28,11 +31,14 @@ descriptive_index = function(x, along=NULL) {
 #' @param index  The index to subset with
 #' @param along  The axis along which to index for array-like objects; default: last dimension
 subset = function(x, index, along=NULL, drop=FALSE) {
-    if (is.vector(x))
+    if (is.vector(x) && !is.list(x))
         x[index, drop=drop]
-    else if (is.list(x) && !is.data.frame(x))
-        b$drop_list(x[index], drop=drop)
-    else if (is.array(x) || is.data.frame(x))
+    else if (is.list(x) && !is.data.frame(x)) { #TODO: drop_list@base? (used in array/construct as well)
+        if (drop && length(index) == 1)
+            x[[index]]
+        else
+            x[index]
+    } else if (is.array(x) || is.data.frame(x))
         import('../array')$subset(x, index, along, drop)
     else
         stop("Not sure how to subset that object")
