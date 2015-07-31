@@ -19,7 +19,7 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
         add_rep = NULL
     } else {
         index = do.call(rbind, replicate(rep, df@index, simplify=FALSE))
-        add_rep = c(sapply(1:nrow(df@index), function(i) rep(i, rep)))
+        add_rep = c(sapply(1:rep, function(i) rep(i, nrow(df@index))))
     }
 
     if (is.null(hpc_args)) {
