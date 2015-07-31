@@ -5,6 +5,7 @@
 #' @param data        The data to process, or parent.frame() by default
 #' @param models      Return model objects instead of fit statistics
 #' @param aggr        Return aggregate statistics instead of fit statistics
+#'                    This can be a list of mlr "Measure" objects (e.g. mlr::mse)
 #' @param xval        Number of cross-validation steps to perform
 #' @param min_pts     Minimum number of data points to calculate model from
 #' @param shuffle_labels  Whether to shuffle the response variable - for null models
@@ -35,7 +36,12 @@ ml = function(formula, train_args, data=environment(formula),
     # train model, max 4 variables
     learner = do.call(mlr::makeLearner, as.list(train_args))
     task = mlr::makeRegrTask(data=data, target=dep_vars)
-    result = mlr::crossval(learner, task, iters=xval, models=models)
+
+    if (is.list(aggr)) {
+        result = mlr::crossval(learner, task, iters=xval, models=models, measures=aggr)
+        aggr = TRUE
+    } else
+        result = mlr::crossval(learner, task, iters=xval, models=models)
 
     if (aggr)
         result$aggr
