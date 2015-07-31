@@ -12,18 +12,6 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
     if (!inherits(df, "IndexedCall"))
         stop("df needs to be created with df$create_[formula_]index")
 
-    if (is.null(hpc_args))
-        .serial(df=df, fun=fun, ..., result_only=result_only, tidy=tidy, rep=rep)
-    else
-        do.call(.hpc, c(list(df=df, ` fun`=fun, ..., rep=rep,
-                result_only=result_only, tidy=tidy), hpc_args))
-}
-
-.serial = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=NULL) {
-    irow2result = function(i) {
-        do.call(fun, ..., c(as.list(df@index[i,,drop=FALSE]), args))
-    }
-
     args = c(df@args, subsets=list(df@subsets))
 
     if (identical(rep, FALSE) || is.null(rep)) {
@@ -34,39 +22,16 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
         add_rep = c(sapply(1:nrow(df@index), function(i) rep(i, rep)))
     }
 
-    result = lapply(seq_len(nrow(df@index)), irow2result)
-    index$rep = add_rep
-
-    if (!result_only) {
-        rownames(index) = as.character(1:nrow(index))
-        result = lapply(names(result), function(i) {
-            if (is.null(names(result[[1]])))
-                c(as.list(index[i,,drop=FALSE]), result=as.list(result[[i]]))
-            else
-                c(as.list(index[i,,drop=FALSE]), as.list(result[[i]]))
+    if (is.null(hpc_args)) {
+        result = lapply(seq_len(nrow(index)), function(i) {
+            do.call(fun, ..., c(as.list(index[i,,drop=FALSE]), args))
         })
-    }
-    if (tidy) {
-        result = lapply(result, as.data.frame)
-        result = plyr::rbind.fill(result)
-    }
-
-    result
-}
-
-.hpc = function(df, ` fun`, ..., result_only=FALSE, rep=FALSE, tidy=TRUE) {
-    hpc = import('../hpc')
-    args = list(c(df@args, subsets=list(df@subsets)))
-
-    if (identical(rep, FALSE) || is.null(rep)) {
-        index = df@index
-        add_rep = NULL
+        names(result) = 1:length(result)
     } else {
-        index = do.call(rbind, replicate(rep, df@index, simplify=FALSE))
-        add_rep = c(sapply(1:nrow(df@index), function(i) rep(i, rep)))
+        hpc = import('../hpc')
+        result = do.call(hpc$Q, c(list(` fun`=fun, ...), index,
+                                  hpc_args, more.args=list(args)))
     }
-
-    result = do.call(hpc$Q, c(list(` fun`=` fun`, ...), index, more.args=args))
     index$rep = add_rep
 
     if (!result_only) {
