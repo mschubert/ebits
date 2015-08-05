@@ -43,10 +43,8 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
                 c(as.list(index[i,,drop=FALSE]), as.list(result[[i]]))
         })
     }
-    if (tidy) {
-        result = lapply(result, as.data.frame)
-        result = plyr::rbind.fill(result)
-    }
+    if (tidy)
+        result = dplyr::rbind_all(lapply(result, as.data.frame))
 
     result
 }
