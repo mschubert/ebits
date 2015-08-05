@@ -27,7 +27,7 @@ ml = function(formula, train_args, data=environment(formula),
         if (is.matrix(data[[i]]) && ncol(data[[i]]) == 1 && is.null(colnames(data[[i]])))
             colnames(data[[i]]) = names(data)[i]
     data = as.data.frame(na.omit(do.call(cbind, data)))
-    colnames(data) = make.names(colnames(data)) # mlr needs this
+    colnames(data) = make.names(colnames(data), unique=TRUE) # mlr needs this
 
     # make sure we have enough data
     if (nrow(data) < min_pts)
