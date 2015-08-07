@@ -20,6 +20,11 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
     } else {
         index = do.call(rbind, replicate(rep, df@index, simplify=FALSE))
         add_rep = c(sapply(1:rep, function(i) rep(i, nrow(df@index))))
+
+        if (nrow(index) == 0) { # because rbind((1,0)*x) = (0,0), not (x,0)
+            index = data.frame(.=add_rep)
+            index$. = NULL
+        }
     }
 
     if (is.null(hpc_args)) {
