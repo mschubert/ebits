@@ -46,7 +46,7 @@ get_z = function(cid, rid=landmarks, map.genes=FALSE) {
 
     if (is.character(map.genes)) {
         ann = import('../../process/microarray/annotate')
-        ann$annotate(re, annotation="hthgu133a.db", summarize="hgnc_symbol")
+        ann$annotate(re, annotation="hthgu133a.db", summarize=map.genes)
     } else
         re
 }
