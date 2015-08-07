@@ -33,8 +33,6 @@ annotate = function(normData, summarize="hgnc_symbol", ...) {
 }
 
 annotate.list = function(normData, summarize="hgnc_symbol") {
-    stopifnot(summarize == "hgnc_symbol")
-
     re = lapply(normData, function(x) annotate(x) %catch% NA)
     if (any(is.na(re)))
         warning("dropping ", names(re)[is.na(re)])
@@ -44,8 +42,6 @@ annotate.list = function(normData, summarize="hgnc_symbol") {
 }
 
 annotate.ExpressionSet = function(normData, summarize="hgnc_symbol") {
-    stopifnot(summarize == "hgnc_symbol")
-
     annotation = .gene[[normData@annotation]]
     if (is.null(annotation))
         stop("No annotation package found for", normData@annotation)
@@ -58,8 +54,6 @@ annotate.ExpressionSet = function(normData, summarize="hgnc_symbol") {
 }
 
 annotate.matrix = function(normData, annotation, summarize="hgnc_symbol") {
-    stopifnot(summarize == "hgnc_symbol")
-
     # load annotation package
     if (!require(annotation, character.only=TRUE)) {
         source("http://bioconductor.org/biocLite.R")
@@ -68,6 +62,11 @@ annotate.matrix = function(normData, annotation, summarize="hgnc_symbol") {
     }
 
     # work on expression matrix, summarize using limma
-    rownames(normData) = annotate::getSYMBOL(as.vector(rownames(normData)), annotation)
+    if (summarize == "hgnc_symbol")
+        rownames(normData) = annotate::getSYMBOL(as.vector(rownames(normData)), annotation)
+    else if (summarize == "entrezgene")
+        rownames(normData) = annotate::getEG(as.vector(rownames(normData)), annotation)
+    else
+        stop("Method", summarize, "not supported, only 'hgnc_symbol', 'entrezgene'")
     limma::avereps(normData[!is.na(rownames(normData)),])
 }
