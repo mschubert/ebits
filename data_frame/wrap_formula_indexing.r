@@ -11,7 +11,7 @@ wrap_formula_indexing = function(FUN) {
             # subset data according to data.frame indices, specified subsets
             is_iterated = intersect(names(data), names(args))
             for (name in is_iterated) {
-                tmp = idx$subset(data[[name]], args[[name]], drop=TRUE)
+                tmp = idx$subset(data[[name]], args[[name]], atomic=atomic_class, drop=TRUE)
                 if (is.null(subsets))
                     data[[name]] = tmp
                 else
@@ -46,4 +46,25 @@ wrap_formula_indexing = function(FUN) {
     add_formals = list(group=NULL, subsets=NULL, atomic=NULL, rep=FALSE, hpc_args=NULL)
     formals(new_FUN) = c(FUN_formals, add_formals)
     new_FUN
+}
+
+if (is.null(module_name())) {
+    fx = function(f, data=environment(f), atomic_class='vector') names(data)
+    wf = wrap_formula_indexing(fx)
+    
+    re1 = wf(Sepal.Length ~ Sepal.Width, data=iris)
+    testthat::expect_true(all(unlist(re1) %in% colnames(iris)))
+
+    re2 = wf(Sepal.Length ~ Sepal.Width, data=iris, rep=5)
+    testthat::expect_equal(nrow(re2), 5)
+
+    fx = function(f, data=environment(f), atomic_class='vector') 1
+    wf = wrap_formula_indexing(fx)
+
+    width = cbind(sepal=iris$Sepal.Width, petal=iris$Petal.Width)
+    length = cbind(sepal=iris$Sepal.Length, petal=iris$Petal.Length)
+    re3 = wf(width ~ length)
+    testthat::expect_equal(nrow(re3), 4)
+    testthat::expect_equal(setdiff(colnames(width), re3$width), character(0))
+    testthat::expect_equal(setdiff(colnames(length), re3$length), character(0))
 }

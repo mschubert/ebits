@@ -25,11 +25,19 @@ source(module_file('IndexedCall.r'))
 #' @param ...      Further arguments to be stored
 #' @return         A IndexedFormula object
 create_formula_index = function(formula, data=parent.frame(), group=NULL,
-                                subsets=NULL, atomic=NULL, ...) {
+                                subsets=NULL, atomic=NULL, atomic_class=NULL, ...) {
     pp = .gfd$get_formula_data(form=formula, data=data)
     data = pp$data
     formula = pp$form
     formula_vars = setdiff(all.vars(formula), atomic)
+
+    check = function(fun) sapply(data[formula_vars], fun)
+    if ('vector' %in% atomic_class)
+        formula_vars = formula_vars[check(is.list) | !check(is.vector)]
+    if ('matrix' %in% atomic_class)
+        formula_vars = formula_vars[!check(is.array) & !check(is.data.frame)]
+    if ('list' %in% atomic_class)
+        formula_vars = formula_vars[check(is.data.frame) | !check(is.list)]
 
     # define anchor to iterate only non-grouped variables first
     anchor = group[1]
@@ -47,6 +55,12 @@ create_formula_index = function(formula, data=parent.frame(), group=NULL,
     # add grouped items to be the same as the var they are grouped with
     for (var in grouped)
         index[[var]] = index[[anchor]]
+
+    # if index is empty, fake one row
+    if (nrow(index) == 0) {
+        index = data.frame(.=1)
+        index$. = NULL
+    }
 
     # add data as attribute
     new("IndexedFormula",

@@ -6,8 +6,10 @@ import('../../base/operators')
 #' @param data      A data.frame, list, or by default the formula env containing vars      
 #' @param min_pts   Minimum number of points to create a model for
 #' @param return_intercept  Whether the result data.frame should contain the intercept
+#' @param atomic_class  Variable classes that should not be split by default
 #' @return          A data.frame containing the model result
-lm = function(formula, data=environment(formula), min_pts=3, return_intercept=FALSE) {
+lm = function(formula, data=environment(formula), min_pts=3, return_intercept=FALSE,
+              atomic_class='vector') {
     pts = nrow(na.omit(do.call(cbind, data)))
     if (pts < min_pts)
         NULL

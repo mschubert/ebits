@@ -27,18 +27,19 @@ descriptive_index = function(x, along=NULL) {
 
 #' Subsets an object, either with numeric indices or names if available
 #'
-#' @param x      An object to get a subset from
-#' @param index  The index to subset with
-#' @param along  The axis along which to index for array-like objects; default: last dimension
-subset = function(x, index, along=NULL, drop=FALSE) {
-    if (is.vector(x) && !is.list(x))
+#' @param x       An object to get a subset from
+#' @param index   The index to subset with
+#' @param atomic  Character vector of classes that should not be split ('vector','matrix','list')
+#' @param along   The axis along which to index for array-like objects; default: last dimension
+subset = function(x, index, along=NULL, atomic=NULL, drop=FALSE) {
+    if (is.vector(x) && !is.list(x) && !'vector' %in% atomic)
         x[index, drop=drop]
-    else if (is.list(x) && !is.data.frame(x)) { #TODO: drop_list@base? (used in array/construct as well)
+    else if (is.list(x) && !is.data.frame(x) && !'list' %in% atomic) {
         if (drop && length(index) == 1)
             x[[index]]
         else
             x[index]
-    } else if (is.array(x) || is.data.frame(x))
+    } else if (is.array(x) || is.data.frame(x) && !'matrix' %in% atomic)
         import('../array')$subset(x, index, along, drop)
     else
         stop("Not sure how to subset that object")

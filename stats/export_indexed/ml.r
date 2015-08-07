@@ -10,9 +10,10 @@
 #' @param min_pts     Minimum number of data points to calculate model from
 #' @param shuffle_labels  Whether to shuffle the response variable - for null models
 #' @param subsets     Vector whose unique set is used to split the data along rows
+#' @param atomic_class  Variable classes that should not be split by default
 #' @return            A data.frame containing the trained models
-ml = function(formula, train_args, data=environment(formula),
-              models=FALSE, aggr=FALSE, xval=5, min_pts=10, shuffle_labels=FALSE) {
+ml = function(formula, train_args, data=environment(formula), models=FALSE, aggr=FALSE,
+              xval=5, min_pts=10, shuffle_labels=FALSE, atomic_class=c('vector','matrix')) {
     library(mlr) # needed for options
 
     # set all formula vars to atomic

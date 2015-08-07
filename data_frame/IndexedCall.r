@@ -22,15 +22,16 @@ setMethod("initialize", signature(.Object="IndexedCall"),
 })
 
 #' Display the contents
-setMethod("print", "IndexedCall", definition = function (x, ...) { 
+setMethod("print", "IndexedCall", definition = function (x, ...) {
     cat("Indexed values:\n")
     cat("data.frame with", ncol(x@index), "columns and", nrow(x@index), "rows\n")
     callNextMethod(x = head(x@index,10))
     cat("\nConstant args:\n")
     callNextMethod(x = x@args)
-    if (!is.null(subsets))
-    cat("Subsets:")
-    callNextMethod(x = table(x@subsets))
+    if (!is.null(subsets)) {
+        cat("Subsets:")
+        callNextMethod(x = table(x@subsets))
+    }
 })
 
 #' Simple access to print method
