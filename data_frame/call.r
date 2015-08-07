@@ -5,61 +5,46 @@
 #' @param ...          Further arguments to pass to `fun`
 #' @param result_only  Return only the result column instead of the data.frame
 #' @param tidy         Try to convert the result into a data.frame
+#' @param rep          How many times to repeat the calls (useful for sampling funcs)
 #' @param hpc_args     If not NULL, arguments to be passed to `hpc$Q`
 #' @return             A data frame with the function call results
-call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
+call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=NULL) {
     if (!inherits(df, "IndexedCall"))
         stop("df needs to be created with df$create_[formula_]index")
 
-    if (is.null(hpc_args))
-        .serial(df=df, fun=fun, ..., result_only=result_only, tidy=tidy)
-    else
-        do.call(.hpc, c(list(df=df, ` fun`=fun, ...,
-                result_only=result_only, tidy=tidy), hpc_args))
-}
+    args = c(df@args, subsets=list(df@subsets))
 
-.serial = function(df, fun, ..., result_only=FALSE, tidy=TRUE, hpc_args=NULL) {
-    irow2result = function(i) {
-        index_row = as.list(df@index[i,,drop=FALSE])
-        result = do.call(fun, c(index_row, args))
-
-        if (is.null(result))
-            return(NULL)
-
-        if (tidy)
-            result = as.data.frame(result)
-
-        if (result_only)
-            c(result)
-        else
-            cbind(index_row, result)
+    if (identical(rep, FALSE) || is.null(rep)) {
+        index = df@index
+        add_rep = NULL
+    } else {
+        index = do.call(rbind, replicate(rep, df@index, simplify=FALSE))
+        add_rep = c(sapply(1:rep, function(i) rep(i, nrow(df@index))))
     }
 
-    args = c(list(...), df@args, subsets=list(df@subsets))
-
-    result = lapply(seq_len(nrow(df@index)), irow2result)
-
-    if (tidy)
-        do.call(rbind, result)
-    else
-        result
-}
-
-.hpc = function(df, ` fun`, ..., result_only=FALSE, tidy=TRUE) {
-    hpc = import('../hpc')
-    args = list(c(df@args, subsets=list(df@subsets)))
-    result = do.call(hpc$Q, c(list(` fun`=` fun`, ...), df@index, more.args=args))
+    if (is.null(hpc_args)) {
+        result = lapply(seq_len(nrow(index)), function(i) {
+            do.call(fun, ..., c(as.list(index[i,,drop=FALSE]), args))
+        })
+        names(result) = 1:length(result)
+    } else {
+        hpc = import('../hpc')
+        result = do.call(hpc$Q, c(list(` fun`=fun, ...), index,
+                                  hpc_args, more.args=list(args)))
+    }
+    index$rep = add_rep
 
     if (!result_only) {
-        rownames(df@index) = as.character(1:nrow(df@index))
-        result = lapply(names(result), function(i)
-            c(as.list(df@index[i,,drop=FALSE]), as.list(result[[i]]))
-        )
+        rownames(index) = as.character(1:nrow(index))
+        result = lapply(names(result), function(i) {
+            if (is.null(names(result[[1]])))
+                c(as.list(index[i,,drop=FALSE]), result=as.list(result[[i]]))
+            else
+                c(as.list(index[i,,drop=FALSE]), as.list(result[[i]]))
+        })
     }
-    if (tidy) {
-        result = lapply(result, as.data.frame)
-        result = plyr::rbind.fill(result)
-    }
+    if (tidy)
+        result = dplyr::rbind_all(lapply(result, as.data.frame))
 
     result
 }
