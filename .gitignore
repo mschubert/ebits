@@ -5,7 +5,11 @@
 *-Ex.R
 
 # R data files from past sessions
-.Rdata
+*.Rdata
+*.RData
 
 # vim .swp files
 *.swp
+
+# library files
+*.so
