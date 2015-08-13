@@ -20,7 +20,7 @@ llapply = function(x, fun, vectors=FALSE) {
     relist(lapply(flatten(x, vectors=vectors), fun), like=x, vectors=vectors)
 }
 
-transpose = function(x, simplify=TRUE) {
+transpose = function(x, simplify=FALSE) {
     re = as.list(data.frame(do.call(rbind, x), check.names=FALSE))
     if (simplify)
         lapply(re, function(r) sapply(r, function(x) x))
