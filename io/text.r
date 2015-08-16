@@ -39,7 +39,7 @@ read_table = function (file, ..., stringsAsFactors = FALSE, na.strings = c(NA, '
     eval.parent(call)
 }
 
-write_table = function (x, file = '', quote = FALSE, row.names = FALSE) {
+write_table = function (x, file = '', ..., quote = FALSE, row.names = FALSE) {
     call = .b$match_call_defaults()
     call[[1]] = quote(write.table)
 
