@@ -284,7 +284,7 @@ items = lp(p, `[`)
 #'
 #' @usage neg(f)
 #' @seealso \code{\link{base::Negate}}
-neg = p(compose, `!`)
+neg = lp(compose, `!`)
 
 # TODO: Add `and` and `or` analogously
 
