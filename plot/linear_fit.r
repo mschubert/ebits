@@ -34,7 +34,7 @@ linear_fit = function(formula, subsets=NULL, data=parent.frame(),
         y = c(y)
     }
 
-    result = st$assocs(y ~ x, subsets=subsets) %>%
+    result = st$lm(y ~ x, subsets=subsets) %>%
         filter(term == "x" & p.value < 0.05)
 
     df = data.frame(x=x, y=y, subsets=subsets) %>%

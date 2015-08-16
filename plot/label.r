@@ -6,7 +6,7 @@ filter = function(df, label="label", filter="pvalue", top=20) {
 #    disty = disty / max(disty)
 #    distsq = distx*distx + 2*disty*disty
 #    ord = order(distsq, decreasing=T)
-    ord = order(df$pvalue, decreasing=F)
+    ord = order(df[[filter]], decreasing=FALSE)
 
     df[['label']][ord[top+1:length(ord)]] = ""
     df
