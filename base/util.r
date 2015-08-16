@@ -51,3 +51,11 @@ min_mask = function(x, N=2) {
     else
         seq_along(x) %in% order(x, decreasing=FALSE, na.last=NA)[1:N]
 }
+
+add_class = function (x, cls) {
+    `class<-`(x, c(cls, class(x)))
+}
+
+remove_class = function (x, cls) {
+    `class<-`(x, setdiff(class(x), cls))
+}
