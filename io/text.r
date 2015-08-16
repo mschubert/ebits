@@ -22,7 +22,7 @@ read_table = function (file, ..., stringsAsFactors = FALSE, na.strings = c(NA, '
 
     if (missing(file)) {
         call[[1]] = quote(read.table)
-        return(eval.parent(call))
+        return(.b$add_class(eval.parent(call), 'tbl_df'))
     }
 
     extension = .b$grep('\\.(\\w+)(\\.gz)?$', file)[1]
@@ -34,9 +34,11 @@ read_table = function (file, ..., stringsAsFactors = FALSE, na.strings = c(NA, '
         call$sep = separators[[extension]]
     }
 
-    call[[1]] = if (identical(extension, 'xlsx'))
-        quote(xlsx::read.xlsx) else quote(read.table)
-    eval.parent(call)
+    call[[1]] = if (identical(extension, 'xlsx')) {
+        call$na.strings = NULL
+        quote(xlsx::read.xlsx)
+    } else quote(read.table)
+    .b$add_class(eval.parent(call), 'tbl_df')
 }
 
 write_table = function (x, file = '', quote = FALSE, row.names = FALSE) {
