@@ -12,14 +12,14 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
     if (!inherits(df, "IndexedCall"))
         stop("df needs to be created with df$create_[formula_]index")
 
-    args = c(df@args, subsets=list(df@subsets))
+    args = c(df$args, subsets=list(df$subsets))
 
     if (identical(rep, FALSE) || is.null(rep)) {
-        index = df@index
+        index = df$index
         add_rep = NULL
     } else {
-        index = do.call(rbind, replicate(rep, df@index, simplify=FALSE))
-        add_rep = c(sapply(1:rep, function(i) rep(i, nrow(df@index))))
+        index = do.call(rbind, replicate(rep, df$index, simplify=FALSE))
+        add_rep = c(sapply(1:rep, function(i) rep(i, nrow(df$index))))
 
         if (nrow(index) == 0) { # because rbind((1,0)*x) = (0,0), not (x,0)
             index = data.frame(.=add_rep)

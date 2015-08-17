@@ -1,5 +1,5 @@
 .b = import('../base', attach_operators=FALSE)
-source(module_file('IndexedCall.r'))
+.ic = import('./IndexedCall')
 
 #' expand.grid() function not converting to factors
 expand_grid = function(..., KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE) {
@@ -20,5 +20,5 @@ create_index = function(..., args=list(), expand_grid=FALSE) {
     # set class so that our object can handle it
     attr(index, "class") = "data.frame"
 
-    new("IndexedCall", index=index, args=args)
+    .ic$IndexedCall$new(index=index, args=args)
 }
