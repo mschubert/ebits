@@ -12,7 +12,7 @@
 
 # start with st$.assocs_subset here, leave the row-wise calls to df$call
 .b = import('../base', attach_operators=FALSE)
-source(module_file('IndexedCall.r'))
+.ic = import('./IndexedCall')
 .gfd = import('./get_formula_data')
 
 #' Gathers all data required for a formula and creates a subsetting index
@@ -63,10 +63,11 @@ create_formula_index = function(formula, data=parent.frame(), group=NULL,
     }
 
     # add data as attribute
-    new("IndexedFormula",
-        index=index,
+    .ic$IndexedFormula$new(
+        index = index,
         args = c(list(data=data, formula=formula), list(...)),
-        subsets=subsets)
+        subsets = subsets
+    )
 }
 
 if (is.null(module_name())) {
@@ -96,20 +97,20 @@ if (is.null(module_name())) {
     # 3 x z      o x
     # 4 y z      o y
 
-    testthat::expect_equal(x1@args$data, x2@args$data)
-    testthat::expect_true(x1@args$something)
-    testthat::expect_equal(x2@args$data, x3@args$data)
+    testthat::expect_equal(x1$args$data, x2$args$data)
+    testthat::expect_true(x1$args$something)
+    testthat::expect_equal(x2$args$data, x3$args$data)
 
-    testthat::expect_equal(x1@index,
+    testthat::expect_equal(x1$index,
     structure(list(A = c("x", "y", "x", "y"), B = c("z", "z", "z",
     "z"), C = c(1L, 1L, 2L, 2L)), .Names = c("A", "B", "C"), class = "data.frame",
     row.names = c(NA, -4L)))
 
-    testthat::expect_equal(x2@index,
+    testthat::expect_equal(x2$index,
     structure(list(A = c("x", "y"), B = c("z", "z"), C = c("x", "y"
     )), .Names = c("A", "B", "C"), row.names = c(NA, -2L), class = "data.frame"))
 
-    testthat::expect_equal(x3@index,
+    testthat::expect_equal(x3$index,
     structure(list(A = c("x", "y", "x", "y"), B = c("z", "z", "z",
     "z"), subset = c("w", "w", "o", "o"), C = c("x", "y", "x", "y"
     )), .Names = c("A", "B", "subset", "C"), row.names = c(NA, -4L
