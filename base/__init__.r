@@ -4,6 +4,7 @@ export_submodule('./util')
 export_submodule('./functional')
 export_submodule('./lambda')
 export_submodule('./indexing')
+export_submodule('./vector')
 
 omit = import('./omit')
 list = import('./list')
