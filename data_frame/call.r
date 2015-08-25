@@ -34,8 +34,8 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
         names(result) = 1:length(result)
     } else {
         hpc = import('../hpc')
-        result = do.call(hpc$Q, c(list(` fun`=fun, ...), index,
-                                  hpc_args, more.args=list(args)))
+        result = do.call(hpc$Q, c(list(fun=fun, ...), index,
+                                  hpc_args, const=list(args)))
     }
     index$rep = add_rep
 
