@@ -11,7 +11,13 @@ label = import('./label')
 
 #' Draw a volcano plot from calculated associations
 #'
-#' @param df         A data.frame obtained from the stats module
+#' @param df         A data.frame obtained from the stats module.
+#'                   It has to have the following fields:
+#'                     .x    : x coordinate in the plot
+#'                     .y    : y coordinate in the plot
+#'                     size  : size of the filled circle
+#'                   Optionally, it can have the fields:
+#'                     circle: draw a border around the circle [TRUE/FALSE]
 #' @param base.size  Scaling factor for the points drawn
 #' @param p          Line between significant and insignificant associations
 #' @param ceil       Minimum p-value to set top associations to; default: 0, no filter
@@ -25,11 +31,13 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
         stop("Column 'label' not found. You need to specify a label for your points")
     if (!'color' %in% colnames(df))
         stop("Column 'color' not found. Did you call plt$color$...?")
+    if (!'circle' %in% colnames(df))
+        df$circle = FALSE
 
     # remove insignificant points outside x limits, adjust size
     df = df %>%
-        filter(.y < p | abs(.x)<max(abs(.x[.y<p]), na.rm=TRUE)) %>%
-        mutate(size = size*base.size)
+        dplyr::filter(.y < p | abs(.x)<max(abs(.x[.y<p]), na.rm=TRUE)) %>%
+        dplyr::mutate(size = size*base.size)
 
     # set very low p-values to the cutoff value and label point
     pmin = df$.y < ceil
@@ -55,6 +63,7 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
                            limits = ylim) +
         scale_x_continuous(limits = xlim) +
         geom_point(size = sqrt(df$size), colour = df$color, na.rm = TRUE) +
+        geom_point(size = ifelse(df$circle, sqrt(df$size), NA), shape=1, colour = 'black', na.rm = TRUE) +
         geom_vline(xintercept = 0, lwd = 0.3) +
         geom_hline(yintercept = p, lwd = 0.3, linetype = 2) +
 #        annotate("text", x=min(df$.x), y=0.05, hjust=1, vjust=2, 
@@ -64,4 +73,16 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
         theme_bw() +
         geom_text(mapping = aes(x = .x, y = .y, label = label), 
                   colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
+}
+
+if (is.null(module_name)) {
+    df = data.frame(estimate = -12:12/12)
+    df$adj.p = 10^(-10*abs(df$estimate))
+    df$label = LETTERS[1:25]
+    df = color$p_effect(df, "adj.p")
+    df$size = 1:25
+    df$circle = rep(c(T,F,T,F,T),5)
+
+    p = volcano(df)
+    testthat::expect_equal(digest::digest(p), "9b5462f8bc3cfb42b17ef9cfe51a861d")
 }
