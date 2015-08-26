@@ -1,3 +1,5 @@
+import('../base/operators')
+
 # http://stackoverflow.com/questions/8139677
 flatten = function(x, vectors=FALSE) {
     while(any(vapply(x, is.list, logical(1)))) {
@@ -20,10 +22,15 @@ llapply = function(x, fun, vectors=FALSE) {
     relist(lapply(flatten(x, vectors=vectors), fun), like=x, vectors=vectors)
 }
 
-transpose = function(x, simplify=FALSE) {
-    re = as.list(data.frame(do.call(rbind, x), check.names=FALSE))
+transpose = function(x, use_names=TRUE, simplify=FALSE) {
+    re = lapply(x, as.list) %>%
+        do.call(rbind, .) %>%
+        data.frame(check.names=FALSE) %>%
+        as.list()
+    if (!use_names)
+        re = unname(re)
     if (simplify)
-        lapply(re, function(r) sapply(r, function(x) x))
+        lapply(re, simplify2array)
     else
         re
 }
@@ -48,4 +55,13 @@ to_array = function(x, index_list, fill=NA) {
     }
 
     array(re, dim=sapply(index.list, length), dimnames=index.list)
+}
+
+if (is.null(module_name())) {
+    # transpose
+    TP = list(x = 1:2, y = c("a", "b"))
+    TREF = list(`1` = list(x = 1, y = "a"), `2` = list(x = 2, y = "b"))
+    testthat::expect_equal(transpose(TP), TREF)
+    testthat::expect_equal(transpose(TP, use_names=FALSE), unname(TREF))
+    testthat::expect_equal(transpose(transpose(TP, use_names=FALSE), simplify=TRUE), TP)
 }
