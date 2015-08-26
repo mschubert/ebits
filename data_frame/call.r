@@ -27,16 +27,15 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
         }
     }
 
-    if (is.null(hpc_args)) {
+    if (is.null(hpc_args))
         result = lapply(seq_len(nrow(index)), function(i) {
             do.call(fun, ..., c(as.list(index[i,,drop=FALSE]), args))
         })
-        names(result) = 1:length(result)
-    } else {
-        hpc = import('../hpc')
-        result = do.call(hpc$Q, c(list(fun=fun, ...), index,
-                                  hpc_args, const=list(args)))
-    }
+    else
+        result = do.call(import('../hpc')$Q, c(list(fun=fun, ...), index,
+            hpc_args, const=list(args)))
+
+    names(result) = 1:length(result)
     index$rep = add_rep
 
     if (!result_only) {
