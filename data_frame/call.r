@@ -12,8 +12,6 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
     if (!inherits(df, "IndexedCall"))
         stop("df needs to be created with df$create_[formula_]index")
 
-    args = c(df$args, subsets=list(df$subsets))
-
     if (identical(rep, FALSE) || is.null(rep)) {
         index = df$index
         add_rep = NULL
@@ -27,13 +25,18 @@ call = function(df, fun, ..., result_only=FALSE, tidy=TRUE, rep=FALSE, hpc_args=
         }
     }
 
+    # pass 'subsets' as argument if they are specified
+    if ("subsets" %in% ls(df))
+        df$args = c(df$args, subsets=list(df$subsets))
+
+    # perform function calls either sequentially or with hpc module
     if (is.null(hpc_args))
         result = lapply(seq_len(nrow(index)), function(i) {
-            do.call(fun, ..., c(as.list(index[i,,drop=FALSE]), args))
+            do.call(fun, ..., c(as.list(index[i,,drop=FALSE]), df$args))
         })
     else
         result = do.call(import('../hpc')$Q, c(list(fun=fun, ...), index,
-            hpc_args, const=list(args)))
+            hpc_args, const=list(df$args)))
 
     names(result) = 1:length(result)
     index$rep = add_rep
