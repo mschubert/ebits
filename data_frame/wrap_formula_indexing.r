@@ -8,14 +8,15 @@ wrap_formula_indexing = function(FUN) {
         one_item = function(data, subsets=NULL, ...) {
             args = list(...)
 
-            # subset data according to data.frame indices, specified subsets
+            # subset all iterated data that is not masked by 'atomic' flags
             is_iterated = intersect(names(data), names(args))
-            for (name in is_iterated) {
-                tmp = idx$subset(data[[name]], args[[name]], atomic=atomic_class, drop=TRUE)
-                if (is.null(subsets))
-                    data[[name]] = tmp
-                else
-                    data[[name]] = idx$subset(tmp, subsets==args$subset, along=1)
+            for (name in is_iterated)
+                data[[name]] = idx$subset(data[[name]], args[[name]], atomic=atomic_class, drop=TRUE)
+
+            # subset data according to subsets (irrespective of atomic specifications)
+            if (!is.null(subsets)) {
+                for (name in names(data))
+                    data[[name]] = idx$subset(data[[name]], subsets==args$subset, along=1)
             }
 
             # calculate the model
