@@ -30,21 +30,18 @@ wrap_formula_indexing = function(FUN) {
         idx = import('../base/indexing')
         df = import('../data_frame')
         call_args = as.list(func$match_call_defaults())[-1]
-        call_args = lapply(call_args, function(a) {
-            if (class(a) %in% c("name", "call"))
-                eval(a)
-            else
-                a
-        })
+        for (i in seq_along(call_args)) #TODO: add this in match_call_defaults()?
+            if (class(call_args[[i]]) %in% c("name", "call"))
+                call_args[[i]] = eval(call_args[[i]], envir=parent.frame())
         call_args = call_args[!names(call_args) %in% c("rep","hpc_args")]
         idf = do.call(df$create_formula_index, call_args)
-        df$call(idf, one_item, rep=rep, hpc_args=hpc_args)
+        df$call(idf, one_item, rep=rep, result_only=result_only, hpc_args=hpc_args)
     }
 
     FUN_formals = formals(FUN)
     if (!"data" %in% names(FUN_formals))
         stop("function needs 'data' argument in order to be wrapped")
-    add_formals = list(group=NULL, subsets=NULL, atomic=NULL, rep=FALSE, hpc_args=NULL)
+    add_formals = list(group=NULL, subsets=NULL, atomic=NULL, rep=FALSE, hpc_args=NULL, result_only=FALSE)
     formals(new_FUN) = c(FUN_formals, add_formals)
     new_FUN
 }
