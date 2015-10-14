@@ -1,9 +1,3 @@
-library(ggplot2)
-library(reshape2)
-library(gridExtra)
-library(RColorBrewer)
-library(pheatmap)
-library(plotrix)
 .b = import('../base')
 import('./helpers', attach=TRUE)
 color = import('./color')
@@ -76,6 +70,7 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
 }
 
 if (is.null(module_name)) {
+    color = import('./color')
     df = data.frame(estimate = -12:12/12)
     df$adj.p = 10^(-10*abs(df$estimate))
     df$label = LETTERS[1:25]

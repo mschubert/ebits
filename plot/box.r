@@ -1,9 +1,3 @@
-library(ggplot2)
-library(reshape2)
-library(modules)
-b = import('base')
-ar = import('array')
-
 #' Plots a given data.frame as a boxplot with optional subsets
 #'
 #' @param df         data.frame holding at least the columns specified by x, y, and label
@@ -12,7 +6,7 @@ ar = import('array')
 #' @param label      Column of label to be used for each sample; indicates subsets
 #' @param quantiles  If `x="group"` quantiles will eb used to assign `up`, `down`, and `null`
 #' @param drop       Whether to drop unused factor levels in `label`
-box = function(df, x="group", y="y", label="label", quantiles=c(0.2,0.8), drop=T) {
+box = function(df, x="group", y="y", label="label", quantiles=c(0.2,0.8), drop=TRUE) {
     df$group = st$map.quantiles(score, quantiles, c('down', 'null', 'up'))
 
     ggplot(df, aes_string(x="group", y="y")) +

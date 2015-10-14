@@ -3,6 +3,7 @@
 #' @param haystack  data.frame to search for matches in
 #' @param needle    data.frame to use as query
 #' @param cols      columns for matching
+#' @return          data.frame with indices of haystack and needle as columns
 match = function(haystack, needle, cols=intersect(colnames(haystack), colnames(needle))) {
     haystack = haystack[cols]
     needle = needle[cols]
@@ -16,12 +17,23 @@ match = function(haystack, needle, cols=intersect(colnames(haystack), colnames(n
     merge(needle, haystack, by=cols, all=FALSE)[c('haystack','needle')]
 }
 
+#' Return boolean index where rows of haystack contain rows of needle
+#'
+#' @param haystack  data.frame to search for matches in
+#' @param needle    data.frame to use as query
+#' @return          boolean indices
+contains = function(haystack, needle) {
+    indices = match(haystack, needle)
+    1:nrow(haystack) %in% indices$haystack
+}
+
 #' Subset a data.frame with a data.frame, always comparing characters
 #'
 #' @param df            data.frame to update
 #' @param subs          data.frame to use for subsetting
 #' @param one_per_row   restrict to unique matches per row of upd
 #' @param add_cols      whether to add columns that are in subs but not df
+#' @return              data.frame that subsets (and extends columns) of df
 subset = function(df, subs, one_per_row=FALSE, add_cols=FALSE) {
     indices = match(df, subs)
 
