@@ -1,16 +1,18 @@
-library(scales)
-library(gtools)
+.scales = import_package('scales')
 
 reverselog_trans = function(base=exp(1)) {
     trans = function(x) -log(x, base)
     inv = function(x) base^-x
-    trans_new(paste0("log-", format(base)), trans, inv, log_breaks(base = base), 
-                     domain = c(1e-100, Inf))
+    .scales$trans_new(paste0("log-", format(base)),
+                      trans,
+                      inv,
+                      .scales$log_breaks(base = base), 
+                      domain = c(1e-100, Inf))
 }
 
 # function for relabeling the y-axis
 scientific_10 = function(x) {
-    parse(text=gsub("e", " %*% 10^", scientific_format()(x)))
+    parse(text=gsub("e", " %*% 10^", .scales$scientific_format()(x)))
 }
 
 # http://stackoverflow.com/questions/6738085

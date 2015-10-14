@@ -1,5 +1,3 @@
-library(ggplot2)
-library(reshape2)
 .b = import('../base')
 .st = import('../stats')
 #.spf = import('../stats/process_formula')
