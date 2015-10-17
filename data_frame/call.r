@@ -41,16 +41,16 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
 
     if (!result_only) {
         index$rep = add_rep
-        index$id = rownames(index)
+        index$..id = rownames(index)
 
         # converting to list: https://github.com/hadley/dplyr/issues/1450
-        result = mapply(function(r,n) c(as.list(r), id=n),
+        result = mapply(function(r,n) c(as.list(r), ..id=n),
                         result, as.character(seq_along(result)),
                         USE.NAMES=TRUE, SIMPLIFY=FALSE) %>%
             .dp$bind_rows() %>%
-            .dp$left_join(index, ., by="id") %>%
-            .dp$select(-id)
-        result$id = NULL
+            .dp$left_join(index, ., by="..id") %>%
+            .dp$select(-..id)
+        result$..id = NULL
         colnames(result)[colnames(result) == ""] = "result"
     }
 
