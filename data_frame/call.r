@@ -44,8 +44,17 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
         index$..id = rownames(index)
 
         # converting to list: https://github.com/hadley/dplyr/issues/1450
-        result = mapply(function(r,n) c(as.list(r), ..id=n),
-                        result, as.character(seq_along(result)),
+        # bind rows not with mixed length list (to be raised)
+        # could simplify to c(as.list(r), ..id=n) if this worked
+        concat = function(r,n) {
+            if (is.null(r))
+                list(..id=n)
+            else {
+                r = as.list(r)
+                c(r, ..id=list(rep(n, length(r[[1]]))))
+            }
+        }
+        result = mapply(concat, result, as.character(seq_along(result)),
                         USE.NAMES=TRUE, SIMPLIFY=FALSE) %>%
             .dp$bind_rows() %>%
             .dp$left_join(index, ., by="..id") %>%
