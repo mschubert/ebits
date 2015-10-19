@@ -44,7 +44,7 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
     # make sure we don't plot too many insignificant points
     if (simplify && sum(df$.y > p) > 300) {
         set.seed(123456)
-        idx = which(df$.y > .b$minN(df$.y[df$.y > p], 100))
+        idx = which(df$.y >= .b$minN(df$.y[df$.y > p], 100))
         keep = sample(idx, size=200, replace=FALSE, prob=1-df$.y[idx])
         df$.y[setdiff(idx, keep)] = NA
         df$label[idx] = ""
