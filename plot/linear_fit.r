@@ -30,7 +30,8 @@ linear_fit = function(formula, subsets=NULL, data=parent.frame(),
         subsets = c(sapply(colnames(y), function(i) rep(i, nrow(y))))
         x = rep(x, ncol(y))
         y = c(y)
-    }
+    } else
+        subsets = rep(1, nrow(x))
 
     result = st$lm(y ~ x, subsets=subsets) %>%
         filter(term == "x" & p.value < 0.05)
