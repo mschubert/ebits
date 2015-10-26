@@ -1,4 +1,5 @@
 import('../../base/operators')
+.ar = import('../../array/map')
 
 #' Function to calculate and return a cleaned linear model
 #'
@@ -10,18 +11,31 @@ import('../../base/operators')
 #' @return          A data.frame containing the model result
 lm = function(formula, data=environment(formula), min_pts=3, return_intercept=FALSE,
               atomic_class='vector') {
-    pts = nrow(na.omit(do.call(cbind, data)))
-    if (pts < min_pts)
-        NULL
-    else {
-        re = stats::lm(formula, data) %>%
-            broom::tidy() %>%
-            cbind(size = pts)
-        if (return_intercept)
-            re
+    pts = model.frame(formula, data)
+    size = lapply(pts, function(x) {
+        if (is.logical(x) || is.factor(x))
+            as.list(table(x))
         else
-            dplyr::filter(re, term != "(Intercept)")
-    }
+            sum(!is.na(x))
+    })
+    names(size) = names(pts)
+    size$'(Intercept)' = nrow(pts)
+    orig_names = names(size) # that's a bit clumsy, but it works
+    size = unlist(size)      # better would be to
+    for (n in orig_names)    # change delimiter in unlist to ""
+        names(size) = sub(paste0(n,"\\."), n, names(size))
+
+    if (nrow(pts) < min_pts)
+        return(NULL)
+
+    re = stats::lm(formula, data) %>%
+        broom::tidy() %>%
+        cbind(size = sapply(.$term, function(x) size[x])) %>%
+        dplyr::as_data_frame()
+    if (return_intercept)
+        re
+    else
+        dplyr::filter(re, term != "(Intercept)")
 }
 
 if (is.null(module_name())) {
