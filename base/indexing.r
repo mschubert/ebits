@@ -32,7 +32,7 @@ descriptive_index = function(x, along=NULL) {
 #' @param atomic  Character vector of classes that should not be split ('vector','matrix','list')
 #' @param along   The axis along which to index for array-like objects; default: last dimension
 subset = function(x, index, along=NULL, atomic=NULL, drop=FALSE) {
-    if (((is.vector(x) && !is.list(x)) || is.factor(x)) && !'vector' %in% atomic)
+    if (is.atomic(x) && !'vector' %in% atomic)
         x[index, drop=drop]
     else if (is.list(x) && !is.data.frame(x) && !'list' %in% atomic) {
         if (drop && length(index) == 1)
