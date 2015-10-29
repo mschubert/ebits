@@ -33,7 +33,7 @@ create_formula_index = function(formula, data=parent.frame(), group=NULL,
 
     check = function(fun) sapply(data[formula_vars], fun)
     if ('vector' %in% atomic_class)
-        formula_vars = formula_vars[check(is.list) | !check(is.vector)]
+        formula_vars = formula_vars[check(is.list) | !check(is.atomic)]
     if ('matrix' %in% atomic_class)
         formula_vars = formula_vars[!check(is.array) & !check(is.data.frame)]
     if ('list' %in% atomic_class)
