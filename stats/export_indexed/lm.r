@@ -16,13 +16,16 @@ lm = function(formula, data=environment(formula), min_pts=3, return_intercept=FA
         if (is.logical(x) || is.factor(x))
             as.list(table(x))
         else
-            sum(!is.na(x))
+            sum(!(is.na(x) | x==0))
     })
     names(size) = names(pts)
     size$'(Intercept)' = nrow(pts)
-    orig_names = names(size) # that's a bit clumsy, but it works
-    size = unlist(size)      # better would be to
-    for (n in orig_names)    # change delimiter in unlist to ""
+
+    # that's a bit clumsy, but it works -
+    # better would be to use delimiter "" in unlist
+    orig_names = names(size)
+    size = unlist(size)
+    for (n in orig_names)
         names(size) = sub(paste0(n,"\\."), n, names(size))
 
     if (nrow(pts) < min_pts)
@@ -40,8 +43,8 @@ lm = function(formula, data=environment(formula), min_pts=3, return_intercept=FA
 
 if (is.null(module_name())) {
     re1 = lm(Sepal.Width ~ Sepal.Length, data=iris)
-    testthat::expect_equal(re1['1','term'], 'Sepal.Length')
-    testthat::expect_equal(re1['1','size'], 150)
+    testthat::expect_equal(unname(unlist(re1['term'])), 'Sepal.Length')
+    testthat::expect_equal(unname(unlist(re1['size'])), 150)
 
     re2 = lm(Sepal.Width ~ Sepal.Length, data=iris, return_intercept=TRUE)
     ref2 = broom::tidy(stats::lm(Sepal.Width ~ Sepal.Length, data=iris))
@@ -49,4 +52,8 @@ if (is.null(module_name())) {
     
     re3 = lm(Sepal.Width ~ Sepal.Length, data=iris, min_pts=200)
     testthat::expect_null(re3)
+
+    # r uses first factor level as reference, others to compare -> 2 rows
+    re4 = lm(Petal.Length ~ Species, data=iris)
+    testthat::expect_equal(nrow(re4), 2)
 }
