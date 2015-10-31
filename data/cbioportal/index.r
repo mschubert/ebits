@@ -5,7 +5,7 @@ library(cgdsr)
 .p = import('../path')
 .mycgds = cgdsr::CGDS("http://www.cbioportal.org/public-portal/")
 
-studies = function(tcga=NULL, exclude) {
+studies = function(tcga=NULL, exclude=NULL) {
     if (is.null(tcga))
         re = cgdsr::getCancerStudies(.mycgds)[,1]
     else
@@ -61,6 +61,7 @@ variants = function(studies, genes) {
         if (is.na(p))
             return(NULL)
 
+        # _allele is sometimes logical, don't know why
         cgdsr::getMutationData(.mycgds,
             caseList = study,
             geneticProfile = p,
@@ -76,8 +77,8 @@ variants = function(studies, genes) {
                       chr = chr,
                       start_position = start_position,
                       end_position = end_position,
-                      reference_allele = reference_allele,
-                      variant_allele = variant_allele)
+                      reference_allele = as.character(reference_allele),
+                      variant_allele = as.character(variant_allele))
     }
     
     lapply(studies, study2variants) %>% bind_rows()
@@ -101,19 +102,24 @@ rna = function(studies, genes, na.rm=TRUE) {
     lapply(studies, study2rna) %>% bind_rows()
 }
 
-cna = function(studies, genes, na.rm=TRUE) {
+cna = function(studies, genes, na.rm=TRUE, only_altered=FALSE) {
     study2cna = function(study) {
         p = profile("cna", study)
         if (is.na(p))
             return(NULL)
 
-        cgdsr::getProfileData(.mycgds,
+        re = cgdsr::getProfileData(.mycgds,
             caseList = paste0(study, "_all"),
             geneticProfiles = p,
             genes = genes) %>%
             cbind(id = rownames(.), .) %>%
             mutate(id = gsub("\\.", "-", id)) %>% # invalid if not TCGA?
-            .omit$na(omit=na.rm)
+            .omit$na(omit = na.rm)
+
+        if (only_altered)
+            re = re[apply(select(re, -id), 1, function(x) any(x != 0)),]
+
+        re
     }
 
     lapply(studies, study2cna) %>% bind_rows()
