@@ -22,7 +22,7 @@ codes = list(center_code = 'code_tables/center_code.txt',
 regex_barcode = paste("^TCGA",              # TCGA identifer
                       "([a-zA-Z0-9]+)",     # tissue source site (eg. GBM from MBA)
                       "([a-zA-Z0-9]+)",     # participant id (4 digit alphanumeric)
-                      "([0-9]+)([A-Z])"  ,  # tumor/normal id, number of vial
+                      "([0-9]+)([A-Z])?"  , # tumor/normal id, number of vial
                       "?([0-9]+)?([A-Z])?", # portion (numbered); analyte (eg. [D/R]NA)
                       "?([a-zA-Z0-9]+)?",   # plate id (4 digit alphanumeric)
                       "?([0-9]+)?$",        # centre (eg. 01=BROAD GCC)
