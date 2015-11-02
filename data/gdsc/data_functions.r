@@ -13,11 +13,11 @@ ngs_bem = function() {
 }
 
 #' Returns a matrix of frequency- and intogen-filtered mutated genes
-mutated_genes = function(frequency=0, intogen=F, tissue=NULL) {
+mutated_genes = function(frequency=0, intogen=FALSE, tissue=NULL) {
     mut = t(.file$get('NGS_BEM')$logical)
 
     if (!is.null(tissue))
-        mut = mut[rownames(mut) %in% names(getTissues(tissue)),]
+        mut = mut[rownames(mut) %in% names(tissues(tissue)),]
 
 #    if (intogen) {
 #        drivers = getDrivers(tissue=tissue)
