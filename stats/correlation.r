@@ -8,7 +8,7 @@ fisher_r2z = function(rho) 0.5 * log((1 + rho)/(1 - rho))
 #'
 #' @param mat  A sample matrix with [obs x samples]
 #' @return     A matrix with p-values
-cor_test = function(mat, self=0) {
+test = function(mat, self=0) {
     mat = as.matrix(mat)
     n = ncol(mat)
     p.mat = matrix(NA, n, n)
@@ -24,7 +24,7 @@ cor_test = function(mat, self=0) {
 #' @param x  A sample matrix with [obs x samples]
 #' @param y  A samples matrix with [obs x samples]
 #' @return     A matrix with p-values
-cor_diff_test = function(x, y) {
+diff_test = function(x, y) {
     #TODO: move this somewhere proper
     rep_row = function(x,n){
         matrix(rep(x,each=n),nrow=n)
