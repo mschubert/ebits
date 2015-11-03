@@ -1,6 +1,7 @@
 export_submodule('./nmf')
 export_submodule('./util')
 batch = import('./batch')
+cor = import('./correlation')
 
 .wrap = import('../data_frame/wrap_formula_indexing')
 for (fname in list.files(module_file('export_indexed'), recursive=TRUE)) {
