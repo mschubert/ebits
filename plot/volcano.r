@@ -29,9 +29,12 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
         df$circle = FALSE
 
     # remove insignificant points outside x limits, adjust size
-    df = df %>%
-        dplyr::filter(.y < p | abs(.x)<max(abs(.x[.y<p]), na.rm=TRUE)) %>%
-        dplyr::mutate(size = size*base.size)
+    if (any(df$.y < p))
+        df = dplyr::filter(df, .y < p |
+                           abs(.x)<max(abs(.x[.y<p]),
+                           na.rm=TRUE))
+
+    df = dplyr::mutate(df, size = size*base.size)
 
     # set very low p-values to the cutoff value and label point
     pmin = df$.y < ceil
