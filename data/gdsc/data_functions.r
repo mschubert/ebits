@@ -60,9 +60,10 @@ basal_expression = function() {
 #' @param drug_names     Boolean flag indicating whether to name drugs or use IDs
 #' @param cell_names     Boolean flag indicating whether to use cell line names or COSMIC IDs
 #' @param min_tissue_measured  Minimum number of measured responses per tissue, NA otherwise
+#' @param drop           Remove columns that only contain NAs
 #' @return               A filtered and ID-mapped drug response matrix
-drug_response = function(metric='IC50s', filter_cosmic=TRUE,
-            drug_names=TRUE, cell_names=FALSE, min_tissue_measured=0, drop=FALSE) {
+drug_response = function(metric='IC50s', filter_cosmic=TRUE, drug_names=TRUE,
+        cell_names=FALSE, min_tissue_measured=0, drop=FALSE) {
     if (grepl("IC50", metric))
         SCREENING = .file$get('DRUG_IC50')
     else if (grepl("AUC", metric))
@@ -80,7 +81,7 @@ drug_response = function(metric='IC50s', filter_cosmic=TRUE,
         CONC = .file$get('CONC')
         for (tissue in unique(tissue_vec))
             for (did in colnames(SCREENING)) {
-                if (sum(SCREENING[tissue==tissue_vec, did]<CONC[did,'maxConc'],
+                if (sum(SCREENING[tissue==tissue_vec, did]<drug$conc('max',ids=did),
                             na.rm=TRUE) < min_tissue_measured)
                     SCREENING[tissue==tissue_vec, did] = NA
             }
