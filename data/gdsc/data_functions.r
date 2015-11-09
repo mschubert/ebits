@@ -61,9 +61,10 @@ basal_expression = function() {
 #' @param cell_names     Boolean flag indicating whether to use cell line names or COSMIC IDs
 #' @param min_tissue_measured  Minimum number of measured responses per tissue, NA otherwise
 #' @param drop           Remove columns that only contain NAs
+#' @param median_top     Include only drug responses where the tissue median is in the top N tissues
 #' @return               A filtered and ID-mapped drug response matrix
 drug_response = function(metric='IC50s', filter_cosmic=TRUE, drug_names=TRUE,
-        cell_names=FALSE, min_tissue_measured=0, drop=FALSE) {
+        cell_names=FALSE, min_tissue_measured=0, drop=FALSE, median_top=NA) {
     if (grepl("IC50", metric))
         SCREENING = .file$get('DRUG_IC50')
     else if (grepl("AUC", metric))
@@ -85,6 +86,20 @@ drug_response = function(metric='IC50s', filter_cosmic=TRUE, drug_names=TRUE,
                             na.rm=TRUE) < min_tissue_measured)
                     SCREENING[tissue==tissue_vec, did] = NA
             }
+    }
+
+    if (is.numeric(median_top)) {
+        tissues = tissues()
+        ar = import('array')
+        ar$intersect(SCREENING, tissues, along=1)
+        tissue_medians = ar$map(SCREENING, along=1, subsets=tissues,
+                                function(x) median(x, na.rm=TRUE))
+        tissue_ranks = ar$map(tissue_medians, along=1, order)
+
+        for (tissue in unique(tissues))
+            for (did in colnames(SCREENING))
+                if (tissue_ranks[tissue,did] > median_top)
+                    SCREENING[tissue == tissues, did] = NA
     }
 
     if (drug_names)
