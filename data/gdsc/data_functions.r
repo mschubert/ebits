@@ -17,7 +17,7 @@ mutated_genes = function(frequency=0, intogen=F, tissue=NULL) {
     mut = t(.file$get('NGS_BEM')$logical)
 
     if (!is.null(tissue))
-        mut = mut[rownames(mut) %in% names(getTissues(tissue)),]
+        mut = mut[rownames(mut) %in% names(tissues(tissue)),]
 
 #    if (intogen) {
 #        drivers = getDrivers(tissue=tissue)
