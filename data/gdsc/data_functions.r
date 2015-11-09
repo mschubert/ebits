@@ -62,7 +62,7 @@ basal_expression = function() {
 #' @param min_tissue_measured  Minimum number of measured responses per tissue, NA otherwise
 #' @return               A filtered and ID-mapped drug response matrix
 drug_response = function(metric='IC50s', filter_cosmic=TRUE,
-            drug_names=TRUE, cell_names=FALSE, min_tissue_measured=0) {
+            drug_names=TRUE, cell_names=FALSE, min_tissue_measured=0, drop=FALSE) {
     if (grepl("IC50", metric))
         SCREENING = .file$get('DRUG_IC50')
     else if (grepl("AUC", metric))
@@ -91,6 +91,9 @@ drug_response = function(metric='IC50s', filter_cosmic=TRUE,
 
     if (cell_names)
         rownames(SCREENING) = cosmic$id2name(rownames(SCREENING))
+
+    if (drop)
+        SCREENING = SCREENING[,apply(SCREENING, 2, function(x) !all(is.na(x)))]
 
     SCREENING
 }
