@@ -22,7 +22,7 @@ codes = list(center_code = 'code_tables/center_code.txt',
 regex_barcode = paste("^TCGA",              # TCGA identifer
                       "([a-zA-Z0-9]+)",     # tissue source site (eg. GBM from MBA)
                       "([a-zA-Z0-9]+)",     # participant id (4 digit alphanumeric)
-                      "([0-9]+)([A-Z])"  ,  # tumor/normal id, number of vial
+                      "([0-9]+)([A-Z])?"  , # tumor/normal id, number of vial
                       "?([0-9]+)?([A-Z])?", # portion (numbered); analyte (eg. [D/R]NA)
                       "?([a-zA-Z0-9]+)?",   # plate id (4 digit alphanumeric)
                       "?([0-9]+)?$",        # centre (eg. 01=BROAD GCC)
@@ -50,9 +50,16 @@ barcode2index = function(ids) {
                       Analyte = m[,7],
                       Plate.ID = m[,8],
                       Analysis.Center = m[,9]) %>%
-        inner_join(codes$tissue_source_site, by="TSS.Code") %>%
-        inner_join(codes$sample_type, by="Code") %>%
-        inner_join(codes$disease_study, by="Study.Name") %>%
+        left_join(codes$tissue_source_site, by="TSS.Code") %>%
+        left_join(codes$sample_type, by="Code") %>%
+        left_join(codes$disease_study, by="Study.Name") %>%
         rename(Sample.Code = Code,
                Sample.Definition = Definition)
+}
+
+barcode2study = function(ids) {
+    barcode2index(ids) %>%
+        select(Study.Abbreviation) %>%
+        unlist() %>%
+        setNames(ids)
 }

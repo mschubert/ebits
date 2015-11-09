@@ -32,7 +32,7 @@ descriptive_index = function(x, along=NULL) {
 #' @param atomic  Character vector of classes that should not be split ('vector','matrix','list')
 #' @param along   The axis along which to index for array-like objects; default: last dimension
 subset = function(x, index, along=NULL, atomic=NULL, drop=FALSE) {
-    if (((is.vector(x) && !is.list(x)) || is.factor(x)) && !'vector' %in% atomic)
+    if (is.null(dim(x)) && !'vector' %in% atomic)
         x[index, drop=drop]
     else if (is.list(x) && !is.data.frame(x) && !'list' %in% atomic) {
         if (drop && length(index) == 1)
@@ -40,7 +40,41 @@ subset = function(x, index, along=NULL, atomic=NULL, drop=FALSE) {
         else
             x[index]
     } else if (is.array(x) || is.data.frame(x) && !'matrix' %in% atomic)
-        import('../array')$subset(x, index, along, drop)
+        import('../array/subset')$subset(x, index, along, drop)
     else
         stop("Not sure how to subset that object")
+}
+
+if (is.null(module_name())) {
+    A = matrix(rnorm(20), dimnames=list(letters[1:5],LETTERS[1:4]), nrow=5, ncol=4)
+
+    # names vectors, matrices
+    testthat::expect_equal(colnames(A),
+                           descriptive_index(A[1,]),
+                           descriptive_index(A, along=2))
+
+    # subsetting vectors
+    testthat::expect_equal(A[1,c(1:2,4)],
+        subset(A[1,], c(1:2,4), drop=TRUE),
+        subset(A[1,], c(1:2,4), drop=FALSE),
+        subset(A[1,], LETTERS[c(1:2,4)], drop=TRUE),
+        subset(A[1,], LETTERS[c(1:2,4)], drop=FALSE),
+        subset(A[1,], c(TRUE, TRUE, FALSE, TRUE), drop=TRUE),
+        subset(A[1,], c(TRUE, TRUE, FALSE, TRUE), drop=FALSE))
+
+    # subsetting matrices
+    testthat::expect_equal(A[,2:3],
+                           subset(A, 2:3, along=2, drop=TRUE),
+                           subset(A, 2:3, along=2, drop=FALSE),
+                           subset(A, LETTERS[2:3], along=2, drop=TRUE),
+                           subset(A, LETTERS[2:3], along=2, drop=FALSE),
+                           subset(A, c(FALSE, TRUE, TRUE, FALSE, drop=TRUE)),
+                           subset(A, c(FALSE, TRUE, TRUE, FALSE, drop=FALSE)))
+
+    testthat::expect_equal(A[,3,drop=FALSE],
+                           subset(A, 3, along=2, drop=FALSE),
+                           subset(A, LETTERS[3], along=2, drop=FALSE),
+                           subset(A, c(FALSE, FALSE, TRUE, FALSE, along=2, drop=FALSE)))
+
+    # how about factors, data.frames?
 }
