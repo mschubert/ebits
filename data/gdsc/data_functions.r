@@ -63,7 +63,7 @@ basal_expression = function() {
 #' @param drop           Remove columns that only contain NAs
 #' @param median_top     Include only drug responses where the tissue median is in the top N tissues
 #' @return               A filtered and ID-mapped drug response matrix
-drug_response = function(metric='IC50s', filter_cosmic=TRUE, drug_names=TRUE,
+drug_response = function(metric='IC50s', tissue=NULL, filter_cosmic=TRUE, drug_names=TRUE,
         cell_names=FALSE, min_tissue_measured=0, drop=FALSE, median_top=NA) {
     if (grepl("IC50", metric))
         SCREENING = .file$get('DRUG_IC50')
@@ -72,34 +72,35 @@ drug_response = function(metric='IC50s', filter_cosmic=TRUE, drug_names=TRUE,
     else
         stop("invalid metric")
 
+    ar = import('array')
+    tissues = tissues()
+
+    if (is.numeric(median_top)) {
+        ar$intersect(SCREENING, tissues, along=1)
+        tissue_ranks = ar$map(SCREENING, along=1, subsets=tissues,
+            function(x) median(x, na.rm=TRUE)) %>%
+            ar$map(along=1, function(x) rank(x, ties.method="min"))
+
+        for (tt in unique(tissues))
+            for (did in colnames(SCREENING))
+                if (tissue_ranks[tt,did] > median_top)
+                    SCREENING[tt == tissues, did] = NA
+    }
+
+    if (!is.null(tissue)) {
+        tissues = tissues(tissue)
+        ar$intersect(SCREENING, tissues, along=1)
+    }
+
     if (min_tissue_measured > 0) {
         if (grepl("AUC", metric))
             stop("concentration measurements only for IC50")
 
-        tissue_vec = tissues(minN=min_tissue_measured)
-        tissue_vec = tissue_vec[names(tissue_vec) %in% rownames(SCREENING)]
-        SCREENING = SCREENING[names(tissue_vec),]
-        CONC = .file$get('CONC')
-        for (tissue in unique(tissue_vec))
-            for (did in colnames(SCREENING)) {
-                if (sum(SCREENING[tissue==tissue_vec, did]<drug$conc('max',ids=did),
-                            na.rm=TRUE) < min_tissue_measured)
-                    SCREENING[tissue==tissue_vec, did] = NA
-            }
-    }
-
-    if (is.numeric(median_top)) {
-        tissues = tissues()
-        ar = import('array')
-        ar$intersect(SCREENING, tissues, along=1)
-        tissue_medians = ar$map(SCREENING, along=1, subsets=tissues,
-                                function(x) median(x, na.rm=TRUE))
-        tissue_ranks = ar$map(tissue_medians, along=1, order)
-
-        for (tissue in unique(tissues))
+        for (tt in unique(tissues))
             for (did in colnames(SCREENING))
-                if (tissue_ranks[tissue,did] > median_top)
-                    SCREENING[tissue == tissues, did] = NA
+                if (sum(SCREENING[tt==tissues, did] <
+                        drug$conc('max',ids=did), na.rm=TRUE) < min_tissue_measured)
+                    SCREENING[tt==tissues, did] = NA
     }
 
     if (drug_names)
