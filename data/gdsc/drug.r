@@ -31,10 +31,12 @@ id2name = function(id, table=FALSE) {
 #' Returns the maximum screening concentration given a drug name or ID
 #'
 #' @param type   'max' or 'min' for screening concentrations
-#' @param drugs  Character vector of drug IDs or names
+#' @param drugs  Character vector of drug names
+#' @param ids    Character vector of drug IDs
+#' @param log    Return log uM (TRUE) or uM (FALSE)
 #' @param ...    Arguments passed to drug/name2id
 #' @return       Maximum concentration that was screened
-conc = function(type="max", names=NULL, ids=NULL, ...) {
+conc = function(type="max", names=NULL, ids=NULL, log=TRUE, ...) {
     if (is.null(names) + is.null(ids) != 1)
         stop("Need either drug names or IDs")
 
@@ -48,6 +50,11 @@ conc = function(type="max", names=NULL, ids=NULL, ...) {
         query = names
     }
 
-    conc = setNames(CONC[[paste0(toupper(type), "_CONC")]], mapping)
+    if (log==TRUE)
+        field = "_LOG_UM"
+    else
+        field = "_UMOLAR"
+
+    conc = setNames(CONC[[paste0(toupper(type), field)]], mapping)
     setNames(conc[query], query)
 }

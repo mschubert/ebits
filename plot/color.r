@@ -26,45 +26,6 @@ p_effect = function(df, pvalue="p.value", effect="estimate", dir=1, thresh=0.05)
     df
 }
 
-#' Shows available colour palettes, either as plot or return value
-palettes = function() {
-    tryCatch(
-        RColorBrewer::display.brewer.all(),
-        warning = function(x) RColorBrewer::brewer.pal.info
-    )
-}
-
-#' @param df        Main data frame
-#' @param value     Field name of variable to derive colours from
-#' @param color     Field name of variable to save colours to
-#' @param palette   ColorBrewer palette to use
-#' @param na        Colour to use if value is NA
-#' @param quantize  Number of colours or sequence of breaks - e.g.: `seq(-1,1,by=0.25)`
-#TODO: alpha?
-#TODO: handle categorical, mix between categorical+continuous [subsets=]
-brew = function(df, value="value", color="color", palette="RdYlBu", na=NA, quantize=100) {
-    if (length(quantize) == 1) {
-        n_col = quantize
-        quantize = seq(from = min(df[[value]], na.rm=TRUE),
-                       to = max(df[[value]], na.rm=TRUE),
-                       length.out = n_col)
-    } else
-        n_col = length(quantize)
-
-    max_cols = RColorBrewer::brewer.pal.info[palette,'maxcolors']
-    if (n_col > max_cols)
-        pal_col = max_cols
-    else
-        pal_col = n_col
-
-    bins = cut(df[[value]], breaks=quantize, include.lowest=TRUE,
-               label=cut(quantize, breaks=quantize)[-1])
-    cols = RColorBrewer::colorRampPalette(brewer.pal(pal_col, palette))(n_col)
-    df[[color]] = cols[as.numeric(bins)]
-    df[[color]][is.na(df[[color]])] = na
-    df
-}
-
 # Graphics helpers
 import('../base/functional', attach = TRUE)
 
