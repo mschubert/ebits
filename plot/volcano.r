@@ -1,3 +1,4 @@
+library(ggrepel)
 .b = import('../base')
 import('./helpers', attach=TRUE)
 color = import('./color')
@@ -50,7 +51,7 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
         idx = which(df$.y >= .b$minN(df$.y[df$.y > p], 100))
         keep = sample(idx, size=200, replace=FALSE, prob=1-df$.y[idx])
         df$.y[setdiff(idx, keep)] = NA
-        df$label[idx] = ""
+        df$label[idx] = NA
     }
 
     # and do the actual plot
@@ -68,8 +69,10 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
         xlab("Effect size") + 
         ylab("Adjusted P-value") +
         theme_bw() +
-        geom_text(mapping = aes(x = .x, y = .y, label = label), 
-                  colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
+#        geom_text(mapping = aes(x = .x, y = .y, label = label),
+#                  colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
+        geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
+                  colour = "#353535", size = 3, na.rm = TRUE)
 }
 
 if (is.null(module_name)) {
