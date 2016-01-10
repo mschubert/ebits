@@ -5,7 +5,7 @@
 #' @param X        An n-dimensional array
 #' @param along    Along which axis to apply the function
 #' @param FUN      A function that maps a vector to the same length or a scalar
-map_simple = function(X, along, FUN) { #TODO: replace this by alply?
+.map_simple = function(X, along, FUN) {
     if (is.vector(X) || length(dim(X))==1)
         return(FUN(X))
 
@@ -50,8 +50,7 @@ map = function(X, along, FUN, subsets=rep(1,dim(X)[along]), drop=TRUE) {
 
     # for each subset, call mymap
     resultList = lapply(subsetIndices, function(f)
-        map_simple(.s$subset(X, f), along, FUN))
-#    resultList = lapply(subsetIndices, function(x) alply(subset(X, f), along, FUN)) # TODO: replace map_simple by d/plyr function
+        .map_simple(.s$subset(X, f), along, FUN))
 
     # assemble results together
     Y = do.call(function(...) abind::abind(..., along=along), resultList)

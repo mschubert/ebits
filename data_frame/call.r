@@ -1,3 +1,5 @@
+.dp = import_package('dplyr')
+
 #' Call a function passing each row as arguments
 #'
 #' @param df           A call index of class `IndexedCall` or descendent thereof
@@ -38,17 +40,27 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
             hpc_args, const=list(df$args)))
 
     if (!result_only) {
-        names(result) = 1:length(result)
         index$rep = add_rep
+        index$..id = rownames(index)
 
-        rownames(index) = as.character(1:nrow(index))
-        result = lapply(names(result), function(i) {
-            if (is.null(names(result[[i]])))
-                c(as.list(index[i,,drop=FALSE]), result=as.list(result[[i]]))
-            else
-                c(as.list(index[i,,drop=FALSE]), as.list(result[[i]]))
-        })
-        result = dplyr::bind_rows(lapply(result, as.data.frame))
+        # converting to list: https://github.com/hadley/dplyr/issues/1450
+        # bind rows not with mixed length list (to be raised)
+        # could simplify to c(as.list(r), ..id=n) if this worked
+        concat = function(r,n) {
+            if (is.null(r))
+                list(..id=n)
+            else {
+                r = as.list(r)
+                c(r, ..id=list(rep(n, length(r[[1]]))))
+            }
+        }
+        result = mapply(concat, result, as.character(seq_along(result)),
+                        USE.NAMES=TRUE, SIMPLIFY=FALSE) %>%
+            .dp$bind_rows() %>%
+            .dp$left_join(index, ., by="..id") %>%
+            .dp$select(-..id)
+        result$..id = NULL
+        colnames(result)[colnames(result) == ""] = "result"
     }
 
     result

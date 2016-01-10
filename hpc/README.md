@@ -1,28 +1,39 @@
 High performance computing / LSF jobs
 =====================================
 
-This script uses the [BatchJobs package](https://github.com/tudo-r/BatchJobs) to run functions either locally, on
-multiple cores, or LSF, depending on your configuration. It has a simpler
-interface, does more error checking than the library itself, and is able to
-queue different function calls before waiting for the results. The function
-supplied **must be self-sufficient**, i.e. load libraries and scripts.
+Perform function calls in LSF jobs. The module will start `n_jobs` LSF jobs (workers) with the
+memory requirements specified, and then send `<i>` function calls to those workers.
 
-**Note:** There were some issues with concurrent database access, use BatchJobs>=1.6
+This is done entirely on the network and without temporary files (unless `log_worker=TRUE`),
+so there is no strain on the file system apart from starting up R once per LSF job.
+
+The module also performs load-balancing, i.e. workers that get their jobs done faster will also
+receive more function calls to work on. This is especially useful if not all calls
+return after the same time, or one worker has a high load. For long running jobs use `n_jobs=<i>`.
+
+It is based upon the [rzmq package](https://github.com/armstrtw/rzmq) and the
+[ZeroMQ library](http://zeromq.org/) that is also used for workers in IPython.
+
+The function supplied **must be self-sufficient**, i.e. load libraries and scripts.
+
+### Custom setup
+
+Currently, only LSF is supported as a scheduler. Adding others should be simple, but will
+only be implemented if there is a need for it.
+
+If not at EBI, you may need to adjust the `LSF.tmpl` file according to your needs,
+especially for the queue and custom resources.
 
 ### `Q()`
 
-Creates a new registry with that vectorises a function call and returns 
-results if `get=T` (default).
-
 ```r
-library(modules)
 hpc = import('hpc')
 s = function(x) x
-hpc$Q(s, x=c(1:3)) # list(1,2,3)
+hpc$Q(s, x=c(1:3), n_jobs=1) # list(1,2,3)
 ```
 
 ```r
 t = function(x) sum(x)
 a = matrix(3:6, nrow=2)
-hpc$Q(t, a) # splits a by columns: list(7, 11)
+hpc$Q(t, a, n_jobs=1) # splits a by columns: list(7, 11)
 ```
