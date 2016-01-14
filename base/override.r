@@ -1,8 +1,8 @@
 ###
 ### general utility functions without specific use
 ###
-.op = import('./operators', attach_operators=FALSE)
-.omit = import('./omit')
+.op = import_('./operators', attach_operators=FALSE)
+.omit = import_('./omit')
 
 #' match() function with extended functionality
 #'

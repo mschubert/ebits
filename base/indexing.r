@@ -40,7 +40,7 @@ subset = function(x, index, along=NULL, atomic=NULL, drop=FALSE) {
         else
             x[index]
     } else if (is.array(x) || is.data.frame(x) && !'matrix' %in% atomic)
-        import('../array/subset')$subset(x, index, along, drop)
+        import_('../array/subset')$subset(x, index, along, drop)
     else
         stop("Not sure how to subset that object")
 }

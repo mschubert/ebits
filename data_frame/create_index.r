@@ -1,5 +1,5 @@
-.b = import('../base', attach_operators=FALSE)
-.ic = import('./IndexedCall')
+.b = import_('../base', attach_operators=FALSE)
+.ic = import_('./IndexedCall')
 
 #' expand.grid() function not converting to factors
 expand_grid = function(..., KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE) {

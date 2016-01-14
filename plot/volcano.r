@@ -1,8 +1,8 @@
 library(ggrepel)
-.b = import('../base')
-import('./helpers', attach=TRUE)
-color = import('./color')
-label = import('./label')
+.b = import_('../base')
+import_('./helpers', attach=TRUE)
+color = import_('./color')
+label = import_('./label')
 
 #' Draw a volcano plot from calculated associations
 #'
@@ -76,7 +76,7 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
 }
 
 if (is.null(module_name)) {
-    color = import('./color')
+    color = import_('./color')
     df = data.frame(estimate = -12:12/12)
     df$adj.p = 10^(-10*abs(df$estimate))
     df$label = LETTERS[1:25]

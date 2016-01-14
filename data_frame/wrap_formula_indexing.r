@@ -26,9 +26,9 @@ wrap_formula_indexing = function(FUN) {
             do.call(FUN, call_args)
         }
 
-        func = import('../base/functional')
-        idx = import('../base/indexing')
-        df = import('../data_frame')
+        func = import_('../base/functional')
+        idx = import_('../base/indexing')
+        df = import_('../data_frame')
         call_args = as.list(func$match_call_defaults())[-1]
         for (i in seq_along(call_args)) #TODO: add this in match_call_defaults()?
             if (class(call_args[[i]]) %in% c("name", "call"))

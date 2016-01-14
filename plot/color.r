@@ -27,7 +27,7 @@ p_effect = function(df, pvalue="p.value", effect="estimate", dir=1, thresh=0.05)
 }
 
 # Graphics helpers
-import('../base/functional', attach = TRUE)
+import_('../base/functional', attach = TRUE)
 
 # Color helper functions {{{
 transparent = function (colors, alpha = 0.5) {

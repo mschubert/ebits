@@ -10,4 +10,4 @@ export_submodule('./matrix')
 export_submodule('./venn') # bad style
 export_submodule('./color')
 
-brew = import('./brew')
+brew = import_('./brew')

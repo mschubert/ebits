@@ -1,4 +1,4 @@
-import('./functional', attach = TRUE)
+import_('./functional', attach = TRUE)
 
 #' Create a logical vector from a numeric index vector
 #'

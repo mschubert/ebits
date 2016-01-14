@@ -1,5 +1,5 @@
-import('../../base/operators')
-.ar = import('../../array/map')
+import_('../../base/operators')
+.ar = import_('../../array/map')
 
 #' Function to calculate and return a cleaned linear model
 #'

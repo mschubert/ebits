@@ -1,4 +1,4 @@
-.b = import('../../base')
+.b = import_('../../base')
 
 #' Function to normalize expression objects
 #'

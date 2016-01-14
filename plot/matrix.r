@@ -1,5 +1,5 @@
-.b = import('../base')
-.ar = import('../array')
+.b = import_('../base')
+.ar = import_('../array')
 
 #' @param df       The data.frame containing the associations
 #' @param formula  A formula of the kind value ~ axis[, axis2] FIXME: doesn't work

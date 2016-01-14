@@ -1,4 +1,4 @@
-import('../../base/operators')
+import_('../../base/operators')
 
 #' Function to calculate and return a cleaned Cox proportional hazards model
 #'

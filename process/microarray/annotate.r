@@ -1,4 +1,4 @@
-.b = import('../../base')
+.b = import_('../../base')
 
 #' mapping of annotation identifier to annotation package
 #' there should be a mapping between the two available somewhere?

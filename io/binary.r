@@ -1,5 +1,5 @@
 # I/O helper functions on R binary files
-.b = import('../base')
+.b = import_('../base')
 
 #' Load function that returns the object(s) instead of attaching it to the global namespace
 #'

@@ -1,5 +1,5 @@
 # I/O helper functions on text files
-.b = import('../base', attach_operators = FALSE)
+.b = import_('../base', attach_operators = FALSE)
 
 #' Add \code{ext}ension parameter to \link{\code{base::file.path}}
 file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {

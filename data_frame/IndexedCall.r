@@ -1,4 +1,4 @@
-R6 = import_package('R6')
+R6 = import_package_('R6')
 
 #' Class to represent a series of function calls
 IndexedCall = R6$R6Class("IndexedCall",

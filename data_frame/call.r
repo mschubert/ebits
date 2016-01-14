@@ -1,4 +1,4 @@
-.dp = import_package('dplyr')
+.dp = import_package_('dplyr')
 
 #' Call a function passing each row as arguments
 #'
@@ -36,7 +36,7 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
             do.call(fun, ..., c(as.list(index[i,,drop=FALSE]), df$args))
         })
     else
-        result = do.call(import('../hpc')$Q, c(list(fun=fun, ...), index,
+        result = do.call(import_('../hpc')$Q, c(list(fun=fun, ...), index,
             hpc_args, const=list(df$args)))
 
     if (!result_only) {

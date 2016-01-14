@@ -6,5 +6,5 @@ export_submodule('./lambda')
 export_submodule('./indexing')
 export_submodule('./vector')
 
-omit = import('./omit')
-list = import('./list')
+omit = import_('./omit')
+list = import_('./list')

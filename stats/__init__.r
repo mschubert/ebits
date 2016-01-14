@@ -1,11 +1,11 @@
 export_submodule('./nmf')
 export_submodule('./util')
-batch = import('./batch')
-cor = import('./correlation')
+batch = import_('./batch')
+cor = import_('./correlation')
 
-.wrap = import('../data_frame/wrap_formula_indexing')
+.wrap = import_('../data_frame/wrap_formula_indexing')
 for (fname in list.files(module_file('export_indexed'), recursive=TRUE)) {
-    .mod = import(paste0("./export_indexed/", sub("\\.r$", "", fname)))
+    .mod = import_(paste0("./export_indexed/", sub("\\.r$", "", fname)))
     .FUN = ls(.mod)
     assign(.FUN, .wrap$wrap_formula_indexing(.mod[[.FUN]]))
 }

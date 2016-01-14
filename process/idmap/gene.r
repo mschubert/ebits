@@ -1,6 +1,6 @@
-.b = import('../../base')
-.io = import('../../io')
-.ar = import('../../array')
+.b = import_('../../base')
+.io = import_('../../io')
+.ar = import_('../../array')
 
 #' Gene ID mapping function
 #'

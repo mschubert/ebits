@@ -1,4 +1,4 @@
-.scales = import_package('scales')
+.scales = import_package_('scales')
 
 reverselog_trans = function(base=exp(1)) {
     trans = function(x) -log(x, base)

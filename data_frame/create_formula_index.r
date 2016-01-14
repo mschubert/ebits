@@ -11,9 +11,9 @@
 # could i maybe use a grouped data_frame for this?
 
 # start with st$.assocs_subset here, leave the row-wise calls to df$call
-.b = import('../base', attach_operators=FALSE)
-.ic = import('./IndexedCall')
-.gfd = import('./get_formula_data')
+.b = import_('../base', attach_operators=FALSE)
+.ic = import_('./IndexedCall')
+.gfd = import_('./get_formula_data')
 
 #' Gathers all data required for a formula and creates a subsetting index
 #'

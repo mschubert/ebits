@@ -1,7 +1,7 @@
 # this should use data_frame infrastructure to calculate NMF clustering, optionally in cluster jobs
-.b = import('../base')
-.io = import('../io')
-.df = import('../data_frame')
+.b = import_('../base')
+.io = import_('../io')
+.df = import_('../data_frame')
 
 #' Wrapper function that takes k, num.clusterings and performs max_iter iterations
 #'
