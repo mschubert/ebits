@@ -46,35 +46,37 @@ subset = function(x, index, along=NULL, atomic=NULL, drop=FALSE) {
 }
 
 if (is.null(module_name())) {
+    library(testthat)
+
     A = matrix(rnorm(20), dimnames=list(letters[1:5],LETTERS[1:4]), nrow=5, ncol=4)
 
     # names vectors, matrices
-    testthat::expect_equal(colnames(A),
-                           descriptive_index(A[1,]),
-                           descriptive_index(A, along=2))
+    expect_equal(colnames(A),
+                 descriptive_index(A[1,]),
+                 descriptive_index(A, along=2))
 
     # subsetting vectors
-    testthat::expect_equal(A[1,c(1:2,4)],
-        subset(A[1,], c(1:2,4), drop=TRUE),
-        subset(A[1,], c(1:2,4), drop=FALSE),
-        subset(A[1,], LETTERS[c(1:2,4)], drop=TRUE),
-        subset(A[1,], LETTERS[c(1:2,4)], drop=FALSE),
-        subset(A[1,], c(TRUE, TRUE, FALSE, TRUE), drop=TRUE),
-        subset(A[1,], c(TRUE, TRUE, FALSE, TRUE), drop=FALSE))
+    expect_equal(A[1,c(1:2,4)],
+                 subset(A[1,], c(1:2,4), drop=TRUE),
+                 subset(A[1,], c(1:2,4), drop=FALSE),
+                 subset(A[1,], LETTERS[c(1:2,4)], drop=TRUE),
+                 subset(A[1,], LETTERS[c(1:2,4)], drop=FALSE),
+                 subset(A[1,], c(TRUE, TRUE, FALSE, TRUE), drop=TRUE),
+                 subset(A[1,], c(TRUE, TRUE, FALSE, TRUE), drop=FALSE))
 
     # subsetting matrices
-    testthat::expect_equal(A[,2:3],
-                           subset(A, 2:3, along=2, drop=TRUE),
-                           subset(A, 2:3, along=2, drop=FALSE),
-                           subset(A, LETTERS[2:3], along=2, drop=TRUE),
-                           subset(A, LETTERS[2:3], along=2, drop=FALSE),
-                           subset(A, c(FALSE, TRUE, TRUE, FALSE, drop=TRUE)),
-                           subset(A, c(FALSE, TRUE, TRUE, FALSE, drop=FALSE)))
+    expect_equal(A[,2:3],
+                 subset(A, 2:3, along=2, drop=TRUE),
+                 subset(A, 2:3, along=2, drop=FALSE),
+                 subset(A, LETTERS[2:3], along=2, drop=TRUE),
+                 subset(A, LETTERS[2:3], along=2, drop=FALSE),
+                 subset(A, c(FALSE, TRUE, TRUE, FALSE, drop=TRUE)),
+                 subset(A, c(FALSE, TRUE, TRUE, FALSE, drop=FALSE)))
 
-    testthat::expect_equal(A[,3,drop=FALSE],
-                           subset(A, 3, along=2, drop=FALSE),
-                           subset(A, LETTERS[3], along=2, drop=FALSE),
-                           subset(A, c(FALSE, FALSE, TRUE, FALSE, along=2, drop=FALSE)))
+    expect_equal(A[,3,drop=FALSE],
+                 subset(A, 3, along=2, drop=FALSE),
+                 subset(A, LETTERS[3], along=2, drop=FALSE),
+                 subset(A, c(FALSE, FALSE, TRUE, FALSE, along=2, drop=FALSE)))
 
     # how about factors, data.frames?
 }

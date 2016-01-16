@@ -74,6 +74,8 @@ nmf = function(A, k, max_iter=1000, seed=1234, nsame=200, rep=10, hpc_args=NULL)
 }
 
 if (is.null(module_name())) {
+    library(testthat)
+
     #TODO: write proper tests here
     #  this is just testing that the clustering runs without error
     data = data.matrix(iris[1:4])

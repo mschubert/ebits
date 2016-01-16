@@ -25,6 +25,8 @@ assemble = function(...) {
 }
 
 if (is.null(module_name())) {
+    library(testthat)
+
     a = setNames(c(1,3,5), c("A","C","E"))
     b = setNames(c(1,2,3,4), LETTERS[1:4])
     x = setNames("2", "B")
@@ -33,8 +35,8 @@ if (is.null(module_name())) {
     df = assemble(a=a, b, x, y)
     classes = unname(sapply(df, class))
 
-    testthat::expect_equal(sum(is.na(df)), 11)
-    testthat::expect_equal(rownames(df), c("A","C","E","B","D"))
-    testthat::expect_equal(classes, c(class(a), class(b), class(x), class(y)))
-    testthat::expect_equal(unname(y), df$y[1])
+    expect_equal(sum(is.na(df)), 11)
+    expect_equal(rownames(df), c("A","C","E","B","D"))
+    expect_equal(classes, c(class(a), class(b), class(x), class(y)))
+    expect_equal(unname(y), df$y[1])
 }

@@ -86,8 +86,10 @@ geneTable = .geneTable
 .lookup = .geneTable()
 
 if (is.null(module_name())) {
-    testthat::expect_equal(gene('683_at', to="hgnc_symbol"),
-                           setNames("OTC", "683_at"))
+    library(testthat)
+
+    expect_equal(gene('683_at', to="hgnc_symbol"),
+                 setNames("OTC", "683_at"))
 
     #FIXME: column name is dropped, should not be
     #m = matrix(1, nrow=2, ncol=1, dimnames=list(c('683_at','683_at'), 'x'))
@@ -98,5 +100,5 @@ if (is.null(module_name())) {
     M = gene(m, to="hgnc_symbol")
     Mref = structure(c(1, 1), .Dim = 1:2,
                      .Dimnames = list("OTC", c("x", "y")))
-    testthat::expect_equal(M, Mref)
+    expect_equal(M, Mref)
 }

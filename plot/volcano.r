@@ -76,6 +76,8 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
 }
 
 if (is.null(module_name)) {
+    library(testthat)
+
     color = import_('./color')
     df = data.frame(estimate = -12:12/12)
     df$adj.p = 10^(-10*abs(df$estimate))
@@ -85,5 +87,5 @@ if (is.null(module_name)) {
     df$circle = rep(c(T,F,T,F,T),5)
 
     p = volcano(df)
-    testthat::expect_equal(digest::digest(p), "9b5462f8bc3cfb42b17ef9cfe51a861d")
+    expect_equal(digest::digest(p), "9b5462f8bc3cfb42b17ef9cfe51a861d")
 }

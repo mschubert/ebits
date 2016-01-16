@@ -39,15 +39,17 @@ get_formula_data = function(form, data=parent.frame()) {
 }
 
 if (is.null(module_name())) {
+    library(testthat)
+
     time = c(4,3,1,1,2,2,3)
     status = c(1,0,1,0,1,1,0)
 
     # directly reference data
     form = status ~ time
     d1 = get_formula_data(form)
-    testthat::expect_equal(d1$form, form)
-    testthat::expect_equal(d1$data$time, time)
-    testthat::expect_equal(d1$data$status, status)
+    expect_equal(d1$form, form)
+    expect_equal(d1$data$time, time)
+    expect_equal(d1$data$status, status)
 
     test = list(time = c(4,3,1,1,2,2,2),
                 x = c(0,2,1,1,1,0,0),
@@ -55,13 +57,13 @@ if (is.null(module_name())) {
 
     # provide data, prefer over formula env (fallback)
     d2 = get_formula_data(status ~ time, data=test)
-    testthat::expect_equal(d2$form, form)
-    testthat::expect_equal(d2$data$time, test$time)
-    testthat::expect_equal(d2$data$status, status)
+    expect_equal(d2$form, form)
+    expect_equal(d2$data$time, test$time)
+    expect_equal(d2$data$status, status)
 
     # syntax for survival fits
     d3 = get_formula_data(status + time ~ 0 + x, data=test)
-    testthat::expect_equal(d3$form, status + time ~ 0 + x)
-    testthat::expect_equal(d3$data$time, test$time)
-    testthat::expect_equal(d3$data$status, status)
+    expect_equal(d3$form, status + time ~ 0 + x)
+    expect_equal(d3$data$time, test$time)
+    expect_equal(d3$data$status, status)
 }

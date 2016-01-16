@@ -58,10 +58,13 @@ to_array = function(x, index_list, fill=NA) {
 }
 
 if (is.null(module_name())) {
+    library(modues)
+    library(testthat)
+
     # transpose
     TP = list(x = 1:2, y = c("a", "b"))
     TREF = list(`1` = list(x = 1, y = "a"), `2` = list(x = 2, y = "b"))
-    testthat::expect_equal(transpose(TP), TREF)
-    testthat::expect_equal(transpose(TP, use_names=FALSE), unname(TREF))
-    testthat::expect_equal(transpose(transpose(TP, use_names=FALSE), simplify=TRUE), TP)
+    expect_equal(transpose(TP), TREF)
+    expect_equal(transpose(TP, use_names=FALSE), unname(TREF))
+    expect_equal(transpose(transpose(TP, use_names=FALSE), simplify=TRUE), TP)
 }

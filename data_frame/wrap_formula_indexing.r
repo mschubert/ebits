@@ -47,14 +47,16 @@ wrap_formula_indexing = function(FUN) {
 }
 
 if (is.null(module_name())) {
+    library(testthat)
+
     fx = function(f, data=environment(f), atomic_class='vector') names(data)
     wf = wrap_formula_indexing(fx)
     
     re1 = wf(Sepal.Length ~ Sepal.Width, data=iris)
-    testthat::expect_true(all(unlist(re1) %in% colnames(iris)))
+    expect_true(all(unlist(re1) %in% colnames(iris)))
 
     re2 = wf(Sepal.Length ~ Sepal.Width, data=iris, rep=5)
-    testthat::expect_equal(nrow(re2), 5)
+    expect_equal(nrow(re2), 5)
 
     fx = function(f, data=environment(f), atomic_class='vector') 1
     wf = wrap_formula_indexing(fx)
@@ -62,7 +64,7 @@ if (is.null(module_name())) {
     width = cbind(sepal=iris$Sepal.Width, petal=iris$Petal.Width)
     length = cbind(sepal=iris$Sepal.Length, petal=iris$Petal.Length)
     re3 = wf(width ~ length)
-    testthat::expect_equal(nrow(re3), 4)
-    testthat::expect_equal(setdiff(colnames(width), re3$width), character(0))
-    testthat::expect_equal(setdiff(colnames(length), re3$length), character(0))
+    expect_equal(nrow(re3), 4)
+    expect_equal(setdiff(colnames(width), re3$width), character(0))
+    expect_equal(setdiff(colnames(length), re3$length), character(0))
 }
