@@ -1,6 +1,6 @@
 # String helper functions
 
-import_('./functional', attach = TRUE)
+import_('./base/functional', attach = TRUE)
 
 ltrim = lp(sub, '^ +', '')
 
