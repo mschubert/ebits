@@ -49,7 +49,7 @@ wrap_formula_indexing = function(FUN) {
 if (is.null(module_name())) {
     library(testthat)
 
-    fx = function(f, data=environment(f), atomic_class='vector') names(data)
+    fx = function(f, data=parent.frame(), atomic_class='vector') names(data)
     wf = wrap_formula_indexing(fx)
     
     re1 = wf(Sepal.Length ~ Sepal.Width, data=iris)
@@ -58,7 +58,7 @@ if (is.null(module_name())) {
     re2 = wf(Sepal.Length ~ Sepal.Width, data=iris, rep=5)
     expect_equal(nrow(re2), 5)
 
-    fx = function(f, data=environment(f), atomic_class='vector') 1
+    fx = function(f, data=parent.frame(), atomic_class='vector') 1
     wf = wrap_formula_indexing(fx)
 
     width = cbind(sepal=iris$Sepal.Width, petal=iris$Petal.Width)
