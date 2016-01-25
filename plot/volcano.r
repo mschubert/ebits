@@ -75,7 +75,7 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
                   colour = "#353535", size = 3, na.rm = TRUE)
 }
 
-if (is.null(module_name)) {
+if (is.null(module_name())) {
     library(testthat)
 
     color = import_('./color')
