@@ -1,5 +1,4 @@
 import_('../../base/operators')
-.ar = import_('../../array/map')
 
 #' Function to calculate and return a cleaned linear model
 #'
@@ -13,7 +12,8 @@ lm = function(formula, data=environment(formula), min_pts=3, return_intercept=FA
               atomic_class='vector') {
     pts = model.frame(formula, data)
     size = lapply(pts, function(x) {
-        if (is.logical(x) || is.factor(x))
+        # could potentially convert to factor first as well
+        if (is.logical(x) || is.factor(x) || is.character(x))
             as.list(table(x))
         else
             sum(!(is.na(x) | x==0))
@@ -58,4 +58,12 @@ if (is.null(module_name())) {
     # r uses first factor level as reference, others to compare -> 2 rows
     re4 = lm(Petal.Length ~ Species, data=iris)
     expect_equal(nrow(re4), 2)
+    expect_equal(sum(is.na(re4$size)), 0)
+
+    # make sure we catch character factors as well
+    iris2 = iris
+    iris2$Species = as.character(iris2$Species)
+    re5 = lm(Petal.Length ~ Species, data=iris2)
+    expect_equal(nrow(re5), 2)
+    expect_equal(sum(is.na(re5$size)), 0)
 }
