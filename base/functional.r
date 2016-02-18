@@ -123,7 +123,8 @@ f = function (...) {
 #'
 #' paste_csv('a', 'test') # => "a,test"
 #' paste_csv('a', 'test', sep = ';') # => "a;test"
-match_call_defaults = function (call = match.call(sys.function(sys.parent()), sys.call(sys.parent())),
+match_call_defaults = function (call = match.call(sys.function(sys.parent()),
+                                                  sys.call(sys.parent())),
                                 .formals = formals(sys.function(sys.parent()))) {
     .formals = .formals[names(.formals) != '...']
     missing = is.na(match(names(.formals), names(call)))
