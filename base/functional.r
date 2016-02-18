@@ -134,6 +134,14 @@ match_call_defaults = function (call = match.call(sys.function(sys.parent()),
     call
 }
 
+eval_call = function (call = match_call_defaults(call = match.call(sys.function(sys.parent()),
+                                                                   sys.call(sys.parent())),
+                                                 .formals = formals(sys.function(sys.parent()))),
+                      envir = parent.frame()) {
+    call[] = lapply(call, eval, envir = envir)
+    call
+}
+
 # Tools for function composition and chaining {{{
 
 #' Partial function application
