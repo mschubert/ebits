@@ -29,11 +29,10 @@ wrap_formula_indexing = function(FUN) {
         func = import_('../base/functional')
         idx = import_('../base/indexing')
         df = import_('../data_frame')
-        call_args = as.list(func$match_call_defaults())[-1]
-        for (i in seq_along(call_args)) #TODO: add this in match_call_defaults()?
-            if (class(call_args[[i]]) %in% c("name", "call"))
-                call_args[[i]] = eval(call_args[[i]], envir=parent.frame())
+
+        call_args = as.list(func$eval_call(func$match_call_defaults()))[-1]
         call_args = call_args[!names(call_args) %in% c("rep","hpc_args")]
+
         idf = do.call(df$create_formula_index, call_args)
         df$call(idf, one_item, rep=rep, result_only=result_only, hpc_args=hpc_args)
     }
