@@ -1,5 +1,6 @@
 export_submodule('./nmf')
 export_submodule('./util')
+export_submodule('./roc')
 batch = import_('./batch')
 cor = import_('./correlation')
 
