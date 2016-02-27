@@ -20,8 +20,8 @@ label = import_('./label')
 #' @param ylim       Limits along the vertical axis; default: fit data
 #' @param simplify   Drop some insignificant points and labels to reduce file size
 #' @return           A ggplot2 object of the volcano plot
-volcano = function(df, base.size=1, p=0.05, ceil = 0,
-        xlim=c(NA,NA), ylim=c(NA,NA), simplify=TRUE) {
+volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
+        text.size=3.5, xlim=c(NA,NA), ylim=c(NA,NA), simplify=TRUE) {
     if (!'label' %in% colnames(df))
         stop("Column 'label' not found. You need to specify a label for your points")
     if (!'color' %in% colnames(df))
@@ -44,6 +44,12 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
             label = paste0(label, " (p < 1e", ceiling(log10(.y)), ")"),
             .y = ceil)
     }
+
+    # filter labels, but only for points we don't highlight
+    rel_effect = df$.x/max(abs(df$.x))
+    rel_pval = 2 * log10(df$.y) / min(log10(df$.y))
+    point_dist = rel_effect^2 + rel_pval^2
+    df$label[rank(-point_dist) > label_top & !df$circle] = NA
 
     # make sure we don't plot too many insignificant points
     if (simplify && sum(df$.y > p) > 300) {
@@ -72,7 +78,7 @@ volcano = function(df, base.size=1, p=0.05, ceil = 0,
 #        geom_text(mapping = aes(x = .x, y = .y, label = label),
 #                  colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
         geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
-                  colour = "#353535", size = 3, na.rm = TRUE)
+                  colour = "#353535", size = text.size, na.rm = TRUE)
 }
 
 if (is.null(module_name())) {
