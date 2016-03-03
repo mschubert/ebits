@@ -27,19 +27,22 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
         }
     }
 
+    # add (...) to df$args
+    const_args = c(list(...), df$args)
+
     # pass 'subsets' as argument if they are specified
     if ("subsets" %in% ls(df))
-        df$args = c(df$args, subsets=list(df$subsets))
+        const_args = c(const_args, subsets=list(df$subsets))
 
     # perform function calls either sequentially or with hpc module
     #TODO: replace local call by dplyr::do(rowwise(df))
     if (is.null(hpc_args))
         result = lapply(seq_len(nrow(index)), function(i) {
-            do.call(fun, c(as.list(index[i,,drop=FALSE]), list(...), df$args))
+            do.call(fun, c(as.list(index[i,,drop=FALSE]), const_args))
         })
     else
-        result = do.call(import_('../hpc')$Q, c(list(fun=fun, ...), index,
-            hpc_args, const=list(df$args)))
+        result = do.call(import_('../hpc')$Q, c(list(fun=fun), index,
+            hpc_args, const=list(const_args)))
 
     if (!result_only) {
         index$rep = add_rep
@@ -64,6 +67,9 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
         result$..id = NULL
         colnames(result)[colnames(result) == ""] = "result"
     }
+
+#result[sapply(result, class) == "try-error"] = NA #TODO: @df$call
+#result = ar$stack(result, along=2) # ar$construct instead
 
     result
 }
