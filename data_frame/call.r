@@ -1,8 +1,9 @@
 .dp = import_package_('dplyr')
+.ci = import_('./create_index')
 
 #' Call a function passing each row as arguments
 #'
-#' @param df           A call index of class `IndexedCall` or descendent thereof
+#' @param df           A data.frame or index of class `IndexedCall` or descendent thereof
 #' @param fun          The function to call
 #' @param ...          Further arguments to pass to `fun`
 #' @param result_only  Return only the result column instead of the data.frame
@@ -11,7 +12,7 @@
 #' @return             A data frame with the function call results
 call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
     if (!inherits(df, "IndexedCall"))
-        stop("df needs to be created with df$create_[formula_]index")
+        df = do.call(.ci$create_index, df)
 
     if (identical(rep, FALSE) || is.null(rep)) {
         index = df$index
@@ -31,9 +32,10 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
         df$args = c(df$args, subsets=list(df$subsets))
 
     # perform function calls either sequentially or with hpc module
+    #TODO: replace local call by dplyr::do(rowwise(df))
     if (is.null(hpc_args))
         result = lapply(seq_len(nrow(index)), function(i) {
-            do.call(fun, ..., c(as.list(index[i,,drop=FALSE]), df$args))
+            do.call(fun, c(as.list(index[i,,drop=FALSE]), list(...), df$args))
         })
     else
         result = do.call(import_('../hpc')$Q, c(list(fun=fun, ...), index,
