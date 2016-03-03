@@ -67,3 +67,22 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
 
     result
 }
+
+if (is.null(module_name())) {
+    library(testthat)
+	b = import('../base')
+
+	x = 1:2
+	y = 3:4
+	z = 10
+
+	f1 = function(x,y) x+y
+	r1 = b$expand_grid(x=x,y=y) %>% call(f1)
+
+	f2 = function(x,y,z) x+y+z
+	r2 = b$expand_grid(x=x,y=y) %>% call(f2, z=z)
+
+	expect_equal(r1[c('x','y')], r2[c('x','y')])
+	expect_equal(r1$result, rowSums(expand.grid(x,y)))
+	expect_equal(r2$result, z + rowSums(expand.grid(x,y)))
+}
