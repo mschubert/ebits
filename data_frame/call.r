@@ -52,7 +52,7 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
         # bind rows not with mixed length list (to be raised)
         # could simplify to c(as.list(r), ..id=n) if this worked
         concat = function(r,n) {
-            if (is.null(r))
+            if (length(r) == 0)
                 list(..id=n)
             else {
                 r = as.list(r)
