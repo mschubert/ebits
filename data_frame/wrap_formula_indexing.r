@@ -31,10 +31,15 @@ wrap_formula_indexing = function(FUN) {
         df = import_('../data_frame')
 
 #FIXME: commented line below does not work
+        fca = function(ca) {
+            if (class(ca) %in% c("name", "call"))
+                eval(ca, envir=ca_env)
+            else
+                ca
+        }
+        ca_env = parent.frame()
         call_args = as.list(func$match_call_defaults())[-1]
-        for (i in seq_along(call_args))
-            if (class(call_args[[i]]) %in% c("name", "call"))
-                call_args[[i]] = eval(call_args[[i]], envir=parent.frame())
+        call_args = lapply(call_args, fca)
 
 #        call_args = as.list(func$eval_call())[-1]
         call_args = call_args[!names(call_args) %in% c("rep","hpc_args")]
@@ -75,7 +80,7 @@ if (is.null(module_name())) {
 
     # integrative test using linear model
     lm_fun = function(x, index) {
-        st = import('stats')
+        st = import('../stats')
         mod = st$lm(x ~ 0 + Species, data=index)
     }
     re = lm_fun(x=iris[1:3], index=iris['Species'])
