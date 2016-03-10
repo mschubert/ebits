@@ -6,6 +6,9 @@ library(dplyr)
 #' @param value  The numeric value associated with the score
 #' @param hit    Whether (1) or not (0) the observation is a success
 roc = function(df, value, hit) {
+    if (any(is.na(df[[value]]) | is.na(df[[hit]])))
+        stop("data.frame contains NAs, remove them first")
+
     mydf = data.frame(value = df[[value]], hit = df[[hit]], check.names=FALSE) %>%
         mutate(i = 1:nrow(.),
                value = value - min(value)) %>%
