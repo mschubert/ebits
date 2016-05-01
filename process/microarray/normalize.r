@@ -31,37 +31,38 @@ normalize.AffyBatch = function(rawData, method="rma") {
     else if (method == "gcrma")
         gcrma::gcrma(rawData)
     else if (method == "frma")
-        expr = frma::frma(rawData, target="core")
+        frma::frma(rawData, target="core")
     else
         stop("invalid method")
 }
 
 normalize.EListRaw = function(rawData, method="quantile") {
     rawData %>%
-        limma::backgroundCorrect() %>%
-        limma::normalizeBetweenArrays(method=method) %>%
-        limma::avereps(., ID=.$genes$ProbeName)
+        limma::backgroundCorrect(method="normexp") %>%
+        limma::normalizeBetweenArrays(method=method)
 }
 
 normalize.RGList = function(rawData, method="loess") {
     rawData %>%
-        limma::backgroundCorrect() %>%
-        limma::normalizeWithinArrays(method=method) %>%
-        limma::avereps(., ID=.$genes$ProbeName)
+        limma::backgroundCorrect(method="normexp") %>%
+        limma::normalizeWithinArrays(method=method)
 }
 
 normalize.NChannelSet = function(rawData, ...) {
     ad = as.list(Biobase::assayData(rawData))
     ad$genes = Biobase::fData(rawData)
 
-    if ("E" %in% names(ad)) # one-color
+    if ("E" %in% names(ad)) { # one-color
         norm = normalize.EListRaw(new("EListRaw", ad), ...)
-    else # two-color
+        ad = with(norm, Biobase::assayDataNew(E = E))
+    } else { # two-color
         norm = normalize.RGList(new("RGList", ad), ...)
+        ad = with(norm, Biobase::assayDataNew(R = R, G = G))
+    }
 
-    Biobase::fData(rawData) = norm$genes
-    norm$genes = NULL
-    #FIXME: the next line doesn't quite work
-    Biobase::assayData(rawData) = new("list", norm)
-    rawData
+    features = new("AnnotatedDataFrame", norm$genes)
+    normeset = new("NChannelSet", assayData = ad)
+    featureData(normeset) = features
+    phenoData(normeset) = phenoData(rawData)
+    normeset
 }

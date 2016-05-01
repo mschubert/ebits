@@ -1,11 +1,12 @@
-.b = import_('../../base')
-
-#' mapping of annotation identifier to annotation package
+#' Mapping of annotation identifier to annotation package
+#'
 #' there should be a mapping between the two available somewhere?
-.gene = list(
+#' List of BioC annots: https://www.bioconductor.org/packages/3.3/data/annotation/
+mapping = list(
     "pd.hg.u95a" = "hgu95a.db",
     "pd.hg.u95b" = "hgu95b.db",
     "pd.hg.u95av2" = "hgu95av2.db", # A-AFFY-1, GPL8300
+    "hgu133a" = "hgu133a.db", # A-GEOD-14668
     "pd.hg.u133a" = "hgu133a.db", # A-AFFY-33, GPL96
     "pd.hg.u133b" = "hgu133b.db", # A-AFFY-34, GPL97
     "pd.hg.u133.plus.2" = "hgu133plus2.db", # A-AFFY-44, GPL570
@@ -42,15 +43,35 @@ annotate.list = function(normData, summarize="hgnc_symbol") {
 }
 
 annotate.ExpressionSet = function(normData, summarize="hgnc_symbol") {
-    annotation = .gene[[normData@annotation]]
+    annotation = mapping[[normData@annotation]]
     if (is.null(annotation))
-        stop("No annotation package found for", normData@annotation)
+        stop("No annotation package found for: ", normData@annotation)
 
     # read metadata and replace matrix by annotated matrix
     exprs(normData) = annotate(as.matrix(exprs(normData)),
                                annotation = annotation,
                                summarize = summarize)
     normData
+}
+
+annotate.NChannelSet = function(normData, summarize="hgnc_symbol") {
+    if (! "E" %in% ls(assayData(normData)))
+        stop("only single-channel implemented atm")
+
+    # note: there are agilent annotation packages available, but the
+    # array ID is not saved in normData@annotation
+	map_channel = function(expr, ids, from="agilent", to=summarize) {
+		rownames(expr) = ids
+		idmap$gene(expr, from=from, to=summarize)
+	}
+    idmap = import('../idmap')
+    ad = as.list(Biobase::assayData(normData))
+	mapped = sapply(ad, map_channel, ids=fData(normData)$ProbeName,
+                    simplify=FALSE, USE.NAMES=TRUE)
+
+    es = ExpressionSet(mapped$E)
+    phenoData(es) = phenoData(normData)
+    es
 }
 
 annotate.matrix = function(normData, annotation, summarize="hgnc_symbol") {

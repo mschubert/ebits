@@ -1,3 +1,4 @@
+library(dplyr)
 .b = import_('../../base')
 .io = import_('../../io')
 .ar = import_('../../array')
@@ -14,25 +15,29 @@ gene = function(obj, from=NULL, to, summarize=mean) {
 }
 
 gene.character = function(obj, to, from=guess_id_type(obj), summarize=mean) {
-    df = na.omit(data.frame(from=.lookup[[from]], to=.lookup[[to]]))
+    lookup = .lookup[[from]]
+    df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     .b$match(obj, from=df$from, to=df$to)
 }
 
 gene.numeric = function(obj, to, from=guess_id_type(names(obj)), summarize=mean) {
-    df = na.omit(data.frame(from=.lookup[[from]], to=.lookup[[to]]))
+    lookup = .lookup[[from]]
+    df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     .ar$summarize(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
 gene.matrix = function(obj, to, from=guess_id_type(rownames(obj)), summarize=mean) {
-    df = na.omit(data.frame(from=.lookup[[from]], to=.lookup[[to]]))
+    lookup = .lookup[[from]]
+    df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     .ar$summarize(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
 gene.ExpressionSet = function(obj, to, from=guess_id_type(rownames(exprs(obj))),  summarize=mean) {
-    df = na.omit(data.frame(from=.lookup[[from]], to=.lookup[[to]]))
+    lookup = .lookup[[from]]
+    df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     exprs(obj) = .ar$summarize(exprs(obj), along=1, from=df$from, to=df$to, FUN=summarize)
     obj
@@ -74,25 +79,34 @@ cache_lookup_table = function(force=FALSE) {
     warning("no cached file found, biomart query will take ~ 1h")
 
     mart = biomaRt::useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
-    probes = c(grep("^affy_", biomaRt::listAttributes(mart)$name, value=TRUE),
-               grep("^illumina_", biomaRt::listAttributes(mart)$name, value=TRUE))
 
-#    tablecols = c("hgnc_symbol", "affy", "illumina", "genbank", "entrezgene", "ensembl_gene_id")
+    probes = list(
+        affy = grep("^affy_", biomaRt::listAttributes(mart)$name, value=TRUE),
+        illumina = grep("^illumina_", biomaRt::listAttributes(mart)$name, value=TRUE),
+        agilent = grep("agilent_", biomaRt::listAttributes(mart)$name, value=TRUE)
+    )
+
     tablecols = c("hgnc_symbol", "entrezgene", "ensembl_gene_id")
     getPS = function(p) {
         df = biomaRt::getBM(attributes=c(tablecols, p), mart=mart)
         colnames(df)[ncol(df)] = "probe_id"
         df[!is.na(df$probe_id) & df$probe_id!="",]
+        as.data.frame(sapply(df, as.character, simplify=FALSE, USE.NAMES=TRUE))
     }
-    psdf = lapply(probes, getPS)
+    assemblePS = function(p) {
+        re = sapply(p, getPS, simplify=FALSE, USE.NAMES=TRUE) %>%
+            dplyr::bind_rows() %>%
+            dplyr::filter(probe_id != "" & !is.na(probe_id)) %>%
+            dplyr::distinct()
+        re$hgnc_symbol[re$hgnc_symbol == ""] = NA
+        re$entrezgene[re$entrezgene == ""] = NA
+        re$ensembl_gene_id[re$ensembl_gene_id == ""] = NA
+        re
+    }
+    mapping = sapply(probes, assemblePS, simplify=FALSE, USE.NAMES=TRUE)
 
-    allfrom_idsets = do.call(rbind, psdf)
-    allfrom_idsets$entrezgene = as.character(allfrom_idsets$entrezgene)
-    allfrom_idsets = allfrom_idsets[!duplicated(allfrom_idsets),]
-    allfrom_idsets[allfrom_idsets == ""] = NA
-
-    save(allfrom_idsets, file=cache)
-    allfrom_idsets
+    save(mapping, file=cache)
+    mapping
 }
 .lookup = cache_lookup_table()
 
@@ -102,9 +116,11 @@ if (is.null(module_name())) {
     expect_equal(gene('683_at', to="hgnc_symbol"),
                  setNames("OTC", "683_at"))
 
-    #FIXME: column name is dropped, should not be
-    #m = matrix(1, nrow=2, ncol=1, dimnames=list(c('683_at','683_at'), 'x'))
-    #gene(m, to="hgnc_symbol")
+    #FIXME: colnames gets converted from 'x' to '1' for single-column
+#    m = matrix(1, nrow=2, ncol=1, dimnames=list(c('683_at','683_at'), 'x'))
+#    M = gene(m, to="hgnc_symbol")
+#    Mref = matrix(1, ncol=1, nrow=1, dimnames=list("OTC", "1"))
+#    expect_equal(M, Mref)
 
     m = matrix(1, nrow=2, ncol=2,
                dimnames=list(c('683_at','683_at'), c('x','y')))
