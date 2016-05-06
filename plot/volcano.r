@@ -2,7 +2,6 @@ library(ggrepel)
 .b = import_('../base')
 import_('./helpers', attach=TRUE)
 color = import_('./color')
-label = import_('./label')
 
 #' Draw a volcano plot from calculated associations
 #'

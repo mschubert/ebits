@@ -1,6 +1,8 @@
 .b = import_('../base')
 .ar = import_('../array')
 
+#' Cluster the rows and columns, order factor levels to respect that
+#'
 #' @param df       The data.frame containing the associations
 #' @param formula  A formula of the kind value ~ axis[, axis2] FIXME: doesn't work
 #' @param cols     Boolean flag indicating whether to cluster columns
@@ -39,15 +41,18 @@ cluster = function(df, formula, cols=TRUE, rows=TRUE, size=NULL) {
 #' @param palette  ggplot palette that should be used; default: RdYlGn
 #' @param geom     ggplot geom that should be used, 'tile' or 'circle'
 #' @param limits
-matrix = function(df, formula, color="color", label=NULL,
-                  palette="RdYlGn", geom="tile", limits=NULL,
-                  na_value="#f5f5f5") {
+matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn",
+                  geom="tile", limits=NULL, na_value="#f5f5f5",
+                  reverse_colors=FALSE, symmetric=FALSE) {
     value = all.vars(formula[[2]])
     rows = all.vars(formula[[3]])[1]
     cols = all.vars(formula[[3]])[2]
 
     if ('label' %in% colnames(df))
         label = 'label'
+
+    if (symmetric)
+        limits = rep(max(abs(df[[value]])), 2) * c(-1, 1)
 
     po.nopanel = list(theme(
         panel.background = element_blank(),
@@ -58,9 +63,12 @@ matrix = function(df, formula, color="color", label=NULL,
 
     p = ggplot(df, aes_string(x=cols, y=rows, fill=value))
 
+    colors = RColorBrewer::brewer.pal(7, palette)
+    if (reverse_colors)
+        colors = rev(colors)
+
     if (geom == "tile")
-        p = p + scale_fill_gradientn(colours=rev(RColorBrewer::brewer.pal(7, palette)),
-                                     na.value=na_value, limits=limits) +
+        p = p + scale_fill_gradientn(colours=colors, na.value=na_value, limits=limits) +
                 geom_tile(colour="white") #TODO: scale size here as well
 #    else if (geom == "circle")
 #        p = p + scale_colour_brewer(palette) + #,
