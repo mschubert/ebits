@@ -9,5 +9,6 @@ export_submodule('./linear_fit')
 export_submodule('./matrix')
 export_submodule('./venn') # bad style
 export_submodule('./color')
+export_submodule('./symmetrise_scale')
 
 brew = import_('./brew')
