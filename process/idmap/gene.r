@@ -76,7 +76,7 @@ cache_lookup_table = function(force=FALSE) {
     if (file.exists(cache) && !force)
         return(.io$load(cache))
 
-    warning("no cached file found, biomart query will take ~ 1h")
+    warning("no cached file found, biomart query will take ~ 1h", immediate.=TRUE)
 
     mart = biomaRt::useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
 
