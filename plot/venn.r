@@ -8,7 +8,7 @@
 #
 # for now, it works with a 3-5 lists
 
-vennDiagramFromList = function(pr, categories=names(pr), proportional=F) {
+vennDiagramFromList = function(pr, categories=names(pr), proportional=FALSE) {
     require(VennDiagram)
 
     stopifnot(length(pr) >= 3 & length(pr) <= 5)
@@ -53,27 +53,28 @@ vennDiagramFromList = function(pr, categories=names(pr), proportional=F) {
     }
 
     if (length(pr) == 3) {
-        if (proportional) {
-            require(Vennerable)
-            return(Venn(SetNames = categories, Weight=c(0, length(n1),
-                                                 length(n2),
-                                                 length(n3),
-                                                 length(n12),
-                                                 length(n13),
-                                                 length(n23),
-                                                 length(n123))))
-#            require(venneuler)
-#            venneuler(c(
-#                a = length(n1),
-#                b = length(n2),
-#                c = length(n3),
-#                'a&b' = length(n12),
-#                'a&c' = length(n13),
-#                'b&c' = length(n23),
-#                'a&b&c' = length(n123)
-#            ))
-        } else {
-            draw.triple.venn(
+#TODO: these packages don't exist anymore
+#        if (proportional) {
+#            require(Vennerable)
+#            return(Venn(SetNames = categories, Weight=c(0, length(n1),
+#                                                 length(n2),
+#                                                 length(n3),
+#                                                 length(n12),
+#                                                 length(n13),
+#                                                 length(n23),
+#                                                 length(n123))))
+##            require(venneuler)
+##            venneuler(c(
+##                a = length(n1),
+##                b = length(n2),
+##                c = length(n3),
+##                'a&b' = length(n12),
+##                'a&c' = length(n13),
+##                'b&c' = length(n23),
+##                'a&b&c' = length(n123)
+##            ))
+#        } else {
+            return(draw.triple.venn(
                 area1 = length(pr[[1]]),
                 area2 = length(pr[[2]]),
                 area3 = length(pr[[3]]),
@@ -87,8 +88,8 @@ vennDiagramFromList = function(pr, categories=names(pr), proportional=F) {
                 cex = 2,
                 cat.cex = 2,
                 cat.col = c("blue", "red", "green")
-            )
-        }
+            ))
+#        }
     }
 
     if (length(pr) == 4) {
