@@ -9,7 +9,7 @@
 # for now, it works with a 3-5 lists
 
 vennDiagramFromList = function(pr, categories=names(pr), proportional=FALSE) {
-    require(VennDiagram)
+    venn = import_package('VennDiagram')
 
     stopifnot(length(pr) >= 3 & length(pr) <= 5)
     stopifnot(length(pr) == length(categories))
@@ -74,7 +74,7 @@ vennDiagramFromList = function(pr, categories=names(pr), proportional=FALSE) {
 ##                'a&b&c' = length(n123)
 ##            ))
 #        } else {
-            return(draw.triple.venn(
+            return(venn$draw.triple.venn(
                 area1 = length(pr[[1]]),
                 area2 = length(pr[[2]]),
                 area3 = length(pr[[3]]),
@@ -93,7 +93,7 @@ vennDiagramFromList = function(pr, categories=names(pr), proportional=FALSE) {
     }
 
     if (length(pr) == 4) {
-        return (draw.quad.venn(
+        return (venn$draw.quad.venn(
             area1 = length(pr[[1]]),
             area2 = length(pr[[2]]),
             area3 = length(pr[[3]]),
@@ -119,7 +119,7 @@ vennDiagramFromList = function(pr, categories=names(pr), proportional=FALSE) {
     }
 
     if (length(pr) == 5) {
-        return (draw.quintuple.venn(
+        return (venn$draw.quintuple.venn(
             area1 = length(pr[[1]]),
             area2 = length(pr[[2]]),
             area3 = length(pr[[3]]), 
@@ -162,4 +162,3 @@ vennDiagramFromList = function(pr, categories=names(pr), proportional=FALSE) {
         ))
     }
 }
-
