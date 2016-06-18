@@ -29,7 +29,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
         df$circle = FALSE
 
     # remove insignificant points outside x limits, adjust size
-    if (any(df$.y < p))
+    if (any(df$.y < p, na.rm=TRUE))
         df = dplyr::filter(df, .y < p |
                            abs(.x)<max(abs(.x[.y<p]),
                            na.rm=TRUE))
@@ -51,7 +51,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
     df$label[rank(-point_dist) > label_top & !df$circle] = NA
 
     # make sure we don't plot too many insignificant points
-    if (simplify && sum(df$.y > p) > 300) {
+    if (simplify && sum(df$.y > p, na.rm=TRUE) > 300) {
         set.seed(123456)
         idx = which(df$.y >= .b$minN(df$.y[df$.y > p], 100))
         keep = sample(idx, size=200, replace=FALSE, prob=1-df$.y[idx])
