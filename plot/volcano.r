@@ -2,7 +2,6 @@ library(ggrepel)
 .b = import_('../base')
 import_('./helpers', attach=TRUE)
 color = import_('./color')
-label = import_('./label')
 
 #' Draw a volcano plot from calculated associations
 #'
@@ -39,7 +38,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
 
     # set very low p-values to the cutoff value and label point
     pmin = df$.y < ceil
-    if (any(pmin)) {
+    if (any(pmin, na.rm=TRUE)) {
         df[pmin,] = mutate(df[pmin,],
             label = paste0(label, " (p < 1e", ceiling(log10(.y)), ")"),
             .y = ceil)
@@ -75,10 +74,10 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
         xlab("Effect size") + 
         ylab("Adjusted P-value") +
         theme_bw() +
-#        geom_text(mapping = aes(x = .x, y = .y, label = label),
-#                  colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
-        geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
-                  colour = "#353535", size = text.size, na.rm = TRUE)
+        geom_text(mapping = aes(x = .x, y = .y, label = label),
+                  colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
+#        geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
+#                  colour = "#353535", size = text.size, na.rm = TRUE)
 }
 
 if (is.null(module_name())) {
