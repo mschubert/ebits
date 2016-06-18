@@ -47,8 +47,8 @@ if (grepl("^0\\.[0-8]", packageVersion("modules")))
 #' @param template        Template file to use; will be "template_<template>.r" in this dir
 #' @return                A list of whatever `fun` returned
 Q = function(fun, ..., const=list(), expand_grid=FALSE, seed=128965,
-        memory=4096, n_jobs=NULL, job_size=NULL, split_array_by=NA,
-        fail_on_error=TRUE, log_worker=FALSE, wait_time=NA, template="LSF") {
+        memory=4096, n_jobs=NULL, job_size=NULL, split_array_by=NA, fail_on_error=TRUE,
+        log_worker=FALSE, wait_time=NA, chunk_size=NA, template="LSF") {
 
     qsys = import_(paste0('./template_', template))
     stopifnot(c("submit_job", "cleanup") %in% ls(qsys))
@@ -66,12 +66,16 @@ Q = function(fun, ..., const=list(), expand_grid=FALSE, seed=128965,
 
     if (is.null(n_jobs))
         n_jobs = ceiling(length(job_data) / job_size)
+    if (is.na(wait_time))
+        wait_time = ifelse(length(job_data) < 5e5, 1/sqrt(length(job_data)), 0)
+    if (is.na(chunk_size))
+        chunk_size = ceiling(length(job_data) / n_jobs / 100)
 
     on.exit(qsys$cleanup())
-    qsys$init()
+    id = qsys$init()
 
     # do the submissions
-    message("Submitting worker jobs ...")
+    message("Submitting ", n_jobs, " worker jobs (ID: ", id, ") ...")
     pb = txtProgressBar(min=0, max=n_jobs, style=3)
     for (j in 1:n_jobs) {
         qsys$submit_job(memory=memory, log_worker=log_worker)
@@ -80,12 +84,10 @@ Q = function(fun, ..., const=list(), expand_grid=FALSE, seed=128965,
     close(pb)
 
     job_result = rep(list(NULL), length(job_data))
-    submit_index = 1
+    submit_index = 1:chunk_size
     jobs_running = list()
     workers_running = list()
     worker_stats = list()
-    if (is.na(wait_time))
-        wait_time = ifelse(length(job_data) < 5e5, 1/sqrt(length(job_data)), 0)
 
     message("Running calculations ...")
     pb = txtProgressBar(min=0, max=length(job_data), style=3)
@@ -100,24 +102,25 @@ Q = function(fun, ..., const=list(), expand_grid=FALSE, seed=128965,
     #  * when computatons are complete, we send id=0 to the worker
     #    * it responds with id=-1 (and usage stats) and shuts down
     start_time = proc.time()
-    while(submit_index <= length(job_data) || length(workers_running) > 0) {
+    while(submit_index[1] <= length(job_data) || length(workers_running) > 0) {
         msg = qsys$receive_data()
-        if (msg$id == 0) { # worker ready, send common data
+        if (msg$id[1] == 0) { # worker ready, send common data
             qsys$send_common_data(fun=fun, const=const, seed=seed)
             workers_running[[msg$worker_id]] = TRUE
-        } else if (msg$id == -1) { # worker done, shutting down
+        } else if (msg$id[1] == -1) { # worker done, shutting down
             worker_stats[[msg$worker_id]] = msg$time
             workers_running[[msg$worker_id]] = NULL
         } else { # worker sending result
-            jobs_running[[as.character(msg$id)]] = NULL
-            job_result[[msg$id]] = msg$result
-            setTxtProgressBar(pb, submit_index - length(jobs_running) - 1)
+            jobs_running[as.character(msg$id)] = NULL
+            job_result[msg$id] = msg$result
+            setTxtProgressBar(pb, submit_index[1] - length(jobs_running) - 1)
         }
 
-        if (submit_index <= length(job_data)) { # send iterated data to worker
-            qsys$send_job_data(id=submit_index, iter=as.list(job_data[[submit_index]]))
-            jobs_running[[as.character(submit_index)]] = TRUE
-            submit_index = submit_index + 1
+        if (submit_index[1] <= length(job_data)) { # send iterated data to worker
+            submit_index = submit_index[submit_index <= length(job_data)]
+            qsys$send_job_data(id=submit_index, iter=as.list(job_data[submit_index]))
+            jobs_running[as.character(submit_index)] = TRUE
+            submit_index = submit_index + chunk_size
         } else # send shutdown signal to worker
             qsys$send_job_data(id=0)
 

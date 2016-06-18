@@ -5,6 +5,8 @@ export_submodule('./functional')
 export_submodule('./lambda')
 export_submodule('./indexing')
 export_submodule('./vector')
+export_submodule('./refactor')
+export_submodule('./lnapply')
 
 omit = import_('./omit')
 list = import_('./list')

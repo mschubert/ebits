@@ -67,7 +67,6 @@ matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn",
     if (reverse_colors)
         colors = rev(colors)
 
-    #TODO: add option for rev() around RColorBrewer
     if (geom == "tile")
         p = p + scale_fill_gradientn(colours=colors, na.value=na_value, limits=limits) +
                 geom_tile(colour="white") #TODO: scale size here as well

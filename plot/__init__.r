@@ -1,6 +1,6 @@
 # not attaching this might have unforseen consequences
 # do it once, so we can refactor later
-library(ggplot2)
+library(cowplot)
 
 #export_submodule('./box') # broken
 export_submodule('./volcano')
@@ -9,5 +9,6 @@ export_submodule('./linear_fit')
 export_submodule('./matrix')
 export_submodule('./venn') # bad style
 export_submodule('./color')
+export_submodule('./symmetrise_scale')
 
 brew = import_('./brew')

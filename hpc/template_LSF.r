@@ -5,11 +5,10 @@ infuser = import_package_('infuser')
 template = "#BSUB-J {{ job_name }}        # name of the job / array jobs
 #BSUB-g {{ job_group | /rzmq }}           # group the job belongs to
 #BSUB-o {{ log_file | /dev/null }}        # output is sent to logfile, stdout + stderr by default
-#BSUB-P research-rh6                      # Job queue
+#BSUB-P research-rh7                      # Job queue
 #BSUB-W 10080                             # Walltime in minutes
 #BSUB-M {{ memory | 4096 }}               # Memory requirements in Mbytes
 #BSUB-R rusage[mem={{ memory | 4096  }}]  # Memory requirements in Mbytes
-#BSUB-R select[panfs_nobackup_research]
 
 R --no-save --no-restore --args {{ args }} < '{{ rscript }}'
 "
@@ -37,6 +36,8 @@ common_data = NULL
 zmq.context = NULL
 
 #' Initialize the rZMQ context and bind the port
+#'
+#' @return  ID of the job group
 init = function() {
     # be sure our variables are set right to start out with
     assign("job_num", 1, envir=parent.env(environment()))
@@ -64,6 +65,8 @@ init = function() {
 
     assign("master", sprintf("tcp://%s:%i", Sys.info()[['nodename']], exec_socket),
            envir=parent.env(environment()))
+
+    exec_socket
 }
 
 #' Submits one job to the queuing system
@@ -109,7 +112,7 @@ send_common_data = function(...) {
 	rzmq$send.socket(socket, data=common_data, serialize=FALSE, send.more=TRUE)
 }
 
-#' Send interated data to one worker
+#' Send iterated data to one worker
 send_job_data = function(...) {
 	rzmq$send.socket(socket, data=list(...))
 }
