@@ -44,6 +44,11 @@ while(TRUE) {
 
 run_time = proc.time() - start_time
 
-send.socket(socket, data=list(id=-1, worker_id=worker_id, time=run_time, calls=counter))
+send.socket(socket, data=list(
+    id = -1,
+    worker_id = worker_id,
+    time = run_time,
+    calls = counter
+))
 
 print(run_time)
