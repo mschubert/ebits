@@ -66,7 +66,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
                            limits = ylim) +
         scale_x_continuous(limits = xlim) +
         geom_point(size = sqrt(df$size), colour = df$color, na.rm = TRUE) +
-        geom_point(size = ifelse(df$circle, sqrt(df$size), NA), shape=1, colour = 'black', na.rm = TRUE) +
+        geom_point(size = ifelse(df$circle, sqrt(df$size), NA), shape=1, colour = '#00000088', na.rm = TRUE) +
         geom_vline(xintercept = 0, lwd = 0.3) +
         geom_hline(yintercept = p, lwd = 0.3, linetype = 2) +
 #        annotate("text", x=min(df$.x), y=0.05, hjust=1, vjust=2, 
@@ -74,10 +74,10 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
         xlab("Effect size") + 
         ylab("Adjusted P-value") +
         theme_bw() +
-#        geom_text(mapping = aes(x = .x, y = .y, label = label),
-#                  colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
-        geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
-                  colour = "#353535", size = text.size, na.rm = TRUE)
+        geom_text(mapping = aes(x = .x, y = .y, label = label),
+                  colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
+#        geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
+#                  colour = "#353535", size = text.size, na.rm = TRUE)
 }
 
 if (is.null(module_name())) {

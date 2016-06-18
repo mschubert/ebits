@@ -41,7 +41,7 @@ cluster = function(df, formula, cols=TRUE, rows=TRUE, size=NULL) {
 #' @param palette  ggplot palette that should be used; default: RdYlGn
 #' @param geom     ggplot geom that should be used, 'tile' or 'circle'
 #' @param limits
-matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn",
+matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn", text_size=7,
                   geom="tile", limits=NULL, na_value="#f5f5f5",
                   reverse_colors=FALSE, symmetric=FALSE) {
     value = all.vars(formula[[2]])
@@ -84,5 +84,5 @@ matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn",
     if (is.null(label))
         p
     else
-        p + geom_text(data=df, aes(label=label))
+        p + geom_text(data=df, aes(label=label), size=text_size)
 }
