@@ -38,7 +38,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
 
     # set very low p-values to the cutoff value and label point
     pmin = df$.y < ceil
-    if (any(pmin)) {
+    if (any(pmin, na.rm=TRUE)) {
         df[pmin,] = mutate(df[pmin,],
             label = paste0(label, " (p < 1e", ceiling(log10(.y)), ")"),
             .y = ceil)
