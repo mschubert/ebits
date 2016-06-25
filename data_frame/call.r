@@ -47,14 +47,18 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
     # don't use tidyr::unnest() here, too slow
     if (!result_only) {
         index$rep = add_rep
+        index$.id = 1:nrow(index)
+
+        error_empty = function(r) class(r)[1] %in% c("NULL", "try-error")
+        result = result[! sapply(result, error_empty)]
         result = b$lnapply(result, function(x) {
             if (is.list(x))
                 x
             else
                 list(result=x)
         })
+
         result = data.table::rbindlist(result, fill=TRUE, idcol=".id")
-        index$.id = 1:nrow(index)
         result = merge(index, result, by=".id", all.x=TRUE)
         result$.id = NULL
     }
