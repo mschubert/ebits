@@ -100,21 +100,22 @@ submit_job = function(memory, log_worker=FALSE) {
 
 #' Read data from the socket
 receive_data = function() {
-	rzmq$receive.socket(socket)
+    rzmq$receive.socket(socket)
 }
 
 #' Send the data common to all workers, only serialize once
 send_common_data = function(...) {
-	if (is.null(common_data))
-		assign("common_data", serialize(list(...), NULL),
+    if (is.null(common_data))
+        assign("common_data", serialize(list(...), NULL),
                envir=parent.env(environment()))
 
-	rzmq$send.socket(socket, data=common_data, serialize=FALSE, send.more=TRUE)
+    rzmq$send.socket(socket, data=common_data, serialize=FALSE, send.more=TRUE)
+    gc() # why u leak so much memory?
 }
 
 #' Send iterated data to one worker
 send_job_data = function(...) {
-	rzmq$send.socket(socket, data=list(...))
+    rzmq$send.socket(socket, data=list(...))
 }
 
 #' Will be called when exiting the `hpc` module's main loop, use to cleanup
