@@ -44,32 +44,20 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
         result = do.call(import_('../hpc')$Q, c(list(fun=fun), index,
             hpc_args, const=list(const_args)))
 
+    # don't use tidyr::unnest() here, too slow
     if (!result_only) {
         index$rep = add_rep
-        index$..id = rownames(index)
-
-        # converting to list: https://github.com/hadley/dplyr/issues/1450
-        # bind rows not with mixed length list (to be raised)
-        # could simplify to c(as.list(r), ..id=n) if this worked
-        concat = function(r,n) {
-            if (length(r) == 0)
-                list(..id=n)
-            else {
-                r = as.list(r)
-                c(r, ..id=list(rep(n, length(r[[1]]))))
-            }
-        }
-        result = mapply(concat, result, as.character(seq_along(result)),
-                        USE.NAMES=TRUE, SIMPLIFY=FALSE) %>%
-            .dp$bind_rows() %>%
-            .dp$left_join(index, ., by="..id") %>%
-            .dp$select(-..id)
-        result$..id = NULL
-        colnames(result)[colnames(result) == ""] = "result"
+        result = b$lnapply(result, function(x) {
+            if (is.list(x))
+                x
+            else
+                list(result=x)
+        })
+        result = data.table::rbindlist(result, fill=TRUE, idcol=".id")
+        index$.id = 1:nrow(index)
+        result = merge(index, result, by=".id", all.x=TRUE)
+        result$.id = NULL
     }
-
-#result[sapply(result, class) == "try-error"] = NA #TODO: @df$call
-#result = ar$stack(result, along=2) # ar$construct instead
 
     result
 }
