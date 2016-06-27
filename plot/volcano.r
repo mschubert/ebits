@@ -18,9 +18,10 @@ color = import_('./color')
 #' @param xlim       Limits along the horizontal axis; default: fit data
 #' @param ylim       Limits along the vertical axis; default: fit data
 #' @param simplify   Drop some insignificant points and labels to reduce file size
+#' @param repel      Whether to use repel package for labels
 #' @return           A ggplot2 object of the volcano plot
 volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
-        text.size=3.5, xlim=c(NA,NA), ylim=c(NA,NA), simplify=TRUE) {
+        text.size=3.5, xlim=c(NA,NA), ylim=c(NA,NA), simplify=TRUE, repel=FALSE) {
     if (!'label' %in% colnames(df))
         stop("Column 'label' not found. You need to specify a label for your points")
     if (!'color' %in% colnames(df))
@@ -60,7 +61,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
     }
 
     # and do the actual plot
-    ggplot(df, aes(x = .x, y = .y)) + 
+    p = ggplot(df, aes(x = .x, y = .y)) + 
         scale_y_continuous(trans = reverselog_trans(10),
                            label = scientific_10,
                            limits = ylim) +
@@ -73,11 +74,14 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
 #                 size=3.5, label="0.05", colour="black") +
         xlab("Effect size") + 
         ylab("Adjusted P-value") +
-        theme_bw() +
-        geom_text(mapping = aes(x = .x, y = .y, label = label),
-                  colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
-#        geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
-#                  colour = "#353535", size = text.size, na.rm = TRUE)
+        theme_bw()
+
+    if (repel)
+        p + ggrepel::geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
+                colour = "#353535", size = text.size, na.rm = TRUE)
+    else
+        p + geom_text(mapping = aes(x = .x, y = .y, label = label),
+                colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
 }
 
 if (is.null(module_name())) {

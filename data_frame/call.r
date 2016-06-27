@@ -1,3 +1,4 @@
+.b = import('../base')
 .dp = import_package_('dplyr')
 .ci = import_('./create_index')
 
@@ -51,7 +52,7 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
 
         error_empty = function(r) class(r)[1] %in% c("NULL", "try-error")
         result = result[! sapply(result, error_empty)]
-        result = b$lnapply(result, function(x) {
+        result = .b$lnapply(result, function(x) {
             if (is.list(x))
                 x
             else
