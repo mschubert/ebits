@@ -64,8 +64,8 @@ Q = function(fun, ..., const=list(), expand_grid=FALSE, seed=128965,
                                split_array_by=split_array_by)
     names(job_data) = 1:length(job_data)
 
-    if (is.null(n_jobs))
-        n_jobs = ceiling(length(job_data) / job_size)
+    n_jobs = min(ceiling(length(job_data) / job_size), n_jobs)
+
     if (is.na(wait_time))
         wait_time = ifelse(length(job_data) < 5e5, 1/sqrt(length(job_data)), 0)
     if (is.na(chunk_size))
