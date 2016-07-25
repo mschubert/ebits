@@ -20,7 +20,7 @@ file_path = function (..., ext = NULL, fsep = .Platform$file.sep) {
 read_table = function (file, ..., stringsAsFactors = FALSE, na.strings = c(NA, ''), check.names = FALSE) {
     call = .b$match_call_defaults()
 
-    if (missing(file)) {
+    if (missing(file) || is_connection(file)) {
         call[[1]] = quote(read.table)
         return(.b$add_class(eval.parent(call), 'tbl_df'))
     }
@@ -45,7 +45,7 @@ write_table = function (x, file = '', ..., quote = FALSE, row.names = FALSE) {
     call = .b$match_call_defaults()
     call[[1]] = quote(write.table)
 
-    if (file != '' && ! 'sep' %in% names(call)) {
+    if (! is_connection(file) && file != '' && ! 'sep' %in% names(call)) {
         extension = .b$grep('\\.(\\w+)(\\.gz)?$', file)[1]
         separators = list(csv = ',',
                           tsv = '\t',
@@ -61,4 +61,8 @@ read_full_table = function(file, sep="\t", stringsAsFactors=FALSE, check.names=F
     colnames(index) = index[1,]
     rownames(index) = index[,1]
     index[-1,-1]
+}
+
+is_connection = function (x) {
+    inherits(x, 'connection')
 }
