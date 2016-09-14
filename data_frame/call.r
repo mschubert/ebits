@@ -42,13 +42,14 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
             do.call(fun, c(as.list(index[i,,drop=FALSE]), const_args))
         })
     else
-        result = do.call(import_('../hpc')$Q, c(list(fun=fun), index,
+        result = do.call(clustermq::Q, c(list(fun=fun), index,
             hpc_args, const=list(const_args)))
 
     # don't use tidyr::unnest() here, too slow
     if (!result_only) {
         index$rep = add_rep
-        index$.id = 1:nrow(index)
+        index$.id = as.character(1:nrow(index))
+        names(result) = as.character(1:length(result))
 
         error_empty = function(r) class(r)[1] %in% c("NULL", "try-error")
         result = result[! sapply(result, error_empty)]
@@ -84,4 +85,9 @@ if (is.null(module_name())) {
 	expect_equal(r1[c('x','y')], r2[c('x','y')])
 	expect_equal(r1$result, rowSums(expand.grid(x,y)))
 	expect_equal(r2$result, z + rowSums(expand.grid(x,y)))
+
+    # test correct ordering of empty results
+    ferr = function(x) if (x %% 2 == 0) x
+    r3 = call(data.frame(x=1:5), ferr)
+    expect_equal(r3$result, c(NA, 2, NA, 4, NA))
 }
