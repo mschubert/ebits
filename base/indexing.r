@@ -32,11 +32,13 @@ descriptive_index = function(x, along=NULL) {
 #' @param atomic  Character vector of classes that should not be split ('vector','matrix','list')
 #' @param along   The axis along which to index for array-like objects; default: last dimension
 subset = function(x, index, along=NULL, atomic=NULL, drop=FALSE) {
-    if (is.null(dim(x)) && !'vector' %in% atomic)
+    if (is.null(dim(x)) && !is.list(x) && !'vector' %in% atomic)
         x[index, drop=drop]
     else if (is.list(x) && !is.data.frame(x) && !'list' %in% atomic) {
         if (drop && length(index) == 1)
             x[[index]]
+        else if (drop && is.logical(index) && sum(index == 1))
+            x[index][[1]]
         else
             x[index]
     } else if (is.array(x) || is.data.frame(x) && !'matrix' %in% atomic)
@@ -77,6 +79,18 @@ if (is.null(module_name())) {
                  subset(A, 3, along=2, drop=FALSE),
                  subset(A, LETTERS[3], along=2, drop=FALSE),
                  subset(A, c(FALSE, FALSE, TRUE, FALSE, along=2, drop=FALSE)))
+
+    # subsetting lists
+    ll = list(a=1:5, b=letters[1:5])
+    expect_equal(ll[[2]],
+                 subset(ll, 2, drop=TRUE),
+                 subset(ll, c(FALSE, TRUE), drop=TRUE),
+                 subset(ll, "b", drop=TRUE))
+    expect_equal(ll[1],
+                 subset(ll, 1, drop=FALSE),
+                 subset(ll, c(TRUE, FALSE), drop=FALSE),
+                 subset(ll, "a", drop=FALSE),
+                 tolerance = 1e-8, scale=NULL) #FIXME: why is this req'd only here?
 
     # how about factors, data.frames?
 }
