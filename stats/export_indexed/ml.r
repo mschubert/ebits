@@ -24,7 +24,8 @@ ml = function(formula, train_args, data=environment(formula), models=FALSE, aggr
         data[[dep_vars]] = sample(data[[dep_vars]])
 
     # bind data and response to data.frame, use var name if one column
-    for (i in seq_along(data))
+    data = as.list(data)[c(indep_vars, dep_vars)]
+    for (i in names(data))
         if (is.matrix(data[[i]]) && ncol(data[[i]]) == 1 && is.null(colnames(data[[i]])))
             colnames(data[[i]]) = names(data)[i]
     data = as.data.frame(na.omit(do.call(cbind, data)))
@@ -53,4 +54,13 @@ ml = function(formula, train_args, data=environment(formula), models=FALSE, aggr
 }
 
 if (is.null(module_name())) {
+    library(testthat)
+
+    dm = data.matrix(iris[1:4])
+    resp = as.factor(iris$Species)
+
+    re = ml(resp ~ dm, list("regr.glmnet"))
+
+    expect_equal(class(re), "data.frame")
+    expect_equal(nrow(re), 150)
 }
