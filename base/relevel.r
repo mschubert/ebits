@@ -61,5 +61,6 @@ if (is.null(module_name())) {
 
     # but allow empty level
     f2 = f1[1:2]
-    expect_equal(relevel(f2, x=c)
+    expect_equal(as.character(relevel(f2, x=c)),
+                 as.character(f2))
 }
