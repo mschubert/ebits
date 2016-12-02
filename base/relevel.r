@@ -18,8 +18,10 @@ relevel = function(.data, ..., drop=FALSE) {
 
     if (drop)
         factor(.data, levels = new_name)
-    else
-        factor(.data, levels = c(new_name, unique(.data[!update_idx])))
+    else {
+        old_levels = setdiff(.data[!update_idx], new_name)
+        factor(.data, levels = c(new_name, old_levels))
+    }
 }
 
 if (is.null(module_name())) {
@@ -35,12 +37,12 @@ if (is.null(module_name())) {
                  relevel(f1, x="a", drop=FALSE),
                  factor(sub("a", "x", chars), levels=c('x', 'b', 'c')))
 
-    # rename "b" to "x", making it the first level
-    expect_equal(relevel(f1, x=b),
-                 relevel(f1, x=b, drop=FALSE),
-                 relevel(f1, x="b"),
-                 relevel(f1, x="b", drop=FALSE),
-                 factor(sub("b", "x", chars), levels=c('x', 'a', 'c')))
+    # rename "c" to "x", making it the first level
+    expect_equal(relevel(f1, x=c),
+                 relevel(f1, x=c, drop=FALSE),
+                 relevel(f1, x="c"),
+                 relevel(f1, x="c", drop=FALSE),
+                 factor(sub("c", "x", chars), levels=c('x', 'a', 'b')))
 
     # replace all levels
     expect_equal(relevel(f1, x=b, y=c, w=a, drop=FALSE),
