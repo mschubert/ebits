@@ -1,5 +1,3 @@
-import_('./operators')
-
 #' Creates a factor with ordered levels
 #' 
 #' @param x     A vector to be converted in a factor
@@ -11,16 +9,21 @@ relevel = function(.data, ..., drop=FALSE) {
     new_name = names(dots)
     old_name = as.character(dots)
     lookup = setNames(new_name, old_name)
+    cdata = as.character(.data)
+
+    unmapped_levels = setdiff(old_name, c(levels(.data), cdata))
+    if (length(unmapped_levels) > 0)
+        stop("Referenced levels that are not part of the original: ",
+             paste(unmapped_levels, sep=", "))
  
-    .data = as.character(.data)
-    update_idx = .data %in% old_name
-    .data[update_idx] = lookup[.data[update_idx]]
+    update_idx = cdata %in% old_name
+    cdata[update_idx] = lookup[cdata[update_idx]]
 
     if (drop)
-        factor(.data, levels = new_name)
+        factor(cdata, levels = new_name)
     else {
-        old_levels = setdiff(.data[!update_idx], new_name)
-        factor(.data, levels = c(new_name, old_levels))
+        old_levels = setdiff(cdata[!update_idx], new_name)
+        factor(cdata, levels = c(new_name, old_levels))
     }
 }
 
@@ -52,4 +55,11 @@ if (is.null(module_name())) {
     # replace 2 levels, drop rest
     expect_equal(relevel(f1, w=c, x=b, drop=TRUE),
                  factor(c(NA, "x", "w", "w", NA), levels=c('w', 'x')))
+
+    # raise error when ref'ing non-existant label
+    expect_error(relevel(f1, x=d))
+
+    # but allow empty level
+    f2 = f1[1:2]
+    expect_equal(relevel(f2, x=c)
 }
