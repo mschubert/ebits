@@ -8,9 +8,9 @@
 symmetrise_scale = function(p, axis = "x"){
   gb = ggplot_build(p)
   type = switch(axis, "x" = "x.range", "y" = "y.range")
-  lims = sapply(gb$panel$ranges, "[[", type)
-  fname = as.character(p$facet$facets)
-  facets = gb$panel$layout[[fname]]
+  lims = sapply(gb$layout$panel_ranges, "[[", type)
+  fname = as.character(p$facet$params$facets)
+  facets = gb$layout$panel_layout[ ,fname, drop=FALSE]
   lims2 = as.vector(t(tcrossprod(apply(abs(lims), 2, max), c(-1,1))))
   dummy = setNames(data.frame(rep(facets, each=2), lims2), c(fname, axis))
   switch(axis, 
