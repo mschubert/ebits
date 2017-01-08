@@ -48,10 +48,12 @@ annotate.ExpressionSet = function(normData, summarize="hgnc_symbol") {
         stop("No annotation package found for: ", normData@annotation)
 
     # read metadata and replace matrix by annotated matrix
-    exprs(normData) = annotate(as.matrix(exprs(normData)),
-                               annotation = annotation,
-                               summarize = summarize)
-    normData
+    emat = annotate(as.matrix(exprs(normData)),
+                    annotation = annotation,
+                    summarize = summarize)
+
+    Biobase::ExpressionSet(assayData = emat,
+                           phenoData = phenoData(normData))
 }
 
 annotate.NChannelSet = function(normData, summarize="hgnc_symbol") {
