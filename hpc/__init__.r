@@ -1,1 +1,1 @@
-export_submodule('./master')
+Q = clustermq::Q
