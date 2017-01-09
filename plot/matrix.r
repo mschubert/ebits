@@ -52,7 +52,7 @@ matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn", text
         label = 'label'
 
     if (symmetric)
-        limits = rep(max(abs(df[[value]])), 2) * c(-1, 1)
+        limits = rep(max(abs(df[[value]]), na.rm=TRUE), 2) * c(-1, 1)
 
     po.nopanel = list(theme(
         panel.background = element_blank(),
