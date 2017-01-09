@@ -48,7 +48,7 @@ ml = function(formula, train_args, data=environment(formula), models=FALSE, aggr
     if (aggr)
         result$aggr
     else if (models)
-        result$models
+        result
     else
         result$pred$data
 }
