@@ -21,11 +21,13 @@ test = function(mat, self=0) {
 
 #' Tests for significant changes in correlation between two populations
 #'
-#' @param x  A sample matrix with [obs x samples]
-#' @param y  A samples matrix with [obs x samples]
-#' @return     A matrix with p-values
+#' TODO: all stat tests should return a data.frame
+#'
+#' @param x  A sample matrix with [obs x variables]
+#' @param y  A samples matrix with [obs x variables]
+#' @return   A symmetric matrix of p-values [variables x variables]
 diff_test = function(x, y) {
-    #TODO: move this somewhere proper
+    #TODO: move this somewhere proper (array?)
     rep_row = function(x,n){
         matrix(rep(x,each=n),nrow=n)
     }
@@ -33,8 +35,12 @@ diff_test = function(x, y) {
         matrix(rep(x,each=n), ncol=n, byrow=TRUE)
     }
 
-    za = fisher_r2z(cor(x))
-    zb = fisher_r2z(cor(y))
+    corx = cor(x)
+    cory = cor(y)
+    delta_cor = cor(y) - cor(x)
+
+    za = fisher_r2z(corx)
+    zb = fisher_r2z(cory)
 
     na = rep_col(apply(x, 2, function(x) sum(!is.na(x))), ncol(x))
     nb = rep_row(apply(y, 2, function(x) sum(!is.na(x))), ncol(y))
@@ -42,5 +48,7 @@ diff_test = function(x, y) {
     se = sqrt((1/(na-3))+(1/(nb-3)))
     z = (za-zb)/se
 
-    2*pnorm(-abs(z))
+    pval = 2*pnorm(-abs(z))
+
+    list(delta_cor = delta_cor, p.value = pval)
 }
