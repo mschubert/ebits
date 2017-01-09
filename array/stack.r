@@ -5,8 +5,9 @@
 #' @param arrayList  A list of n-dimensional arrays
 #' @param along      Which axis arrays should be stacked on (default: new axis)
 #' @param fill       Value for unknown values (default: \code{NA})
+#' @param allow_overwrite  When stacking to the same array position (default: FALSE)
 #' @return           A stacked array, either n or n+1 dimensional
-stack = function(arrayList, along=length(dim(arrayList[[1]]))+1, fill=NA, drop=FALSE) {
+stack = function(arrayList, along=length(dim(arrayList[[1]]))+1, fill=NA, drop=FALSE, allow_overwrite=FALSE) {
     if (!is.list(arrayList))
         stop(paste("arrayList needs to be a list, not a", class(arrayList)))
     length0 = sapply(arrayList, length) == 0
@@ -87,7 +88,7 @@ stack = function(arrayList, along=length(dim(arrayList[[1]]))+1, fill=NA, drop=F
         else {
             # do not overwrite values unless empty or the same
             slice = do.call("[", c(list(result), dm, drop=FALSE))
-            if (!all(slice==fill | is.na(slice) | slice==arrayList[[i]]))
+            if (!allow_overwrite && !all(slice==fill | is.na(slice) | slice==arrayList[[i]]))
                 stop("value aggregation not allowed, stack along new axis+summarize after")
         }
 
