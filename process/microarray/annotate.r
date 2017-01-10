@@ -21,7 +21,8 @@ mapping = list(
     "pd.huex.1.0.st.v2" = "huex10sttranscriptcluster.db",
     "pd.ht.hg.u133a" = "hthgu133a.db", # A-AFFY-76
 #    "pd.ht.hg.u133.plus.pm" = ???,
-    "pd.hta.2.0" = "hta20sttranscriptcluster.db"
+    "pd.hta.2.0" = "hta20sttranscriptcluster.db",
+    "u133aaofav2" = "hthgu133a.db" # needs to be manually processed by affy
 )
 
 #' Function to annotate expression objects
