@@ -42,7 +42,7 @@ save = function(..., file) {
         else
             .l1k$write.gct(obj, file)
     } else
-        base::save(..., file=file)
+        base::save(..., file=file, envir=parent.frame(2L))
 }
 
 #' Function to load all files that match a regular expression
