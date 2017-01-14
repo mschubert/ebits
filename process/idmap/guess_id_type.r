@@ -16,5 +16,5 @@ guess_id_type = function(from_ids) {
     else if (sum(grepl("^[A-Z]+[0-9]?$", from_ids)) > length(from_ids)/2)
         'hgnc_symbol'
     else
-        stop("need to specify 'from' id type")
+        stop("Can not guess ID type: ", paste(head(from_ids), collapse=", "), " ...")
 }
