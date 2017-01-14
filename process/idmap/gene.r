@@ -6,7 +6,7 @@ library(dplyr)
 
 #' Gene ID mapping function
 #'
-#' @param obj        a character vector or matrix with ids (rownames) to be mapped
+#' @param obj        a character vector or named object to be mapped
 #' @param from       the type of ids to map from; if NULL will try regex matching
 #' @param to         the type of ids to map to
 #' @param summarize  the function to use to aggregate ids
@@ -22,25 +22,25 @@ gene.character = function(obj, to, from=.guess_id_type(obj), summarize=mean) {
     .b$match(obj, from=df$from, to=df$to)
 }
 
-gene.numeric = function(obj, to, from=.guess_id_type(names(obj)), summarize=mean) {
+gene.default = function(obj, to, from=.guess_id_type(.ar$dimnames(obj, along=1)),
+                        summarize=mean) {
     lookup = gene_table()
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
+
+    # remove versions of gene ids
+    if (from == "ensembl_gene_id") {
+        if (is.array(obj))
+            dimnames(obj)[[1]] = sub("\\.[0-9]+$", "", dimnames(obj)[[1]])
+        else
+            names(obj) = sub("\\.[0-9]+$", "", dimnames(obj)[[1]])
+    }
+
     .ar$summarize(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
-gene.matrix = function(obj, to, from=.guess_id_type(rownames(obj)), summarize=mean) {
-    lookup = gene_table()
-    df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
-    df = df[!duplicated(df),]
-    .ar$summarize(obj, along=1, from=df$from, to=df$to, FUN=summarize)
-}
-
-gene.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj))),  summarize=mean) {
-    lookup = gene_table()
-    df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
-    df = df[!duplicated(df),]
-    exprs(obj) = .ar$summarize(exprs(obj), along=1, from=df$from, to=df$to, FUN=summarize)
+gene.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj))), summarize=mean) {
+    exprs(obj) = gene(Biobase::exprs(obj), from=from, to=to, summarize=summarize)
     obj
 }
 
