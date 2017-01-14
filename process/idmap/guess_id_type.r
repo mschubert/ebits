@@ -13,7 +13,7 @@ guess_id_type = function(from_ids) {
         'entrezgene'
     else if (sum(grepl("^[A-Z]{1,3}[0-9]{5,6}$", from_ids)) > length(from_ids)/2)
         'genbank'
-    else if (sum(grepl("^[A-Z]+[0-9]?$"), from_ids) > length(from_ids)/2)
+    else if (sum(grepl("^[A-Z]+[0-9]?$", from_ids)) > length(from_ids)/2)
         'hgnc_symbol'
     else
         stop("need to specify 'from' id type")

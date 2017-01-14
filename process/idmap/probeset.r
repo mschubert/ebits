@@ -54,7 +54,7 @@ probeset.list = function(obj, to, from, summarize=mean) {
 #' @return       A data.frame with the following columns:
 #'     hgnc_symbol, affy, illumina, genbank, entrezgeen, ensembl_probeset_id
 probeset_table = function(force=FALSE) {
-    cache = module_file("probeset_table.RData")
+    cache = file.path(module_file(), "probeset_table.RData")
     if (file.exists(cache) && !force)
         return(.io$load(cache))
 
