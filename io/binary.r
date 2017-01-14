@@ -2,11 +2,17 @@
 .b = import_('../base')
 .l1k = import('./l1ktools_io')
 
-#' Load function that returns the object(s) instead of attaching it to the global namespace
+#' Loads .gctx files
+#'
+#' Workaround until I implement this properly
+load_gctx = .l1k$read.gctx
+
+#' Load function that returns the object(s)
 #'
 #' @param filename  Name or path of file
+#' @param ...       Additional arguments to the loading function
 #' @return          Contents of the file
-load = function(filename) {
+load = function(filename, ...) {
     get_contents = function(fpath) {
         env = new.env()
         fid = strsplit(basename(fpath), "\\$")[[1]]

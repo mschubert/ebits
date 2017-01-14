@@ -245,7 +245,7 @@ read.gct = function(src, rid = NULL, cid = NULL, set_annot_rownames = T) {
         rid = rownames(mat),
         cid = colnames(mat),
         rdesc = rdesc,
-        cdec = cdesc
+        cdesc = cdesc
     )
 }
 
@@ -305,7 +305,7 @@ read.gctx = function(src, rid = NULL, cid = NULL, set_annot_rownames = T) {
         rid = rownames(mat),
         cid = colnames(mat),
         rdesc = rdesc,
-        cdec = cdesc
+        cdesc = cdesc
     )
 }
 
