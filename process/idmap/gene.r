@@ -61,6 +61,10 @@ gene_table = function(force=FALSE) {
     mart = biomaRt::useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
     ids = c('hgnc_symbol', 'entrezgene', 'ensembl_gene_id')
     mapping = biomaRt::getBM(attributes=ids, mart=mart)
+    for (col in colnames(mapping)) {
+        is_empty = nchar(mapping[,col]) == 0
+        mapping[[col]][is_empty] = NA
+    }
 
     save(mapping, file=cache)
     mapping
