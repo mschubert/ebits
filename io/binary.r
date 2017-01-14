@@ -1,5 +1,6 @@
 # I/O helper functions on R binary files
 .b = import_('../base')
+.l1k = import('./l1ktools_io')
 
 #' Load function that returns the object(s) instead of attaching it to the global namespace
 #'
@@ -23,6 +24,19 @@ load = function(filename) {
         lapply(filename, get_contents)
     else
         get_contents(filename)
+}
+
+save = function(..., file) {
+    if (grepl("\\.gct[x]$", file)) {
+        obj = list(...)
+        stopifnot(length(obj) == 1 && class(obj[[1]]) == 'matrix')
+        obj = new("GCT", obj[[1]])
+        if (grepl("x$", file))
+            l1k$write.gctx(obj, file)
+        else
+            l1k$write.gct(obj, file)
+    } else
+        base::save(..., file=file)
 }
 
 #' Function to load all files that match a regular expression
