@@ -32,9 +32,9 @@ save = function(..., file) {
         stopifnot(length(obj) == 1 && class(obj[[1]]) == 'matrix')
         obj = new("GCT", obj[[1]])
         if (grepl("x$", file))
-            l1k$write.gctx(obj, file)
+            .l1k$write.gctx(obj, file)
         else
-            l1k$write.gct(obj, file)
+            .l1k$write.gct(obj, file)
     } else
         base::save(..., file=file)
 }

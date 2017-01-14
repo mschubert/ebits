@@ -137,12 +137,13 @@ check_colnames <- function(test_names, df, throw_error=T) {
 setMethod("initialize",
         signature = "GCT",
         definition = function(.Object, mat, rid = NULL, cid = NULL,
-                              set_annot_rownames = T, rdesc=NULL, cdesc=NULL) {
+                              set_annot_rownames = T,
+                              rdesc=data.frame(), cdesc=data.frame()) {
             .Object@mat = mat
             .Object@rid = rownames(mat)
             .Object@cid = colnames(mat)
             .Object@rdesc = rdesc
-            .Object@cdec = cdesc
+            .Object@cdesc = cdesc
             .Object
     }
 )
@@ -363,7 +364,7 @@ write.gct <- function(ds, ofile, precision=4, appenddim=T, ver=3) {
         file=ofile,sep='\n',append=T)
     # line 4 + ncdesc: sample desc
     filler = 'na'
-    for (ii in 1:ncdesc) {
+    for (ii in seq_len(ncdesc)) {
       if (is.numeric(ds@cdesc[,ii])) {
         cat(paste(c(colkeys[ii],rep(filler,nrdesc),
                     round(ds@cdesc[,ii],precision)),
