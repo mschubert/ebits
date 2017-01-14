@@ -135,23 +135,27 @@ check_colnames <- function(test_names, df, throw_error=T) {
 
 # define the initialization method for the class
 setMethod("initialize",
-    signature = "GCT",
-    definition = function(.Object, src, rid = NULL, cid = NULL, set_annot_rownames = T) {
-    # ... add init code here
+        signature = "GCT",
+        definition = function(.Object, mat, rid = NULL, cid = NULL,
+                              set_annot_rownames = T, rdesc=NULL, cdesc=NULL) {
+            .Object@mat = mat
+            .Object@rid = rownames(mat)
+            .Object@cid = colnames(mat)
+            .Object@rdesc = rdesc
+            .Object@cdec = cdesc
+            .Object
     }
 )
 
-read.gct = function(.Object, src, rid = NULL, cid = NULL, set_annot_rownames = T) {
+read.gct = function(src, rid = NULL, cid = NULL, set_annot_rownames = T) {
     # check to make sure it's either .gct or .gctx
     if (! grepl(".gct(\\.gz)?$", src))
         stop("A .gct file must be given")
     if ( ! is.null(rid) || !is.null(cid) )
         stop("rid and cid values may only be given for .gctx files, not .gct files")
 
-    # parse the .gct
-    .Object@src = src
     # get the .gct version by reading first line
-    .Object@version = scan(src, what = "", nlines = 1, sep = "\t", quiet = TRUE)[1]
+    version = scan(src, what = "", nlines = 1, sep = "\t", quiet = TRUE)[1]
     # get matrix dimensions by reading second line
     dimensions = scan(src, what = double(0), nlines = 1, skip = 1, sep = "\t", quiet = TRUE)
     nrmat = dimensions[1]
@@ -229,24 +233,27 @@ read.gct = function(.Object, src, rid = NULL, cid = NULL, set_annot_rownames = T
         cdesc = as.data.frame(cdesc, stringsAsFactors = FALSE)
     }
     # assign to the GCT slots
-    .Object@mat = mat
-    .Object@rid = rownames(mat)
-    .Object@cid = colnames(mat)
-    .Object@rdesc = fix.datatypes(rdesc)
-    .Object@cdesc = fix.datatypes(cdesc)
+    rdesc = fix.datatypes(rdesc)
+    cdesc = fix.datatypes(cdesc)
     # add id columns to rdesc and cdesc
-    .Object@rdesc$id <- rownames(.Object@rdesc)
-    .Object@cdesc$id <- rownames(.Object@cdesc)                  
-    return(.Object)
+    rdesc$id <- rownames(rdesc)
+    cdesc$id <- rownames(cdesc)
+
+    new("GCT",
+        mat = mat,
+        rid = rownames(mat),
+        cid = colnames(mat),
+        rdesc = rdesc,
+        cdec = cdesc
+    )
 }
 
-read.gctx = function(.Object, src, rid = NULL, cid = NULL, set_annot_rownames = T) {
+read.gctx = function(src, rid = NULL, cid = NULL, set_annot_rownames = T) {
     if (! grepl(".gctx(\\.gz)?$", src) )
         stop("A .gctx file must be given")
 
     # parse the .gctx
     message(paste("reading", src))
-    .Object@src = src
     # if the rid's or column id's are .grp files, read them in
     if ( length(rid) == 1 && grepl(".grp$", rid) )
         rid <- parse.grp(rid)
@@ -280,18 +287,25 @@ read.gctx = function(.Object, src, rid = NULL, cid = NULL, set_annot_rownames = 
     rid_keep <- all_rid[ridx]
     cid_keep <- all_cid[cidx]
     # read the data matrix
-    .Object@mat <- h5read(src, name="0/DATA/0/matrix", index=list(ridx, cidx))
+    mat <- h5read(src, name="0/DATA/0/matrix", index=list(ridx, cidx))
     # set the row and column ids
-    .Object@rid <- rid_keep
-    .Object@cid <- cid_keep
-    colnames(.Object@mat) <- all_cid[cidx]
-    rownames(.Object@mat) <- all_rid[ridx]
+    rid <- rid_keep
+    cid <- cid_keep
+    colnames(mat) <- all_cid[cidx]
+    rownames(mat) <- all_rid[ridx]
     # get the meta data
-    .Object@rdesc <- read.gctx.meta(src, dimension="row", ids=rid_keep, set_annot_rownames=set_annot_rownames)
-    .Object@cdesc <- read.gctx.meta(src, dimension="col", ids=cid_keep, set_annot_rownames=set_annot_rownames)
+    rdesc <- read.gctx.meta(src, dimension="row", ids=rid_keep, set_annot_rownames=set_annot_rownames)
+    cdesc <- read.gctx.meta(src, dimension="col", ids=cid_keep, set_annot_rownames=set_annot_rownames)
     # close any open handles and return the object
     H5close()
-    return(.Object)
+
+    new("GCT",
+        mat = mat,
+        rid = rownames(mat),
+        cid = colnames(mat),
+        rdesc = rdesc,
+        cdec = cdesc
+    )
 }
 
 # function to parse a GCT(X)
