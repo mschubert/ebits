@@ -65,7 +65,7 @@ annotate.NChannelSet = function(normData, summarize="hgnc_symbol") {
     # array ID is not saved in normData@annotation
 	map_channel = function(expr, ids, from="agilent", to=summarize) {
 		rownames(expr) = ids
-		idmap$gene(expr, from=from, to=summarize)
+		idmap$probeset(expr, from=from, to=summarize)
 	}
     idmap = import('../idmap')
     ad = as.list(Biobase::assayData(normData))
