@@ -27,7 +27,7 @@ load = function(filename) {
 }
 
 save = function(..., file) {
-    if (grepl("\\.gct[x]$", file)) {
+    if (grepl("\\.gct(x)?$", file)) {
         obj = list(...)
         stopifnot(length(obj) == 1 && class(obj[[1]]) == 'matrix')
         obj = new("GCT", obj[[1]])
