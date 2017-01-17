@@ -1,7 +1,6 @@
 #' Perform a voom transformation (for RNA-seq data)
 #'
 #' @param mat  The untransformed matrix [genes x samples]
-#' @param ids  The ID type of genes (only "hgnc" allowed right now)
 #' @return     A matrix of gene expression values [genes x samples]
 voom = function(mat) UseMethod("voom")
 
