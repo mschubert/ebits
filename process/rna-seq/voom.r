@@ -15,5 +15,12 @@ voom.default = function(mat) {
 
 #' @rdname voom
 voom.list = function(mlist) {
-	lapply(mlist, voom)
+	re = lapply(mlist, function(x) try(vst(x, ...)))
+    errors = sapply(re, function(x) class(x) == "try-error")
+    if (any(errors)) {
+        for (i in which(errors))
+            warning("In element ", i, " ", names(re)[i], ": ", re[[i]])
+        stop("Errors occurred in processing")
+    }
+    re
 }
