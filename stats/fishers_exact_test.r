@@ -13,6 +13,6 @@ fishers_exact_test = function(set1, set2, valid) {
     stats::fisher.test(matrix(c(tp, fp, fn, tn), ncol=2))
 }
 
-if (is.null(module_names())) {
+if (is.null(module_name())) {
     re = fishers_exact_test(1:10, 2:11, 1:100)
 }
