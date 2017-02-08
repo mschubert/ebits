@@ -1,5 +1,9 @@
 #' Perform a HG test for all sigs vs all lists
-hypergeometric_test = function(background, lists, samples, p.adjust="fdr") {
+#'
+#' @param background  A character vector of the ground truth
+#' @param lists       A list of gene sets
+#' @param samples     A vector of my observation or list thereof
+hypergeometric_test = function(background, lists, samples) {
     calc = function(back, li, sam) {
         q = sum(sam %in% li) # number of positive balls in the sample
         m = sum(li %in% back) # number of positive balls in the urn
@@ -20,6 +24,5 @@ hypergeometric_test = function(background, lists, samples, p.adjust="fdr") {
         for (si in seq_along(samples))
             A[li,si] = calc(background, lists[[li]], samples[[si]])
 
-    A[] = p.adjust(A, method=p.adjust)
     drop(A)
 }
