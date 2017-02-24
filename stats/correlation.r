@@ -25,8 +25,9 @@ test = function(mat, self=0) {
 #'
 #' @param x  A sample matrix with [obs x variables]
 #' @param y  A samples matrix with [obs x variables]
+#' @param return_cor  Return cor matrices of x and y (default: FALSE)
 #' @return   A symmetric matrix of p-values [variables x variables]
-diff_test = function(x, y) {
+diff_test = function(x, y, return_cor=FALSE) {
     #TODO: move this somewhere proper (array?)
     rep_row = function(x,n){
         matrix(rep(x,each=n),nrow=n)
@@ -50,5 +51,8 @@ diff_test = function(x, y) {
 
     pval = 2*pnorm(-abs(z))
 
-    list(delta_cor = delta_cor, p.value = pval)
+    if (return_cor)
+        list(x=corx, y=cory, delta_cor = delta_cor, p.value = pval)
+    else
+        list(delta_cor = delta_cor, p.value = pval)
 }
