@@ -1,14 +1,26 @@
+#' Removes all try-error from lists
+#'
+#' @param x     A list  
+#' @param drop  Whether to drop unused dimensions after removing NAs
+#' @param omit  Whether or not to perform action
+error = function(x, drop=FALSE, omit=TRUE) {
+    if (!omit)
+        x
+    else
+        x[! sapply(x, function(x) "try-error" %in% class(x)), drop=drop]
+}
+
 #' Removes NULL (length 0) objects from lists
 #'
 #' @param x     A list  
 #' @param drop  Whether to drop unused dimensions after removing NAs
 #' @param omit  Whether or not to perform action
-null = function(x, drop=FALSE, omit=TRUE){
+null = function(x, drop=FALSE, omit=TRUE) {
     if (!omit)
         x
     else
         x[sapply(x, length) != 0, drop=drop]
-}   
+}
 
 #' Removes `0` elements from an object
 #'
