@@ -4,6 +4,6 @@ cache: packages
 
 install:
  - R -e "install.packages('devtools')"
- - R -e "devtools::install_github('klmr/modules.git')"
+ - R -e "devtools::install_github('klmr/modules')"
 
 script: make test
