@@ -15,7 +15,7 @@ define \n
 
 endef
 
-test: deps
+test:
 	@for DIR in $(MDIRS); do make -C $$DIR; done
 	$(if $(RSCRIPTS_NO_T), \
 			@echo "*** NO TESTS FOUND FOR: $(RSCRIPTS_NO_T) ***", )

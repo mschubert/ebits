@@ -6,4 +6,4 @@ install:
  - R -e "install.packages('devtools')"
  - R -e "devtools::install_github('klmr/modules')"
 
-script: make test
+script: make deps test
