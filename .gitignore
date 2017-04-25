@@ -1,4 +1,5 @@
 # History files
+dependencies.txt
 .Rhistory
 
 # Example code in package build process

@@ -4,6 +4,7 @@ RSCRIPTS = $(wildcard *[^_].r)
 RSCRIPTS_T = $(shell grep -l testthat $(RSCRIPTS) /dev/null)
 RSCRIPTS_NO_T = $(filter-out $(RSCRIPTS_T),$(RSCRIPTS))
 
+DEPS=$(shell ./dependencies.sh)
 R_PKG=modules,$(shell Rscript -e 'cat(sub("package:", "", grep("^package:", search(), value=TRUE)), sep=",")')
 Rscript = Rscript --default-packages=$(R_PKG)
 
@@ -22,7 +23,8 @@ test: deps
 
 deps: dependencies.txt
 	R -e "source('https://bioconductor.org/biocLite.R')" \
-	  -e "biocLite(read.table('$<', header=FALSE)$$V1)"
+	  -e "req = read.table('dependencies.txt', header=FALSE)[[1]]" \
+	  -e "biocLite(setdiff(req, installed.packages()[,'Package']))"
 
 dependencies.txt: dependencies.sh
 	sh $< > $@
