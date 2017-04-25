@@ -6,11 +6,13 @@ library(dplyr)
 
 #' Gene ID mapping function
 #'
-#' @param obj        a character vector or named object to be mapped
-#' @param from       the type of ids to map from; if NULL will try regex matching
-#' @param to         the type of ids to map to
+#' @param obj   a character vector or named object to be mapped
+#' @param from  the type of ids to map from; if NULL will try regex matching
+#'              this can be: 'hgnc_symbol', 'entrezgene', 'ensembl_gene_id'
+#' @param to    the type of ids to map to
+#'              this can be: 'hgnc_symbol', 'entrezgene', 'ensembl_gene_id'
 #' @param summarize  the function to use to aggregate ids
-#' @return           the mapped and optionally summarized object
+#' @return      the mapped and optionally summarized object
 gene = function(obj, from=NULL, to, summarize=mean) {
     UseMethod("gene")
 }
