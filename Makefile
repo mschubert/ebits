@@ -7,18 +7,25 @@ RSCRIPTS_NO_T = $(filter-out $(RSCRIPTS_T),$(RSCRIPTS))
 R_PKG=modules,$(shell Rscript -e 'cat(sub("package:", "", grep("^package:", search(), value=TRUE)), sep=",")')
 Rscript = Rscript --default-packages=$(R_PKG)
 
-.PHONY: test
+.PHONY: test deps
 
 define \n
 
 
 endef
 
-test:
+test: deps
 	@for DIR in $(MDIRS); do make -C $$DIR; done
 	$(if $(RSCRIPTS_NO_T), \
 			@echo "*** NO TESTS FOUND FOR: $(RSCRIPTS_NO_T) ***", )
 	@$(foreach R,$(RSCRIPTS_T),echo $(R); $(Rscript) $(R)$(\n))
+
+deps: dependencies.txt
+	R -e "source('https://bioconductor.org/biocLite.R')" \
+	  -e "biocLite(read.table('$<', header=FALSE)$$V1)"
+
+dependencies.txt: dependencies.sh
+	sh $< > $@
 
 print-%:
 	@echo $* = $($*)

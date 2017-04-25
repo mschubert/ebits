@@ -58,7 +58,6 @@ to_array = function(x, index_list, fill=NA) {
 }
 
 if (is.null(module_name())) {
-    library(modues)
     library(testthat)
 
     # transpose
