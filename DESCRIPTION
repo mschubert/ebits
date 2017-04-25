@@ -1,0 +1,25 @@
+Package: ebits
+Title: Fake DESCRIPTION file to support Travis-CI
+Version: 0
+Author: Michael Schubert <mschu.dev@gmail.com>
+Maintainer: Michael Schubert <mschu.dev@gmail.com>
+Description: the 'ebits' module
+URL: https://github.com/mschubert/narray
+BugReports: https://github.com/mschubert/narray/issues
+Depends:
+    R (>= 3.0.2)
+Imports:
+    abind,
+    pryr,
+    reshape2,
+    stats,
+    stringr,
+    utils
+License: Apache License (== 2.0) | file LICENSE
+LazyData: true
+Encoding: UTF-8
+Suggests:
+    knitr,
+    testthat
+VignetteBuilder: knitr
+RoxygenNote: 5.0.1
