@@ -27,7 +27,7 @@ deps: dependencies.txt
 	  -e "biocLite(setdiff(req, installed.packages()[,'Package']))"
 
 dependencies.txt: dependencies.sh
-	sh $< > $@
+	bash $< > $@
 
 print-%:
 	@echo $* = $($*)
