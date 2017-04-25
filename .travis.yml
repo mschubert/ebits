@@ -1,5 +1,7 @@
 language: r
 
-install: true
+cache: packages
+
+install: R -e "devtools::install_github('klmr/modules.git')"
 
 script: make test
