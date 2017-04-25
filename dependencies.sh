@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 scripts=$(find . -name "*.r" -o -name "*.R")
 content=$(echo $scripts | xargs cat)
 
