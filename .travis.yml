@@ -15,8 +15,8 @@ cache:
 r_github_packages: klmr/modules
 
 install:
- - R -e "devtools::install_github('klmr/modules')"
  - make deps # installs packages
+ - R -e "devtools::install_github('klmr/modules')"
  - make -C stats nmf_mu.so
 
 script: make test
