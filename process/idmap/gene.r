@@ -56,7 +56,7 @@ gene.list = function(obj, to, from, summarize=mean) {
 #' @return       A data.frame with the following columns:
 #'     hgnc_symbol, affy, illumina, genbank, entrezgeen, ensembl_gene_id
 gene_table = function(force=FALSE) {
-    cache = file.path(module_file(), "gene_table.RData")
+    cache = file.path(module_file(), "cache", "gene_table.RData")
     if (file.exists(cache) && !force)
         return(.io$load(cache))
 
@@ -68,6 +68,14 @@ gene_table = function(force=FALSE) {
         mapping[[col]][is_empty] = NA
     }
 
+    dir.create(dirname(cache), showWarnings=FALSE)
     save(mapping, file=cache)
     mapping
+}
+
+if (is.null(module_name())) {
+    library(testthat)
+
+    re = gene("ZNF736P3Y", to="hgnc_symbol")
+    expect_equal("ZNF736P3Y", unname(re))
 }

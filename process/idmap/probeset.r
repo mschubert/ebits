@@ -54,7 +54,7 @@ probeset.list = function(obj, to, from, summarize=mean) {
 #' @return       A data.frame with the following columns:
 #'     hgnc_symbol, affy, illumina, genbank, entrezgene, ensembl_gene_id
 probeset_table = function(force=FALSE) {
-    cache = file.path(module_file(), "probeset_table.RData")
+    cache = file.path(module_file(), "cache", "probeset_table.RData")
     if (file.exists(cache) && !force)
         return(.io$load(cache))
 
@@ -88,6 +88,7 @@ probeset_table = function(force=FALSE) {
     }
     mapping = sapply(probes, assemblePS, simplify=FALSE, USE.NAMES=TRUE)
 
+    dir.create(dirname(cache), showWarnings=FALSE)
     save(mapping, file=cache)
     mapping
 }

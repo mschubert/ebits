@@ -9,8 +9,7 @@ addons:
 cache:
  - packages
  - directories:
-    - process/idmap/gene_table.RData
-    - process/idmap/probeset_table.RData
+    - process/idmap/cache
 
 r_github_packages: klmr/modules
 
