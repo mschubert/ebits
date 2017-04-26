@@ -1,5 +1,9 @@
 language: r
 
+apt_packages:
+ - liblapack-dev # nmf
+ - libarpack2-dev # nmf
+
 cache: packages
 
 r_github_packages: klmr/modules
