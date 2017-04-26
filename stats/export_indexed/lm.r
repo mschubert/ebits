@@ -31,7 +31,7 @@ lm = function(formula, data=environment(formula), min_pts=3, return_intercept=FA
     #TODO: should drop covariates if unique, only if nothing left drop regression
     # (and display a warning of what was dropped)
     # also, drop factor levels individually if < min_pts
-    if (nrow(pts) < min_pts || any(apply(pts, 2, function(x) length(unique(x)) == 1)))
+    if (nrow(pts) < min_pts) # || any(apply(pts, 2, function(x) length(unique(x)) == 1)))
         return(NULL)
 
     re = stats::lm(formula, data) %>%

@@ -1,3 +1,5 @@
+import(".", attach=TRUE)
+
 if (is.null(module_name())) {
     library(testthat)
 
