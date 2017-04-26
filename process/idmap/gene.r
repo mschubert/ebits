@@ -76,6 +76,6 @@ gene_table = function(force=FALSE) {
 if (is.null(module_name())) {
     library(testthat)
 
-    re = gene("ZNF736P3Y", to="hgnc_symbol")
-    expect_equal("ZNF736P3Y", unname(re))
+    re = gene("10009", to="hgnc_symbol")
+    expect_equal("ZBTB33", unname(re))
 }
