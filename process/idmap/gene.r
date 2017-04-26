@@ -71,23 +71,3 @@ gene_table = function(force=FALSE) {
     save(mapping, file=cache)
     mapping
 }
-
-if (is.null(module_name())) {
-    library(testthat)
-
-    expect_equal(gene('683_at', to="hgnc_symbol"),
-                 setNames("OTC", "683_at"))
-
-    #FIXME: colnames gets converted from 'x' to '1' for single-column
-#    m = matrix(1, nrow=2, ncol=1, dimnames=list(c('683_at','683_at'), 'x'))
-#    M = gene(m, to="hgnc_symbol")
-#    Mref = matrix(1, ncol=1, nrow=1, dimnames=list("OTC", "1"))
-#    expect_equal(M, Mref)
-
-    m = matrix(1, nrow=2, ncol=2,
-               dimnames=list(c('683_at','683_at'), c('x','y')))
-    M = gene(m, to="hgnc_symbol")
-    Mref = structure(c(1, 1), .Dim = 1:2,
-                     .Dimnames = list("OTC", c("x", "y")))
-    expect_equal(M, Mref)
-}
