@@ -1,20 +1,21 @@
 language: r
 
+# apt_packages does not work here
 addons:
   apt:
     packages:
       - libarpack2-dev
 
-#apt_packages:
-# - liblapack-dev # nmf
-# - libarpack2-dev # nmf
-
-cache: packages
+cache:
+ - packages
+ - directories:
+    - process/idmap/gene_table.RData
+    - process/idmap/probeset_table.RData
 
 r_github_packages: klmr/modules
 
 install:
- - make deps
+ - make deps # installs packages
  - make -C stats nmf_mu.so
 
 script: make test
