@@ -66,7 +66,8 @@ if (is.null(module_name())) {
     expect_true(all(unlist(re1) %in% colnames(iris)))
 
     re2 = wf(Sepal.Length ~ Sepal.Width, data=iris, rep=5)
-    expect_equal(nrow(re2), 5)
+    expect_equal(nrow(re2), nrow(re1)*5)
+    expect_equal(re2$rep, rep(1:5, each=2))
 
     fx = function(f, data=parent.frame(), atomic_class='vector') 1
     wf = wrap_formula_indexing(fx)
