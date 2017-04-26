@@ -52,7 +52,7 @@ probeset.list = function(obj, to, from, summarize=mean) {
 #'
 #' @param force  Re-probesetrate table if it already exists
 #' @return       A data.frame with the following columns:
-#'     hgnc_symbol, affy, illumina, genbank, entrezgeen, ensembl_probeset_id
+#'     hgnc_symbol, affy, illumina, genbank, entrezgene, ensembl_gene_id
 probeset_table = function(force=FALSE) {
     cache = file.path(module_file(), "probeset_table.RData")
     if (file.exists(cache) && !force)
@@ -68,8 +68,9 @@ probeset_table = function(force=FALSE) {
         agilent = grep("agilent_", biomaRt::listAttributes(mart)$name, value=TRUE)
     )
 
-    tablecols = c("hgnc_symbol", "entrezprobeset", "ensembl_probeset_id")
+    tablecols = c("hgnc_symbol", "entrezgene", "ensembl_gene_id")
     getPS = function(p) {
+        message(p)
         df = biomaRt::getBM(attributes=c(tablecols, p), mart=mart)
         colnames(df)[ncol(df)] = "probe_id"
         df[!is.na(df$probe_id) & df$probe_id!="",]
@@ -81,8 +82,8 @@ probeset_table = function(force=FALSE) {
             dplyr::filter(probe_id != "" & !is.na(probe_id)) %>%
             dplyr::distinct()
         re$hgnc_symbol[re$hgnc_symbol == ""] = NA
-        re$entrezprobeset[re$entrezprobeset == ""] = NA
-        re$ensembl_probeset_id[re$ensembl_probeset_id == ""] = NA
+        re$entrezgene[re$entrezgene == ""] = NA
+        re$ensembl_gene_id[re$ensembl_gene_id == ""] = NA
         re
     }
     mapping = sapply(probes, assemblePS, simplify=FALSE, USE.NAMES=TRUE)
