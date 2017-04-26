@@ -96,5 +96,7 @@ if (is.null(module_name())) {
     df$circle = rep(c(T,F,T,F,T),5)
 
     p = volcano(df)
-    expect_equal(digest::digest(p), "9b5462f8bc3cfb42b17ef9cfe51a861d")
+
+    df$label[df$label %in% c("L", "N")] = NA
+    expect_equal(df, p$data)
 }
