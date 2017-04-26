@@ -60,7 +60,7 @@ probeset_table = function(force=FALSE) {
 
     warning("no cached file found, biomart query will take ~ 1h", immediate.=TRUE)
 
-    mart = biomaRt::useMart(biomart="ensembl", dataset="hsapiens_probeset_ensembl")
+    mart = biomaRt::useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
 
     probes = list(
         affy = grep("^affy_", biomaRt::listAttributes(mart)$name, value=TRUE),
