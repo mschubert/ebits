@@ -9,12 +9,9 @@ BugReports: https://github.com/mschubert/narray/issues
 Depends:
     R (>= 3.0.2)
 Imports:
-    abind,
-    pryr,
-    reshape2,
-    stats,
-    stringr,
-    utils
+    modules
+Remotes:
+    klmr/modules
 License: Apache License (== 2.0) | file LICENSE
 LazyData: true
 Encoding: UTF-8
