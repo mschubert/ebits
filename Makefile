@@ -16,7 +16,7 @@ define \n
 endef
 
 test:
-	@for DIR in $(MDIRS); do make -C $$DIR; done
+	@$(foreach DIR,$(MDIRS),make -C $(DIR)$(\n))
 	$(if $(RSCRIPTS_NO_T), \
 			@echo "*** NO TESTS FOUND FOR: $(RSCRIPTS_NO_T) ***", )
 	@$(foreach R,$(RSCRIPTS_T),echo $(R); $(Rscript) $(R)$(\n))
