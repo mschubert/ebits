@@ -1,14 +1,15 @@
 Package: ebits
-Title: Fake DESCRIPTION file to support Travis-CI
+Title: A collection of bioinformatics-related R modules
 Version: 0
 Author: Michael Schubert <mschu.dev@gmail.com>
 Maintainer: Michael Schubert <mschu.dev@gmail.com>
-Description: the 'ebits' module
-URL: https://github.com/mschubert/narray
-BugReports: https://github.com/mschubert/narray/issues
+Description: File to support Travis-CI
+URL: https://github.com/mschubert/ebits
+BugReports: https://github.com/mschubert/ebits/issues
 Depends:
     R (>= 3.0.2)
 Imports:
+    devtools,
     modules
 Remotes:
     klmr/modules
@@ -16,8 +17,6 @@ License: Apache License (== 2.0) | file LICENSE
 LazyData: true
 Encoding: UTF-8
 Suggests:
-    devtools,
-    knitr,
     testthat
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
