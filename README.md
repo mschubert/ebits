@@ -1,33 +1,28 @@
-ebits: R modules for general reuse
-==================================
+ebits: bioinformatics-related R modules
+=======================================
 
 This repository is meant as a collection of bioinformatics-related R
 code that simplify workflows and can be shared with other people.
 
-We currently provide the following modules:
-
- * [base](base) - some basic functionality, in part overwriting R's `base` functions
- * [io](io) - file reading and writing
- * [array](array) - functions to simplify array programming in R.
- * [hpc](hpc) - functions to send R function calls as LSF jobs.
+For details, see the `README.md` files and API documentation in the respective
+directories.
 
 Requirements
 ------------
 
-The following R libraries are currently required to run `ebits`,
-you can install all the missing packages by executing:
-
-```r
-req = c('devtools','BatchJobs','gtools','plyr','dplyr','abind','reshape2','xlsx')
-# implicit dependencies: stringr, magrittr
-new = req[!(req %in% installed.packages()[,"Package"])]
-if(length(new)) install.packages(new)
-```
-
 This collection of tools requires `modules`, install using using `devtools`:
 
 ```r
+# install.packages('devtools')
 devtools::install_github('klmr/modules')
+```
+
+The scripts also depend on a range of R packages. You can list/install all
+of them by typing:
+
+```sh
+./dependencies.sh # list all packages
+make deps # install all packages (warning: there's a lot)
 ```
 
 Setup
