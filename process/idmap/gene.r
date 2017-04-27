@@ -47,7 +47,7 @@ gene.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj)))
 }
 
 gene.list = function(obj, to, from, summarize=mean) {
-    lapply(obj, gene)
+    lapply(obj, gene, to=to, from=from, summarize=summarize)
 }
 
 #' Creates a table of different identifiers and caches it
