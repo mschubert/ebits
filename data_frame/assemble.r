@@ -27,8 +27,8 @@ assemble = function(...) {
 if (is.null(module_name())) {
     library(testthat)
 
-    a = setNames(c(1,3,5), c("A","C","E"))
-    b = setNames(c(1,2,3,4), LETTERS[1:4])
+    a = setNames(c(1L,3L,5L), c("A","C","E"))
+    b = setNames(c(1.1,2.2,3.3,4.4), LETTERS[1:4])
     x = setNames("2", "B")
     y = setNames(factor(2), "A")
 
