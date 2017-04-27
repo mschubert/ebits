@@ -45,7 +45,7 @@ probeset.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(ob
 }
 
 probeset.list = function(obj, to, from, summarize=mean) {
-    lapply(obj, probeset)
+    lapply(obj, probeset, to=to, from=from, summarize=summarize)
 }
 
 #' Creates a table of different identifiers and caches it

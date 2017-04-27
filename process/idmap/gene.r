@@ -19,6 +19,7 @@ gene = function(obj, from=NULL, to, summarize=mean) {
 
 gene.character = function(obj, to, from=.guess_id_type(obj), summarize=mean) {
     lookup = gene_table()
+print(head(lookup))
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
     .b$match(obj, from=df$from, to=df$to)
@@ -47,7 +48,7 @@ gene.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj)))
 }
 
 gene.list = function(obj, to, from, summarize=mean) {
-    lapply(obj, gene)
+    lapply(obj, gene, to=to, from=from, summarize=summarize)
 }
 
 #' Creates a table of different identifiers and caches it
@@ -57,6 +58,7 @@ gene.list = function(obj, to, from, summarize=mean) {
 #'     hgnc_symbol, affy, illumina, genbank, entrezgeen, ensembl_gene_id
 gene_table = function(force=FALSE) {
     cache = file.path(module_file(), "cache", "gene_table.RData")
+message(cache)
     if (file.exists(cache) && !force)
         return(.io$load(cache))
 
@@ -75,7 +77,8 @@ gene_table = function(force=FALSE) {
 
 if (is.null(module_name())) {
     library(testthat)
-
+debug(gene)
     re = gene("10009", to="hgnc_symbol")
+message(re)
     expect_equal("ZBTB33", unname(re))
 }
