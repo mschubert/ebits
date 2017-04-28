@@ -6,6 +6,13 @@
 
 #' match() function with extended functionality
 #'
+#' The function maps the vector `x` with the possible values `from` to their
+#' corresponding values `to`.
+#'
+#' This either input or output of the matching table (`from`, `to`) are
+#' factors, they will be converted to characters in order to rule out matching
+#' numerical representation of factors.
+#'
 #' @param x            Vector of identifiers that should be mapped
 #' @param from         Vector of identifiers that can be mapped
 #' @param to           Matched mapping for all identifiers
@@ -26,6 +33,12 @@ match = function(x, from, to, filter_from=NULL, filter_to=NULL, data=parent.fram
     if (length(from) != length(to))
         stop("arguments `from` and `to` need to be of the same length")
 
+    # avoid matching its with different level names
+    if (is.factor(from))
+        from = as.character(from)
+    if (is.factor(to))
+        to = as.character(to)
+
     # filter matching table
     if (!is.null(filter_from))
         to[!from %in% filter_from] = NA
@@ -33,7 +46,7 @@ match = function(x, from, to, filter_from=NULL, filter_to=NULL, data=parent.fram
         to[!to %in% filter_to] = NA
 
     # remove identical mappings, then map ambivalent to NA
-    df = .omit$dups(data.frame(from=from, to=to))
+    df = .omit$dups(data.frame(from=from, to=to, stringsAsFactors=FALSE))
     df$to[duplicated(df$from, all=TRUE)] = NA
     df = .omit$dups(df)
     from = df$from
