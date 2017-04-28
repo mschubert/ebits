@@ -96,6 +96,12 @@ probeset_table = function(force=FALSE) {
 if (is.null(module_name())) {
     library(testthat)
 
+    cache = file.path("cache", "probeset_table.RData")
+    if (!file.exists(cache)) {
+        warning("no cache available: skipping probeset test")
+        quit(save="no", status=0)
+    }
+
     expect_equal(probeset('683_at', to="hgnc_symbol"),
                  setNames("OTC", "683_at"))
 
