@@ -13,7 +13,7 @@ assemble = function(...) {
 
     myclasses = sapply(l., class)
 
-    re = as.data.frame(.ar$stack(l., along=2))
+    re = as.data.frame(.ar$stack(l., along=2), stringsAsFactors=FALSE)
     for (i in seq_along(re)) {
         cc = myclasses[names(re)[i]]
         if (cc == "factor")
@@ -37,7 +37,6 @@ if (is.null(module_name())) {
 
     expect_equal(sum(is.na(df)), 11)
     expect_equal(rownames(df), c("A","C","E","B","D"))
-# fails on travis, why?
-#    expect_equal(classes, c(class(a), class(b), class(x), class(y)))
+    expect_equal(classes, sapply(list(a,b,x,y), class))
     expect_equal(unname(y), df$y[1])
 }
