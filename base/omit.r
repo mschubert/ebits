@@ -63,14 +63,14 @@ empty = function(x, drop=FALSE, omit=TRUE) {
 #' @param drop  Whether to drop unused dimensions after removing NAs
 #' @param omit  Whether or not to perform action
 dups = function(x, ..., drop=FALSE, omit=TRUE) {
-    ov = import_('./override')
+    dup = import_('./duplicated')$duplicated
 
     if (!omit)
         x
     else if (is.vector(x))
-        x[!ov$duplicated(x, ...), drop=drop]
+        x[!dup(x, ...), drop=drop]
     else if (is.matrix(x) || is.data.frame(x))
-        x[!ov$duplicated(x, ...),,drop=drop]
+        x[!dup(x, ...),,drop=drop]
     else
         stop("can only work on vector/matrix so far")
 }
