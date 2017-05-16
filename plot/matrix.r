@@ -8,7 +8,8 @@
 #' @param cols     Boolean flag indicating whether to cluster columns
 #' @param rows     Boolean flag indicating whether to cluster rows
 #' @param size     A size c(rows,cols) to limit the result clustering to
-cluster = function(df, formula, cols=TRUE, rows=TRUE, size=NULL) {
+#' @param fill     Fill array if data.frame does not have all values
+cluster = function(df, formula, cols=TRUE, rows=TRUE, size=NULL, fill=NA) {
     mat = .ar$construct(data=df, formula=formula, fun.aggregate=mean)
     indep_vars = all.vars(formula[[3]])
     rname = indep_vars[1] #FIXME: ar$construct should order by std. axis ordering
