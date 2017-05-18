@@ -9,7 +9,7 @@
 #' @return     Results of the function call
 lnapply = function(x, fun, fail_on_error=TRUE, ..., simplify=FALSE, USE.NAMES=TRUE) {
 #    fun = function(...) try(fun(...))
-    re = base::sapply(x, fun, simplify=simplify, USE.NAMES=USE.NAMES)
+    re = base::sapply(x, fun, ..., simplify=simplify, USE.NAMES=USE.NAMES)
 #    errors = sapply(re, function(x) clast(x) == "try-error")
 #
 #    error_msg = .idx$descriptive_index()
