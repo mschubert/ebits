@@ -26,25 +26,25 @@ test = function(mat, self=0) {
 #' @param x  A sample matrix with [obs x variables]
 #' @param y  A samples matrix with [obs x variables]
 #' @param return_cor  Return cor matrices of x and y (default: FALSE)
+#' @param pad  Pad cor(x/y) assuming zero correlation
 #' @return   A symmetric matrix of p-values [variables x variables]
-diff_test = function(x, y, return_cor=FALSE) {
-    #TODO: move this somewhere proper (array?)
-    rep_row = function(x,n){
-        matrix(rep(x,each=n),nrow=n)
+diff_test = function(x, y, return_cor=FALSE, pad=FALSE) {
+    if (pad) {
+        cboth = narray::stack(list(x=cor(x), y=cor(y)), along=3, fill=0)
+        corx = cboth[,,"x"]
+        cory = cboth[,,"y"]
+    } else {
+        narray::intersect(x, y, along=2)
+        corx = cor(x)
+        cory = cor(y)
     }
-    rep_col = function(x,n){
-        matrix(rep(x,each=n), ncol=n, byrow=TRUE)
-    }
-
-    corx = cor(x)
-    cory = cor(y)
-    delta_cor = cor(y) - cor(x)
+    delta_cor = cory - corx
 
     za = fisher_r2z(corx)
     zb = fisher_r2z(cory)
 
-    na = rep_col(apply(x, 2, function(x) sum(!is.na(x))), ncol(x))
-    nb = rep_row(apply(y, 2, function(x) sum(!is.na(x))), ncol(y))
+    na = narray::rrep(apply(x, 2, function(x) sum(!is.na(x))), ncol(x))
+    nb = narray::rrep(apply(y, 2, function(x) sum(!is.na(x))), ncol(y))
 
     se = sqrt((1/(na-3))+(1/(nb-3)))
     z = (za-zb)/se
