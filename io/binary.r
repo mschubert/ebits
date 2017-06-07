@@ -6,6 +6,7 @@
 #'
 #' Workaround until I implement this properly
 load_gctx = .l1k$read.gctx
+read_gct = .l1k$read.gct
 
 #' Load function that returns the object(s)
 #'
