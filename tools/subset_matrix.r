@@ -7,8 +7,9 @@ import_package('dplyr', attach=TRUE)
 #' @param A      The matrix to subset
 #' @param nrows  Number of rows to keep in the subset
 #' @param ncols  Number of columns to keep in subset
+#' @param return_indices  Return indices instead of subsetted matrix
 #' @return       A submatrix of mat which maximises its content
-subset_matrix = function(A, nrows, ncols, verbose=TRUE) {
+subset_matrix = function(A, nrows, ncols, return_indices=FALSE) {
     result = MIPModel() %>%
         add_variable(keep_el[i, j], i=1:nrow(A), j=1:ncol(A), type="binary") %>%
         add_variable(keep_row[i], i=1:nrow(A), type="binary") %>%
@@ -31,7 +32,10 @@ subset_matrix = function(A, nrows, ncols, verbose=TRUE) {
     rows = which(result$solution[sprintf("keep_row[%i]", 1:nrow(A))] == 1)
     cols = which(result$solution[sprintf("keep_col[%i]", 1:ncol(A))] == 1)
 
-    A[rows, cols]
+    if (return_indices)
+        list(rows, cols)
+    else
+        A[rows, cols]
 }
 
 if (is.null(module_name())) {
