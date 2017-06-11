@@ -10,7 +10,8 @@ import_package('dplyr', attach=TRUE)
 #' @param symmetric  Consider A symmetric
 #' @param return_indices  Return indices instead of subsetted matrix
 #' @return       A submatrix of mat which maximises its content
-subset_matrix = function(A, nrows, ncols, symmetric=FALSE, return_indices=FALSE) {
+subset_matrix = function(A, nrows, ncols=nrows, symmetric=FALSE,
+                         return_indices=FALSE) {
     model = MIPModel() %>%
         add_variable(keep_el[i, j], i=1:nrow(A), j=1:ncol(A), type="binary") %>%
         add_variable(keep_row[i], i=1:nrow(A), type="binary") %>%
