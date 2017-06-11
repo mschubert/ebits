@@ -7,7 +7,7 @@ import_package('dplyr', attach=TRUE)
 #' @param A      The matrix to subset
 #' @param nrows  Number of rows to keep in the subset
 #' @param ncols  Number of columns to keep in subset
-#' @param symmetric  Consider A symmetric
+#' @param symmetric  Consider A symmetric (and subset only same indices)
 #' @param return_indices  Return indices instead of subsetted matrix
 #' @return       A submatrix of mat which maximises its content
 subset_matrix = function(A, nrows, ncols=nrows, symmetric=FALSE,
@@ -43,7 +43,9 @@ subset_matrix = function(A, nrows, ncols=nrows, symmetric=FALSE,
     rows = which(result$solution[sprintf("keep_row[%i]", 1:nrow(A))] == 1)
     cols = which(result$solution[sprintf("keep_col[%i]", 1:ncol(A))] == 1)
 
-    if (return_indices)
+    if (return_indices && symmetric)
+        rows
+    else if (return_indices)
         list(rows, cols)
     else
         A[rows, cols]
