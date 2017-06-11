@@ -1,16 +1,17 @@
 import_package('ompr', attach=TRUE)
 import_package('dplyr', attach=TRUE)
-.solver = import_package('ROI.plugin.glpk')
+.solver = import_package('ROI.plugin.cplex')
 
 #' Subset a big matrix to maximise contained value with rows and columns
 #'
 #' @param A      The matrix to subset
 #' @param nrows  Number of rows to keep in the subset
 #' @param ncols  Number of columns to keep in subset
+#' @param symmetric  Consider A symmetric
 #' @param return_indices  Return indices instead of subsetted matrix
 #' @return       A submatrix of mat which maximises its content
-subset_matrix = function(A, nrows, ncols, return_indices=FALSE) {
-    result = MIPModel() %>%
+subset_matrix = function(A, nrows, ncols, symmetric=FALSE, return_indices=FALSE) {
+    model = MIPModel() %>%
         add_variable(keep_el[i, j], i=1:nrow(A), j=1:ncol(A), type="binary") %>%
         add_variable(keep_row[i], i=1:nrow(A), type="binary") %>%
         add_variable(keep_col[j], j=1:ncol(A), type="binary") %>%
@@ -21,10 +22,19 @@ subset_matrix = function(A, nrows, ncols, return_indices=FALSE) {
                        keep_col[j] * nrows, j=1:ncol(A)) %>%
 
         add_constraint(sum_expr(keep_row[i], i=1:nrow(A)) == nrows) %>%
-        add_constraint(sum_expr(keep_col[j], j=1:ncol(A)) == ncols) %>%
+        add_constraint(sum_expr(keep_col[j], j=1:ncol(A)) == ncols)
+
+    if (symmetric) {
+        if (nrow(A) != ncol(A))
+            stop("Matrix needs to be square if symmetric=TRUE")
+        model = model %>%
+            add_constraint(keep_row[i] == keep_col[i], i=1:nrow(A))
+    }
+
+    result = model %>%
         set_objective(sum_expr(keep_el[i, j] * A[i, j], 
                       i=1:nrow(A), j=1:ncol(A)), "max") %>%
-        solve_model(ompr.roi::with_ROI("glpk"))
+        solve_model(ompr.roi::with_ROI("cplex"))
 
     if (result$status != "optimal")
         warning("Solver status: ", result$status)
