@@ -12,8 +12,18 @@ subset_matrix = function(A, nrows, ncols=nrows, symmetric=FALSE,
     if (symmetric == FALSE)
         stop("not implemented")
 
-    clust = hclust(dist(A), method="complete")
-    idx = which(clust$order <= nrows)
+    iterative_remove = function(mat, n) {
+        if (nrow(mat) > n) {
+            idx = which.min(rowSums(mat))
+            iterative_remove(mat[-idx,-idx], n)
+        } else 
+            mat
+    }
+
+    shrink = A
+    rownames(shrink) = 1:nrow(shrink)
+    shrink = iterative_remove(shrink, nrows)
+    idx = as.integer(rownames(shrink))
 
     if (return_indices && symmetric)
         idx
@@ -25,7 +35,6 @@ subset_matrix = function(A, nrows, ncols=nrows, symmetric=FALSE,
 }
 
 if (is.null(module_name())) {
-    # this needs hours of CPU and > 40 GB memory
     dims = 100
     A = matrix(rnorm(dims^2), ncol=dims, nrow=dims)
     subs = 10
