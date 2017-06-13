@@ -13,24 +13,26 @@ subset_matrix = function(A, nrows, ncols=nrows, symmetric=FALSE,
         stop("not implemented")
 
     iterative_remove = function(mat, n) {
-        if (nrow(mat) > n) {
-            idx = which.min(rowSums(mat))
-            iterative_remove(mat[-idx,-idx], n)
+        if (nrow(mat) > n && ncol(mat) > n) {
+            ri = which.min(rowSums(mat))
+            ci = which.min(colSums(mat))
+            iterative_remove(mat[-ri,-ci], n)
         } else 
             mat
     }
 
     shrink = A
     rownames(shrink) = 1:nrow(shrink)
+    colnames(shrink) = 1:ncol(shrink)
     shrink = iterative_remove(shrink, nrows)
-    idx = as.integer(rownames(shrink))
 
-    if (return_indices && symmetric)
-        idx
-    else if (return_indices)
-        list(idx, idx)
+    ri = as.integer(rownames(shrink))
+    ci = as.integer(colnames(shrink))
+
+    if (return_indices)
+        list(ri, ci)
     else
-        A[idx, idx]
+        A[ri, ci]
 
 }
 
