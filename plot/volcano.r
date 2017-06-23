@@ -15,12 +15,13 @@ color = import_('./color')
 #' @param base.size  Scaling factor for the points drawn
 #' @param p          Line between significant and insignificant associations
 #' @param ceil       Minimum p-value to set top associations to; default: 0, no filter
+#' @param check_overlap  Don't print overlapping labels in geom_text()
 #' @param xlim       Limits along the horizontal axis; default: fit data
 #' @param ylim       Limits along the vertical axis; default: fit data
 #' @param simplify   Drop some insignificant points and labels to reduce file size
 #' @param repel      Whether to use repel package for labels
 #' @return           A ggplot2 object of the volcano plot
-volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
+volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=FALSE,
         text.size=3.5, xlim=c(NA,NA), ylim=c(NA,NA), simplify=TRUE, repel=FALSE) {
     if (!'label' %in% colnames(df))
         stop("Column 'label' not found. You need to specify a label for your points")
@@ -81,7 +82,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil = 0,
                 colour = "#353535", size = text.size, na.rm = TRUE)
     else
         p + geom_text(mapping = aes(x = .x, y = .y, label = label),
-                colour = "#353535", size = 2, vjust = -1, na.rm = TRUE)
+                colour = "#353535", size = 2, vjust = -1, na.rm = TRUE, check_overlap=check_overlap)
 }
 
 if (is.null(module_name())) {
