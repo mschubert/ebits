@@ -80,7 +80,7 @@ match = function(x, from, to, filter_from=NULL, filter_to=NULL, data=parent.fram
     from = from[re]
     to = to[re]
 
-    if (warn) {
+    if (warn && any(x != from)) {
         warning("Non-exact matches detected")
         print(na.omit(data.frame(x=x, from=from)[x!=from,]))
     }
