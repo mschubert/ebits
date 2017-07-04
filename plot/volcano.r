@@ -82,7 +82,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
                 colour = "#353535", size = text.size, na.rm = TRUE)
     else
         p + geom_text(mapping = aes(x = .x, y = .y, label = label),
-                colour = "#353535", size = 2, vjust = -1, na.rm = TRUE, check_overlap=check_overlap)
+                colour = "#353535", size = text.size, vjust = -1, na.rm = TRUE, check_overlap=check_overlap)
 }
 
 if (is.null(module_name())) {
