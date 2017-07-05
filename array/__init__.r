@@ -2,4 +2,4 @@
 for (n in ls(.pkg))
     assign(n, .pkg[[n]])
 
-warning("'array' module is deprecated. Use 'narray' package instead.")
+#warning("'array' module is deprecated. Use 'narray' package instead.")
