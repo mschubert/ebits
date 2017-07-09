@@ -12,8 +12,9 @@ read_gct = .l1k$read.gct
 #'
 #' @param filename  Name or path of file
 #' @param ...       Additional arguments to the loading function
+#' @param drop      If one element, return it instead of list
 #' @return          Contents of the file
-load = function(filename, ...) {
+load = function(filename, ..., drop=TRUE) {
     get_contents = function(fpath) {
         env = new.env()
         fid = strsplit(basename(fpath), "\\$")[[1]]
@@ -27,8 +28,8 @@ load = function(filename, ...) {
         else
             contents
     }   
-    if (length(filename) > 1)
-        lapply(filename, get_contents)
+    if (length(filename) > 1 || !drop)
+        setNames(lapply(filename, get_contents), sub("\\.RData", "", filename))
     else
         get_contents(filename)
 }
