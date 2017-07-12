@@ -6,39 +6,60 @@
 #' @param symmetric  Consider A symmetric (and subset only same indices)
 #' @param return_indices  Return indices instead of subsetted matrix
 #' @return       A submatrix of mat which maximises its content
-subset_matrix = function(A, nrows, ncols=nrows, symmetric=FALSE,
+subset_matrix = function(A, nrows=2, ncols=nrows, symmetric=FALSE,
                          return_indices=FALSE) {
 
     if (symmetric == FALSE)
         stop("not implemented")
+    else
+        stopifnot(A == t(A))
 
-    iterative_remove = function(mat, n) {
-        if (nrow(mat) > n && ncol(mat) > n) {
+    idx = list()
+    iterative_remove = function(mat) {
+        if (nrow(mat) > 1 && ncol(mat) > 1) {
             ri = which.min(rowSums(mat))
             ci = which.min(colSums(mat))
-            iterative_remove(mat[-ri,-ci], n)
-        } else 
-            mat
+
+            nri = rownames(mat)[ri]
+            nci = colnames(mat)[ci]
+#            print(c(nri,nci))
+
+            assign("idx", c(idx, list(as.integer(c(nri,nci)))),
+                   envir=parent.env(environment()))
+
+            iterative_remove(mat[-ri,-ci,drop=FALSE])
+        }
     }
 
     shrink = A
     rownames(shrink) = 1:nrow(shrink)
     colnames(shrink) = 1:ncol(shrink)
-    shrink = iterative_remove(shrink, nrows)
+    iterative_remove(shrink)
 
-    ri = as.integer(rownames(shrink))
-    ci = as.integer(colnames(shrink))
+    idx = rev(idx)
+    rows = sapply(idx, function(x) x[1])
+    cols = sapply(idx, function(x) x[2])
 
-    if (return_indices)
-        list(ri, ci)
+    if (return_indices && symmetric)
+        rows
+    else if (return_indices && symmetric)
+        idx
     else
-        A[ri, ci]
-
+        A[head(rows,nrows), head(cols,ncols)]
 }
 
 if (is.null(module_name())) {
-    dims = 100
+    library(testthat)
+
+    dims = 25
     A = matrix(rnorm(dims^2), ncol=dims, nrow=dims)
-    subs = 10
-    idx = subset_matrix(abs(A), subs, symmetric=TRUE, return_indices=TRUE)
+    A = abs(A + t(A))
+    rownames(A) = colnames(A) = sample(letters, nrow(A), replace=TRUE)
+
+    n_subs = 2
+
+    subA = subset_matrix(A, n_subs, symmetric=TRUE, return_indices=FALSE)
+    idx = subset_matrix(A, symmetric=TRUE, return_indices=TRUE)
+
+    expect_equal(sort(rownames(subA)), sort(rownames(A)[head(idx, n_subs)]))
 }
