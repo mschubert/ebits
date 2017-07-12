@@ -23,14 +23,15 @@ load = function(filename, ..., drop=TRUE) {
  
         base::load(file.path(dirname(fpath), fname), env)
         contents = as.list(env)
-        if (length(contents)==1)
+        if (length(contents)==1 && drop)
             contents[[1]] 
         else
             contents
     }   
-    if (length(filename) > 1 || !drop)
-        setNames(lapply(filename, get_contents), sub("\\.RData", "", filename))
-    else
+    if (length(filename) > 1) {
+        nn = sub("\\.RData", "", basename(filename))
+        setNames(lapply(filename, get_contents), nn)
+    } else
         get_contents(filename)
 }
 
