@@ -53,6 +53,7 @@ wrap_formula_indexing = function(FUN) {
         stop("function needs 'data' argument in order to be wrapped")
     add_formals = list(group=NULL, subsets=NULL, atomic=NULL, rep=FALSE, hpc_args=NULL, result_only=FALSE)
     formals(new_FUN) = c(FUN_formals, add_formals)
+    pryr::unenclose(new_FUN)
     new_FUN
 }
 
