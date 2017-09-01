@@ -1,5 +1,6 @@
 .b = import('../base')
 .dp = import_package_('dplyr')
+.func = import('../base/functional')
 
 #' Call a function passing each row as arguments
 #'
@@ -22,6 +23,12 @@ call = function(index, fun, const=list(), result_only=FALSE, rep=FALSE, hpc_args
             index$. = NULL
         }
     }
+
+    # evaluate all references, clean function env
+    call_args = as.list(.func$match_call_defaults())[-1]
+    for (i in seq_along(call_args))
+        assign(names(call_args)[i], eval(call_args[[i]], envir=parent.frame()))
+    rm(list=ls(environment(fun), keep), envir=environment(fun))
 
     # perform function calls either sequentially or with hpc module
     #TODO: replace local call by dplyr::do(rowwise(df))

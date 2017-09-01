@@ -6,6 +6,7 @@ wrap_formula_indexing = function(FUN) {
     new_FUN = function() {
         #' @param ...   Arguments as defined in the data.frame row
         one_item = function(data, subsets=NULL, ...) {
+            idx = import_('../base/indexing')
             args = list(...)
 
             # subset all iterated data that is not masked by 'atomic' flags
@@ -27,25 +28,14 @@ wrap_formula_indexing = function(FUN) {
         }
 
         func = import_('../base/functional')
-        idx = import_('../base/indexing')
         df = import_('../data_frame')
         ci = import('../data_frame/create_formula_index')
 
-#FIXME: commented line below does not work
-        fca = function(ca) {
-            if (class(ca) %in% c("name", "call"))
-                eval(ca, envir=ca_env)
-            else
-                ca
-        }
-        ca_env = parent.frame()
+        # replace with: call_args = as.list(func$eval_call())[-1] ?
         call_args = as.list(func$match_call_defaults())[-1]
-        call_args = lapply(call_args, fca)
-
-#        call_args = as.list(func$eval_call())[-1]
         call_args = call_args[!names(call_args) %in% c("rep","hpc_args")]
-
         content = do.call(ci$create_formula_index, call_args)
+
         df$call(index=content$index, fun=one_item, const=content$const,
                 rep=rep, result_only=result_only, hpc_args=hpc_args)
     }
