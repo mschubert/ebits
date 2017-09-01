@@ -1,6 +1,5 @@
 .b = import('../base')
 .dp = import_package_('dplyr')
-.ci = import_('./create_index')
 
 #' Call a function passing each row as arguments
 #'
@@ -11,16 +10,12 @@
 #' @param rep          How many times to repeat the calls (useful for sampling funcs)
 #' @param hpc_args     If not NULL, arguments to be passed to `hpc$Q`
 #' @return             A data frame with the function call results
-call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
-    if (!inherits(df, "IndexedCall"))
-        df = do.call(.ci$create_index, df)
-
+call = function(index, fun, const=list(), result_only=FALSE, rep=FALSE, hpc_args=NULL) {
     if (identical(rep, FALSE) || is.null(rep)) {
-        index = df$index
         add_rep = NULL
     } else {
-        index = do.call(rbind, replicate(rep, df$index, simplify=FALSE))
-        add_rep = c(sapply(1:rep, function(i) rep(i, nrow(df$index))))
+        index = do.call(rbind, replicate(rep, index, simplify=FALSE))
+        add_rep = c(sapply(1:rep, function(i) rep(i, nrow(index))))
 
         if (nrow(index) == 0) { # because rbind((1,0)*x) = (0,0), not (x,0)
             index = data.frame(.=add_rep)
@@ -28,22 +23,15 @@ call = function(df, fun, ..., result_only=FALSE, rep=FALSE, hpc_args=NULL) {
         }
     }
 
-    # add (...) to df$args
-    const_args = c(list(...), df$args)
-
-    # pass 'subsets' as argument if they are specified
-    if ("subsets" %in% ls(df))
-        const_args = c(const_args, subsets=list(df$subsets))
-
     # perform function calls either sequentially or with hpc module
     #TODO: replace local call by dplyr::do(rowwise(df))
     if (is.null(hpc_args))
         result = lapply(seq_len(nrow(index)), function(i) {
-            do.call(fun, c(as.list(index[i,,drop=FALSE]), const_args))
+            do.call(fun, c(as.list(index[i,,drop=FALSE]), const))
         })
     else
-        result = do.call(clustermq::Q, c(list(fun=fun), index,
-            hpc_args, const=list(const_args)))
+        result = do.call(clustermq::Q,
+             c(list(fun=fun, const=const), index, hpc_args))
 
     # don't use tidyr::unnest() here, too slow
     if (!result_only) {
@@ -80,7 +68,7 @@ if (is.null(module_name())) {
     r1 = b$expand_grid(x=x,y=y) %>% call(f1)
 
     f2 = function(x,y,z) x+y+z
-    r2 = b$expand_grid(x=x,y=y) %>% call(f2, z=z)
+    r2 = b$expand_grid(x=x,y=y) %>% call(f2, const=list(z=z))
 
     expect_equal(r1[c('x','y')], r2[c('x','y')])
     expect_equal(r1$result, rowSums(expand.grid(x,y)))

@@ -68,9 +68,8 @@
 #' @param hpc_args   Optional arguments to pass to hpc module
 #' @return           A data frame with sample names, cluster membership, and score
 nmf = function(A, k, max_iter=1000, seed=1234, nsame=200, rep=10, hpc_args=NULL) {
-    idf = .df$create_index(k = k, args=list(num_clusterings=rep, A=A,
-                  max_iter=max_iter, seed=seed, nsame=nsame))
-    .df$call(idf, fun=.nmf, hpc_args=hpc_args)
+    const = list(num_clusterings=rep, A=A, max_iter=max_iter, seed=seed, nsame=nsame)
+    .df$call(data.frame(k=k), fun=.nmf, const=const, hpc_args=hpc_args)
 }
 
 if (is.null(module_name())) {

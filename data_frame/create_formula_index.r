@@ -12,7 +12,6 @@
 
 # start with st$.assocs_subset here, leave the row-wise calls to df$call
 .b = import_('../base', attach_operators=FALSE)
-.ic = import_('./IndexedCall')
 .gfd = import_('./get_formula_data')
 
 #' Gathers all data required for a formula and creates a subsetting index
@@ -29,6 +28,7 @@ create_formula_index = function(formula, data=parent.frame(), group=NULL,
     pp = .gfd$get_formula_data(form=formula, data=data)
     data = pp$data
     formula = pp$form
+    environment(formula) = .GlobalEnv
     formula_vars = setdiff(all.vars(formula), atomic)
 
     check = function(fun) sapply(data[formula_vars], fun)
@@ -63,11 +63,13 @@ create_formula_index = function(formula, data=parent.frame(), group=NULL,
     }
 
     # add data as attribute
-    .ic$IndexedFormula$new(
-        index = index,
-        args = c(list(data=data, formula=formula), list(...)),
-        subsets = subsets
-    )
+#    .ic$IndexedFormula$new(
+#        index = index,
+#        args = c(list(data=data, formula=formula), list(...)),
+#        subsets = subsets
+#    )
+    list(index = index,
+         const = c(list(data=data, formula=formula, subsets=subsets), list(...)))
 }
 
 if (is.null(module_name())) {
@@ -100,7 +102,7 @@ if (is.null(module_name())) {
     # 4 y z      o y
 
     expect_equal(x1$args$data, x2$args$data)
-    expect_true(x1$args$something)
+#    expect_true(x1$args$something)
     expect_equal(x2$args$data, x3$args$data)
 
     expect_equal(x1$index,

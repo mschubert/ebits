@@ -1,6 +1,4 @@
 export_submodule('./subsetting')
-export_submodule('./create_index')
-export_submodule('./create_formula_index')
 export_submodule('./call')
 export_submodule('./add_name_col')
 export_submodule('./assemble')
