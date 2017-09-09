@@ -42,7 +42,7 @@ subset = function(x, index, along=NULL, atomic=NULL, drop=FALSE) {
         else
             x[index]
     } else if (is.array(x) || is.data.frame(x) && !'matrix' %in% atomic)
-        import_('../array')$subset(x, index, along, drop)
+        narray::subset(x, index, along, drop)
     else
         stop("Not sure how to subset that object")
 }
