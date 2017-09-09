@@ -11,17 +11,16 @@ cache:
  - directories:
     - process/idmap/cache
 
-r_packages:
- - devtools
- - rmarkdown
-
-r_binary_packages:
- - devtools
- - rmarkdown
+# does not work
+#r_packages:
+#r_binary_packages:
+# - devtools
+# - rmarkdown
 
 r_github_packages: klmr/modules
 
 install:
+ - R -e "install.packages(c('devtools','rmarkdown'))"
  - make deps
  - git clone https://github.com/klmr/modules.git
  - cd modules
