@@ -29,9 +29,14 @@ call = function(index, fun, const=list(), result_only=FALSE, rep=FALSE, hpc_args
         result = lapply(seq_len(nrow(index)), function(i) {
             do.call(fun, c(as.list(index[i,,drop=FALSE]), const))
         })
-    else
+    else {
+        keep = mget("idx", envir=environment(fun))
+        environment(fun) = new.env(parent=.GlobalEnv)
+        list2env(keep, envir=environment(fun))
+
         result = do.call(clustermq::Q,
              c(list(fun=fun, const=const), index, hpc_args))
+    }
 
     # don't use tidyr::unnest() here, too slow
     if (!result_only) {

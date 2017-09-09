@@ -5,19 +5,21 @@
 wrap_formula_indexing = function(FUN) {
     new_FUN = function() {
         #' @param ...   Arguments as defined in the data.frame row
-        one_item = function(data, subsets=NULL, ...) {
-            idx = import_('../base/indexing')
+        one_item = function(..., data, subsets=NULL) {
             args = list(...)
 
             # subset all iterated data that is not masked by 'atomic' flags
             is_iterated = intersect(names(data), names(args))
             for (name in is_iterated)
-                data[[name]] = idx$subset(data[[name]], args[[name]], atomic=atomic_class, drop=TRUE)
+                data[[name]] = idx$subset(data[[name]], args[[name]],
+                                          atomic=atomic_class, drop=TRUE)
 
-            # subset data according to subsets (irrespective of atomic specifications)
+            # subset data according to subsets (irrespective of atomics)
             if (!is.null(subsets)) {
                 for (name in names(data))
-                    data[[name]] = idx$subset(data[[name]], subsets==args$subset, along=1)
+                    data[[name]] = idx$subset(data[[name]],
+                                              subsets==args$subset,
+                                              along=1)
             }
 
             # calculate the model
@@ -27,8 +29,9 @@ wrap_formula_indexing = function(FUN) {
             do.call(FUN, call_args)
         }
 
-        func = import_('../base/functional')
         df = import_('../data_frame')
+        idx = import_('../base/indexing')
+        func = import_('../base/functional')
         ci = import('../data_frame/create_formula_index')
 
         # replace with: call_args = as.list(func$eval_call())[-1] ?
@@ -43,9 +46,9 @@ wrap_formula_indexing = function(FUN) {
     FUN_formals = formals(FUN)
     if (!"data" %in% names(FUN_formals))
         stop("function needs 'data' argument in order to be wrapped")
-    add_formals = list(group=NULL, subsets=NULL, atomic=NULL, rep=FALSE, hpc_args=NULL, result_only=FALSE)
+    add_formals = list(group=NULL, subsets=NULL, atomic=NULL,
+                       rep=FALSE, hpc_args=NULL, result_only=FALSE)
     formals(new_FUN) = c(FUN_formals, add_formals)
-    formals(FUN)$data = methods::Quote(data)
     assign("FUN", FUN, envir=environment(new_FUN))
     pryr::unenclose(new_FUN)
 }
