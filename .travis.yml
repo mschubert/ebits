@@ -15,6 +15,10 @@ r_packages:
  - devtools
  - rmarkdown
 
+r_binary_packages:
+ - devtools
+ - rmarkdown
+
 r_github_packages: klmr/modules
 
 install:
