@@ -24,14 +24,7 @@ call = function(index, fun, const=list(), result_only=FALSE, rep=FALSE, hpc_args
         }
     }
 
-    # evaluate all references, clean function env
-    call_args = as.list(.func$match_call_defaults())[-1]
-    for (i in seq_along(call_args))
-        assign(names(call_args)[i], eval(call_args[[i]], envir=parent.frame()))
-    rm(list=ls(environment(fun), keep), envir=environment(fun))
-
     # perform function calls either sequentially or with hpc module
-    #TODO: replace local call by dplyr::do(rowwise(df))
     if (is.null(hpc_args))
         result = lapply(seq_len(nrow(index)), function(i) {
             do.call(fun, c(as.list(index[i,,drop=FALSE]), const))
@@ -63,19 +56,18 @@ call = function(index, fun, const=list(), result_only=FALSE, rep=FALSE, hpc_args
     result
 }
 
-if (is.null(module_name())) {
+if (!is.null(module_name())) {
     library(testthat)
-    b = import('../base')
 
     x = 1:2
     y = 3:4
     z = 10
 
     f1 = function(x,y) x+y
-    r1 = b$expand_grid(x=x,y=y) %>% call(f1)
+    r1 = call(expand.grid(x=x,y=y), f1)
 
     f2 = function(x,y,z) x+y+z
-    r2 = b$expand_grid(x=x,y=y) %>% call(f2, const=list(z=z))
+    r2 = call(expand.grid(x=x,y=y), f2, const=list(z=10))
 
     expect_equal(r1[c('x','y')], r2[c('x','y')])
     expect_equal(r1$result, rowSums(expand.grid(x,y)))
