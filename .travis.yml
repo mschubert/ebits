@@ -15,8 +15,13 @@ r_github_packages: klmr/modules
 
 install:
  - make deps
- - R -e "install.packages('devtools')" \
-     -e "devtools::install_github('klmr/modules',ref='mschubert-patch-1')"
+ - git clone https://github.com/klmr/modules.git
+ - cd modules
+ - make deploy
+ - cd ..
+ - R CMD INSTALL modules
+ - R -e "install.packages('devtools')" #\
+#     -e "devtools::install_github('klmr/modules')"
  - make -C stats nmf_mu.so
 
 script: make test
