@@ -11,6 +11,10 @@ cache:
  - directories:
     - process/idmap/cache
 
+r_packages:
+ - devtools
+ - rmarkdown
+
 r_github_packages: klmr/modules
 
 install:
@@ -21,7 +25,7 @@ install:
  - make deploy
  - cd ..
  - R CMD INSTALL modules
- - R -e "install.packages('devtools')" #\
+# - R -e "install.packages('devtools')" \
 #     -e "devtools::install_github('klmr/modules')"
  - make -C stats nmf_mu.so
 
