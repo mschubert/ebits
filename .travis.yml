@@ -17,6 +17,7 @@ install:
  - make deps
  - git clone https://github.com/klmr/modules.git
  - cd modules
+ - git checkout -b master
  - make deploy
  - cd ..
  - R CMD INSTALL modules
