@@ -24,8 +24,8 @@ install:
  - make deps
  - git clone https://github.com/klmr/modules.git
  - cd modules
- - git checkout -b master
- - make deploy
+ - git checkout mschubert-patch-1
+ - make
  - cd ..
  - R CMD INSTALL --no-build-vignettes modules
 # - R -e "install.packages('devtools')" \
