@@ -27,7 +27,7 @@ install:
  - cd modules
  - git checkout mschubert-patch-1
  - make doc
- - R CMD INSTALL --no-build-vignettes modules
+ - R CMD INSTALL modules
  - cd ../ebits
 # - R -e "install.packages('devtools')" \
 #     -e "devtools::install_github('klmr/modules')"
