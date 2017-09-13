@@ -30,9 +30,10 @@ call = function(index, fun, const=list(), result_only=FALSE, rep=FALSE, hpc_args
             do.call(fun, c(as.list(index[i,,drop=FALSE]), const))
         })
     else {
+        if ("idx" %in% names(hpc_args$export))
+            stop("'idx' is not allowed in export when using df$call")
         keep = mget("idx", envir=environment(fun))
-        environment(fun) = new.env(parent=.GlobalEnv)
-        list2env(keep, envir=environment(fun))
+        hpc_args$export = utils::modifyList(as.list(hpc_args$export), keep)
 
         result = do.call(clustermq::Q,
              c(list(fun=fun, const=const), index, hpc_args))
