@@ -22,15 +22,8 @@ r_github_packages: klmr/modules
 install:
  - R -e "install.packages(c('devtools','rmarkdown'))"
  - make deps
- - cd ..
- - git clone https://github.com/klmr/modules.git
- - cd modules
- - git checkout mschubert-patch-1
- - make doc
- - R CMD INSTALL .
- - cd ../ebits
 # - R -e "install.packages('devtools')" \
-#     -e "devtools::install_github('klmr/modules')"
+#     -e "devtools::install_github('klmr/modules',ref='master')"
  - make -C stats nmf_mu.so
 
 script: make test
