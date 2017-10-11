@@ -13,12 +13,12 @@ run = function(genes, db) {
     if (!req$status == 200)
         stop("HTTP query error for POST on gene list")
 
-    req = httr::GET(url("enrich?backgroundType=", database))
+    req = httr::GET(url("enrich?backgroundType=", db))
     if (!req$status == 200)
         stop("HTTP query error for retrieving enrichment results")
 
     req = httr::GET(url=url("export"),
-                    query=list(file="API", backgroundType=database))
+                    query=list(file="API", backgroundType=db))
 
     if (!req$status == 200)
         stop("HTTP query error for retrieving enrichment table")
