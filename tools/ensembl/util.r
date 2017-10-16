@@ -1,10 +1,12 @@
+#' Ensembl REST server address
+server = "http://rest.ensembl.org"
+
 #' Send HTTP GET request
 #'
 #' @param uri  URI of the endpoint, or parts thereof as character vector
 #' @param ...  Key-value pairs that will be encoded appropriately
 #' @return     Named list of values
 get = function(uri=c(), ...) {
-    server = "http://rest.ensembl.org"
     ext = paste(uri, collapse="/")
     url = paste(server, ext, sep="/")
 
@@ -23,7 +25,6 @@ get = function(uri=c(), ...) {
 #' @param ...  Key-value pairs that will be encoded appropriately
 #' @return     Named list of values
 post = function(uri=c(), ...) {
-    server = "http://rest.ensembl.org"
     ext = paste(uri, collapse="/")
     url = paste(server, ext, sep="/")
 
