@@ -16,3 +16,9 @@ outer = import_('./outer')$outer
 
 omit = import_('./omit')
 list = import_('./list')
+
+library(dplyr) # in global env
+#`%>%` = magrittr::`%>%`
+`%$%` = magrittr::`%$%`
+
+

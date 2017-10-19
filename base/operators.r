@@ -1,9 +1,5 @@
 # some operators for R
 
-`%>%` = magrittr::`%>%`
-
-`%$%` = magrittr::`%$%`
-
 #' If `lhs` is `FALSE`, `NULL`, `NA`, etc. return `rhs`
 `%or%` = function(a, b) {
     cmp = function(a,b) if (identical(a, FALSE) || 
