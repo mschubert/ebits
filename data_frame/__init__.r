@@ -1,5 +1,5 @@
 export_submodule('./subsetting')
 export_submodule('./call')
-export_submodule('./add_name_col')
+export_submodule('./bind_rows')
 export_submodule('./assemble')
 export_submodule('./sample_rows')
