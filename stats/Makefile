@@ -2,7 +2,7 @@ include ../Makefile
 
 # Makefile for nmf_mu
 CCFLAGS = -Wall -Wextra -g -fPIC
-LIBS = -llapack -larpack
+LIBS = $(shell pkg-config --libs lapack arpack)
 
 SOURCE = $(wildcard *.c)
 OBJ = $(SOURCE:%.c=%.o)
