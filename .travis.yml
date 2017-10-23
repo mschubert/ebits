@@ -11,19 +11,10 @@ cache:
  - directories:
     - process/idmap/cache
 
-# does not work
-#r_packages:
-#r_binary_packages:
-# - devtools
-# - rmarkdown
-
 r_github_packages: klmr/modules
 
 install:
- - R -e "install.packages(c('devtools','rmarkdown'))"
  - make deps
-# - R -e "install.packages('devtools')" \
-#     -e "devtools::install_github('klmr/modules',ref='master')"
  - make -C stats nmf_mu.so
 
 script: make test
