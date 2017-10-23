@@ -40,7 +40,7 @@ zero = function(x, drop=FALSE, omit=TRUE) {
 
 #' Remove empty entries in character objects
 #'
-#' @param x      A vector, matrix, or data.frame
+#' @param x     A vector, matrix, or data.frame
 #' @param drop  Whether to drop unused dimensions after removing NAs
 #' @param omit  Whether or not to perform action
 empty = function(x, drop=FALSE, omit=TRUE) {
@@ -48,7 +48,7 @@ empty = function(x, drop=FALSE, omit=TRUE) {
         x
     else if (is.matrix(x) || is.data.frame(x))
         x[apply(x, 1, function(r) all(nchar(r)>0)),,drop=drop]
-    else if (is.vector(x))
+    else if (is.character(x) || is.character(x[[1]]))
         x[sapply(x, nchar) != 0, drop=drop]
     else if (is.list(x))
         x[sapply(x, length) != 0, drop=drop]
