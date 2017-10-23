@@ -1,5 +1,5 @@
-.b = import_('../base')
-.ar = import_('../array')
+.b = import('../base')
+.ar = import('../array')
 
 #' Cluster the rows and columns, order factor levels to respect that
 #'

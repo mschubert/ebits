@@ -12,10 +12,10 @@ export_submodule('./refactor')
 export_submodule('./relevel')
 export_submodule('./lnapply')
 
-outer = import_('./outer')$outer
+outer = import('./outer')$outer
 
-omit = import_('./omit')
-list = import_('./list')
+omit = import('./omit')
+list = import('./list')
 
 library(dplyr) # in global env
 #`%>%` = magrittr::`%>%`

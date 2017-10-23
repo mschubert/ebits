@@ -1,6 +1,6 @@
-.b = import_('../base')
-.st = import_('../stats')
-#.spf = import_('../stats/process_formula')
+.b = import('../base')
+.st = import('../stats')
+#.spf = import('../stats/process_formula')
 
 #' Plots a given data.frame as a linear fit with optional subsets
 #'

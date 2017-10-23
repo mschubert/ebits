@@ -1,4 +1,4 @@
-fun = import_('./functional')
+fun = import('./functional')
 
 #' Define a single-argument function
 #'

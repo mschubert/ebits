@@ -1,4 +1,4 @@
-.b = import_('../base')
+.b = import('../base')
 
 overlap_normals = function(mu1, sd1, mu2, sd2) {
     min.f1f2 = function(x, mu1, mu2, sd1, sd2) {

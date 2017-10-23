@@ -1,7 +1,7 @@
 library(dplyr)
-.b = import_('../../base')
-.io = import_('../../io')
-.ar = import_('../../array')
+.b = import('../../base')
+.io = import('../../io')
+.ar = import('../../array')
 .guess_id_type = import('./guess_id_type')$guess_id_type
 
 #' probeset ID mapping function

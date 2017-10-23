@@ -11,4 +11,4 @@ export_submodule('./venn') # bad style
 export_submodule('./color')
 export_submodule('./symmetrise_scale')
 
-brew = import_('./brew')
+brew = import('./brew')

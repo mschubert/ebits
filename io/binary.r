@@ -1,5 +1,5 @@
 # I/O helper functions on R binary files
-.b = import_('../base')
+.b = import('../base')
 .l1k = import('./l1ktools_io')
 
 #' Loads .gctx files

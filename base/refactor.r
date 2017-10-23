@@ -1,4 +1,4 @@
-import_('./operators')
+import('./operators')
 
 #' Creates a factor where levels are ordered by an external value
 #' 

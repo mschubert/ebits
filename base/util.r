@@ -1,4 +1,4 @@
-import_('./operators')
+import('./operators')
 
 grep = function(pattern, x, ...) {
     # http://stackoverflow.com/questions/2969315

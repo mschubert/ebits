@@ -1,7 +1,7 @@
 library(ggrepel)
-.b = import_('../base')
-import_('./helpers', attach=TRUE)
-color = import_('./color')
+.b = import('../base')
+import('./helpers', attach=TRUE)
+color = import('./color')
 
 #' Draw a volcano plot from calculated associations
 #'
@@ -88,7 +88,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
 if (is.null(module_name())) {
     library(testthat)
 
-    color = import_('./color')
+    color = import('./color')
     df = data.frame(estimate = -12:12/12)
     df$adj.p = 10^(-10*abs(df$estimate))
     df$label = LETTERS[1:25]

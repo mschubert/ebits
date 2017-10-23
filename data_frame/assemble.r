@@ -1,5 +1,5 @@
-import_('../base/operators')
-.ar = import_('../array')
+import('../base/operators')
+.ar = import('../array')
 
 #' Creates a data.frame from named vectors
 #'

@@ -1,4 +1,4 @@
-.ar = import_('../array')
+.ar = import('../array')
 
 merge = function(method, X, batch, covariate=NULL) {
     if (method == "combat")

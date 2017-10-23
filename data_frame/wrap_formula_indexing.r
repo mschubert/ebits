@@ -29,9 +29,9 @@ wrap_formula_indexing = function(FUN) {
             do.call(FUN, call_args)
         }
 
-        df = import_('../data_frame')
-        idx = import_('../base/indexing')
-        func = import_('../base/functional')
+        df = import('../data_frame')
+        idx = import('../base/indexing')
+        func = import('../base/functional')
         ci = import('../data_frame/create_formula_index')
 
         # replace with: call_args = as.list(func$eval_call())[-1] ?

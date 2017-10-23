@@ -1,4 +1,4 @@
-import_('../base/operators')
+import('../base/operators')
 
 # http://stackoverflow.com/questions/8139677
 flatten = function(x, vectors=FALSE) {

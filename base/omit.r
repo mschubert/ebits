@@ -63,7 +63,7 @@ empty = function(x, drop=FALSE, omit=TRUE) {
 #' @param drop  Whether to drop unused dimensions after removing NAs
 #' @param omit  Whether or not to perform action
 dups = function(x, ..., drop=FALSE, omit=TRUE) {
-    dup = import_('./duplicated')$duplicated
+    dup = import('./duplicated')$duplicated
 
     if (!omit)
         x
