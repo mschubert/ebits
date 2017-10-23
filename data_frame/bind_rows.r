@@ -8,7 +8,10 @@
 #' @return          A tibble with an added name per list element
 bind_rows = function(x, name_col=NULL, drop=TRUE) {
     if (!is.data.frame(x[[1]]))
-        x = lapply(x, as.data.frame)
+        x = lapply(x, as.data.frame, stringsAsFactors=FALSE, check.names=FALSE)
+
+    if (is.null(names(x)))
+        names(x) = seq_along(x)
 
     if (drop)
         x = .omit$empty(x)
@@ -18,7 +21,8 @@ bind_rows = function(x, name_col=NULL, drop=TRUE) {
         if (!is.null(name_col))
             xi[[name_col]] = nxi
         xi$`  keep  ` = TRUE
-        xi
+        args = list(xi, stringsAsFactors=FALSE, check.names=FALSE)
+        dplyr::tbl_df(do.call(data.frame, args))
     }, x, names(x), SIMPLIFY=FALSE, USE.NAMES=TRUE)
 
     # calling directly had a bug in some cases
