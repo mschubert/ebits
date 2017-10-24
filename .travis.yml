@@ -11,8 +11,6 @@ cache:
  - directories:
     - process/idmap/cache
 
-r_github_packages: klmr/modules
-
 install:
  - make deps
  - make -C stats nmf_mu.so
