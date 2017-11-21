@@ -3,6 +3,7 @@ export_submodule('./util')
 export_submodule('./roc')
 batch = import('./batch')
 cor = import('./correlation')
+discretize = import('./discretize')
 fishers_exact_test = import('./fishers_exact_test')$fishers_exact_test
 hypergeometric_test = import('./hypergeometric_test')$hypergeometric_test
 
