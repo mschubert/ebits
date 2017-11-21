@@ -1,6 +1,6 @@
 mad = function(x, constant=1.5, levels=c("low", "mid", "high")) {
     med = median(x, na.rm=TRUE)
-    delta = mad(x, constant=constant, na.rm=TRUE)
+    delta = stats::mad(x, constant=constant, na.rm=TRUE)
     re = factor(cut(x, c(-Inf, med-delta, med+delta, Inf)))
     levels(re) = levels
     re
