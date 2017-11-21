@@ -12,9 +12,9 @@ quartile = function(x, levels=c("low", "mid", "high")) {
     re
 }
 
-sd = function(x, levels=c("low", "mid", "high")) {
+sd = function(x, constant=1, levels=c("low", "mid", "high")) {
     med = median(x, na.rm=TRUE)
-    sd = sd(x, na.rm=TRUE)
+    sd = stats::sd(x, na.rm=TRUE) * constant
     re = factor(cut(x, c(-Inf, med-sd, med+sd, Inf)))
     levels(re) = levels
     re
