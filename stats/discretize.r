@@ -6,8 +6,9 @@ mad = function(x, constant=1.5, levels=c("low", "mid", "high")) {
     re
 }
 
-quartile = function(x, levels=c("low", "mid", "high")) {
-    re = factor(cut(x, c(-Inf, quantile(x), Inf)))
+quantile = function(x, levels=c("low", "mid", "mid", "high")) {
+    probs = c(0, seq_along(levels)/length(levels))
+    re = factor(cut(x, c(-Inf, stats::quantile(x, probs=probs, na.rm=TRUE))))
     levels(re) = c(levels[1], levels, levels[length(levels)])
     re
 }
