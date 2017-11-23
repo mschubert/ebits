@@ -11,8 +11,12 @@ cache:
  - directories:
     - process/idmap/cache
 
+#r_github_packages: klmr/modules # this does not work either
+
+# modules should work from DESCRIPTION remote, but doesn't
 install:
  - make deps
+ - Rscript -e "devtools::install_github('mschubert/modules')"
  - make -C stats nmf_mu.so
 
 script: make test
