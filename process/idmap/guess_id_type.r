@@ -3,7 +3,7 @@
 #' @param from_ids  Character vector of IDs
 #' @return          Character string describing the ID type
 guess_id_type = function(from_ids) {
-    if (sum(grepl("^ENSG", from_ids)) > length(from_ids)/2)
+    if (sum(grepl("^(ENS[A-Z]*G)", from_ids)) > length(from_ids)/2)
         'ensembl_gene_id'
     else if (sum(grepl("_at$", from_ids)) > length(from_ids)/2)
         'affy'

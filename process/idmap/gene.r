@@ -11,22 +11,24 @@ library(dplyr)
 #'              this can be: 'hgnc_symbol', 'entrezgene', 'ensembl_gene_id'
 #' @param to    the type of ids to map to
 #'              this can be: 'hgnc_symbol', 'entrezgene', 'ensembl_gene_id'
+#' @param dset  Ensembl data set, e.g. '{hsapiens,mmusculus}_gene_ensembl'
 #' @param summarize  the function to use to aggregate ids
 #' @return      the mapped and optionally summarized object
-gene = function(obj, from=NULL, to, summarize=mean) {
+gene = function(obj, from=NULL, to, dset="hsapiens_gene_ensembl", summarize=mean) {
     UseMethod("gene")
 }
 
-gene.character = function(obj, to, from=.guess_id_type(obj), summarize=mean) {
-    lookup = gene_table()
+gene.character = function(obj, to, from=.guess_id_type(obj),
+                          dset="hsapiens_gene_ensembl", summarize=mean) {
+    lookup = gene_table(dset)
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
     .b$match(obj, from=df$from, to=df$to)
 }
 
 gene.default = function(obj, to, from=.guess_id_type(.ar$dimnames(obj, along=1)),
-                        summarize=mean) {
-    lookup = gene_table()
+                        dset="hsapiens_gene_ensembl", summarize=mean) {
+    lookup = gene_table(dset)
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
 
@@ -41,13 +43,14 @@ gene.default = function(obj, to, from=.guess_id_type(.ar$dimnames(obj, along=1))
     .ar$summarize(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
-gene.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj))), summarize=mean) {
-    exprs(obj) = gene(Biobase::exprs(obj), from=from, to=to, summarize=summarize)
+gene.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj))),
+                              dset="hsapiens_gene_ensembl", summarize=mean) {
+    exprs(obj) = gene(Biobase::exprs(obj), from=from, to=to, dset=dset, summarize=summarize)
     obj
 }
 
-gene.list = function(obj, to, from, summarize=mean) {
-    lapply(obj, gene, to=to, from=from, summarize=summarize)
+gene.list = function(obj, to, from, dset="hsapiens_gene_ensembl", summarize=mean) {
+    lapply(obj, gene, to=to, from=from, dset=dset, summarize=summarize)
 }
 
 #' Creates a table of different identifiers and caches it
@@ -55,13 +58,14 @@ gene.list = function(obj, to, from, summarize=mean) {
 #' @param force  Re-generate table if it already exists
 #' @return       A data.frame with the following columns:
 #'     hgnc_symbol, affy, illumina, genbank, entrezgeen, ensembl_gene_id
-gene_table = function(force=FALSE) {
-    cache = file.path(module_file(), "cache", "gene_table.RData")
+gene_table = function(dset="hsapiens_gene_ensembl", force=FALSE) {
+    fname = sprintf("gene_table-%s.RData", dset)
+    cache = file.path(module_file(), "cache", fname)
     if (file.exists(cache) && !force)
         return(.io$load(cache))
 
-    mart = biomaRt::useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
-    ids = c('hgnc_symbol', 'entrezgene', 'ensembl_gene_id')
+    mart = biomaRt::useMart(biomart="ensembl", dataset=dset)
+    ids = c('external_gene_name', 'entrezgene', 'ensembl_gene_id')
     mapping = biomaRt::getBM(attributes=ids, mart=mart)
     for (col in colnames(mapping)) {
         mapping[[col]] = as.character(mapping[[col]])
