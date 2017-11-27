@@ -8,9 +8,10 @@ library(dplyr)
 #'
 #' @param obj   a character vector or named object to be mapped
 #' @param from  the type of ids to map from; if NULL will try regex matching
-#'              this can be: 'hgnc_symbol', 'entrezgene', 'ensembl_gene_id'
-#' @param to    the type of ids to map to
-#'              this can be: 'hgnc_symbol', 'entrezgene', 'ensembl_gene_id'
+#'              this can be: 'hgnc_symbol', 'entrezgene', 'ensembl_gene_id',
+#'              'band', 'chromosome_name', 'transcript_start', 'transcript_end',
+#'              'transcription_start_site'
+#' @param to    the type of ids to map to (same types as for 'from')
 #' @param dset  Ensembl data set, e.g. '{hsapiens,mmusculus}_gene_ensembl'
 #' @param summarize  the function to use to aggregate ids
 #' @return      the mapped and optionally summarized object
@@ -65,7 +66,9 @@ gene_table = function(dset="hsapiens_gene_ensembl", force=FALSE) {
         return(.io$load(cache))
 
     mart = biomaRt::useMart(biomart="ensembl", dataset=dset)
-    ids = c('external_gene_name', 'entrezgene', 'ensembl_gene_id')
+    ids = c('external_gene_name', 'entrezgene', 'ensembl_gene_id',
+            'band', 'chromosome_name',
+            'transcript_start', 'transcript_end', 'transcription_start_site')
     mapping = biomaRt::getBM(attributes=ids, mart=mart)
     for (col in colnames(mapping)) {
         mapping[[col]] = as.character(mapping[[col]])
