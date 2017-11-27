@@ -21,6 +21,9 @@ gene = function(obj, from=NULL, to, dset="hsapiens_gene_ensembl", summarize=mean
 
 gene.character = function(obj, to, from=.guess_id_type(obj),
                           dset="hsapiens_gene_ensembl", summarize=mean) {
+    if (to %in% c("hgnc_symbol", "mgi_symbol"))
+        to = "external_gene_name"
+
     lookup = gene_table(dset)
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
@@ -29,6 +32,9 @@ gene.character = function(obj, to, from=.guess_id_type(obj),
 
 gene.default = function(obj, to, from=.guess_id_type(.ar$dimnames(obj, along=1)),
                         dset="hsapiens_gene_ensembl", summarize=mean) {
+    if (to %in% c("hgnc_symbol", "mgi_symbol"))
+        to = "external_gene_name"
+
     lookup = gene_table(dset)
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
