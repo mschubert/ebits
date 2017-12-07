@@ -16,18 +16,26 @@ read_granges.character = function(fname, ...) {
         if ("assembly" %in% names(args)) {
             slen = GenomeInfoDb::seqlengths(Rsamtools::BamFile(fname))
             assembly = args$assembly
+
             if (is.data.frame(assembly))
                 assembly = setNames(assembly$length, assembly$chromosome)
+
+            if (!is.null(args$chromosomes))
+                assembly = assembly[names(assembly) %in% args$chromosomes]
+
             cmp = merge(data.frame(chr=names(slen), file=slen),
                         data.frame(chr=names(assembly), assembly=assembly),
                         by="chr")
+
             if (!all(cmp$file == cmp$assembly)) {
                 print(cmp)
                 stop("Assembly length mismatch")
             }
         }
+
         used_args = args[setdiff(names(args), "assembly")]
         do.call(AneuFinder::bam2GRanges, c(list(bamfile=fname), used_args))
+
     } else if (grepl("\\.bed(\\.gz)?$", fname)) {
         used_args = args[setdiff(names(args), "bamindex")]
         do.call(AneuFinder::bed2GRanges, c(list(bedfile=fname), used_args))
