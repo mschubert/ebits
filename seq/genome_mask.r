@@ -37,10 +37,8 @@ genome_mask.character = function(assembly, chrs=NULL,
     ranges = suppressWarnings(do.call(c, ranges))
     GenomeInfoDb::seqinfo(ranges) = GenomeInfoDb::seqinfo(masked)
 
-    if (strip_chr_prefix) {
-        newlvls = GenomeInfoDb::mapSeqlevels(GenomeInfoDb::seqlevels(ranges), "NCBI")
-        GenomeInfoDb::renameSeqlevels(ranges, newlvls)
-    }
+    if (strip_chr_prefix)
+        GenomeInfoDb::seqlevels(ranges) = sub("^chr", "", GenomeInfoDb::seqlevels(ranges))
 
     ranges
 }
