@@ -28,8 +28,9 @@ genome = function(assembly_id, masked=FALSE, chrs=NULL) {
             stop("We're mapping from hg19 and MT is not the same. - Can't do.")
     }
 
-    if (!is.null(chrs))
-        g = .subs(g, chrs)
+#FIXME: this doesn't quite work
+#    if (!is.null(chrs))
+#        g = .subs(g, chrs)
 
     g
 }
