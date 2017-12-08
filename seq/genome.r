@@ -17,6 +17,9 @@ genome = function(assembly_id, masked=FALSE, chrs=NULL) {
         assembly_id = paste(assembly_id, "masked", sep=".")
 
     gname = grep(assembly_id, BSgenome::available.genomes(), value=TRUE)[1]
+    if (length(gname) == 0)
+        stop("BSgenome not found for: ", assembly_id)
+
     g = getFromNamespace(gname, ns=gname)
 
     if (to_ncbi_ids) {
