@@ -7,11 +7,16 @@
 #' @param chrs         Only return the following chromosomes (default: all)
 #' @return             Object from BSgenome
 genome = function(assembly_id, masked=FALSE, chrs=NULL) {
-    if (assembly_id == "GRCh37") {
-        to_ncbi_ids = TRUE
-        assembly_id = "hg19"
-    } else
-        to_ncbi_ids = FALSE
+    genome_lookup = list(
+        GRCh37 = "hg19",
+        GRCm38 = "mm10"
+    )
+
+    ncbi_id = NULL
+    if (assembly_id %in% names(genome_lookup)) {
+        ncbi_id = assembly_id
+        assembly_id = genome_lookup[ncbi_id]
+    }
 
     if (masked)
         assembly_id = paste(assembly_id, "masked", sep=".")
@@ -22,13 +27,18 @@ genome = function(assembly_id, masked=FALSE, chrs=NULL) {
 
     g = getFromNamespace(gname, ns=gname)
 
-    if (to_ncbi_ids) {
+    if (!is.null(ncbi_id)) {
         newlvl = GenomeInfoDb::mapSeqlevels(GenomeInfoDb::seqlevels(g), "NCBI")
-        g = GenomeInfoDb::renameSeqlevels(g, na.omit(newlvl))
-        if (is.null(chrs))
-            chrs = setdiff(GenomeInfoDb::seqnames(g), "MT")
-        else if ("MT" %in% chrs)
-            stop("We're mapping from hg19 and MT is not the same. - Can't do.")
+        na_idx = which(is.na(newlvl))
+        newlvl[na_idx] = names(newlvl)[na_idx]
+        g = GenomeInfoDb::renameSeqlevels(g, newlvl)
+
+        if (ncbi_id == "GRCh37") {
+            if (is.null(chrs))
+                chrs = setdiff(GenomeInfoDb::seqnames(g), "MT")
+            else if ("MT" %in% chrs)
+                stop("We're mapping from hg19 and MT is not the same")
+        }
     }
 
 #FIXME: this doesn't quite work
