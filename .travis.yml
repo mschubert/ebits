@@ -9,7 +9,7 @@ addons:
 cache:
  - packages
  - directories:
-    - process/idmap/cache
+    - seq/cache
 
 #r_github_packages: klmr/modules # this does not work either
 
