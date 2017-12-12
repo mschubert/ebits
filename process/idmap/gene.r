@@ -3,6 +3,7 @@ library(dplyr)
 .io = import('../../io')
 .ar = import('../../array')
 .guess_id_type = import('./guess_id_type')$guess_id_type
+.gene_table = import('../../seq/gene_table')$gene_table
 
 #' Gene ID mapping function
 #'
@@ -24,7 +25,7 @@ gene.character = function(obj, to, from=.guess_id_type(obj),
     if (to %in% c("hgnc_symbol", "mgi_symbol"))
         to = "external_gene_name"
 
-    lookup = gene_table(dset)
+    lookup = .gene_table(dset)
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
     .b$match(obj, from=df$from, to=df$to)
@@ -35,7 +36,7 @@ gene.default = function(obj, to, from=.guess_id_type(.ar$dimnames(obj, along=1))
     if (to %in% c("hgnc_symbol", "mgi_symbol"))
         to = "external_gene_name"
 
-    lookup = gene_table(dset)
+    lookup = .gene_table(dset)
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
 
@@ -60,32 +61,6 @@ gene.list = function(obj, to, from, dset="hsapiens_gene_ensembl", summarize=mean
     lapply(obj, gene, to=to, from=from, dset=dset, summarize=summarize)
 }
 
-#' Creates a table of different identifiers and caches it
-#'
-#' @param force  Re-generate table if it already exists
-#' @return       A data.frame with the following columns:
-#'     hgnc_symbol, affy, illumina, genbank, entrezgeen, ensembl_gene_id
-gene_table = function(dset="hsapiens_gene_ensembl", force=FALSE) {
-    fname = sprintf("gene_table-%s.RData", dset)
-    cache = file.path(module_file(), "cache", fname)
-    if (file.exists(cache) && !force)
-        return(.io$load(cache))
-
-    mart = biomaRt::useMart(biomart="ensembl", dataset=dset)
-    ids = c('external_gene_name', 'entrezgene', 'ensembl_gene_id',
-            'band', 'chromosome_name',
-            'transcript_start', 'transcript_end', 'transcription_start_site')
-    mapping = biomaRt::getBM(attributes=ids, mart=mart)
-    for (col in colnames(mapping)) {
-        mapping[[col]] = as.character(mapping[[col]])
-        is_empty = nchar(mapping[,col]) == 0
-        mapping[[col]][is_empty] = NA
-    }
-
-    dir.create(dirname(cache), showWarnings=FALSE)
-    save(mapping, file=cache)
-    mapping
-}
 
 if (is.null(module_name())) {
     library(testthat)
