@@ -6,6 +6,6 @@ export_submodule('./genome')
 export_submodule('./chr_lengths')
 export_submodule('./genome_mask')
 export_submodule('./subset_genome')
-probeset_table = import('./gene_table')$probeset_table
+probeset_table = import('./probeset_table')$probeset_table
 gene_table = import('./gene_table')$gene_table
 coords = import('./coords')

@@ -1,4 +1,4 @@
-io = import('io')
+io = import('../io')
 
 #' Creates a table of different identifiers and caches it
 #'
