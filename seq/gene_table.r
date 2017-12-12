@@ -17,8 +17,7 @@ gene_table = function(dset="hsapiens_gene_ensembl", force=FALSE) {
             'transcription_start_site', 'strand', 'gene_biotype')
     mapping = biomaRt::getBM(attributes=ids, mart=mart)
     for (col in colnames(mapping)) {
-        mapping[[col]] = as.character(mapping[[col]])
-        is_empty = nchar(mapping[,col]) == 0
+        is_empty = nchar(as.character(mapping[,col])) == 0
         mapping[[col]][is_empty] = NA
     }
 
