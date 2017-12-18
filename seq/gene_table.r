@@ -2,6 +2,7 @@ io = import('../io')
 
 #' Creates a table of different identifiers and caches it
 #'
+#' @param dset  Ensembl data set, e.g. '{hsapiens,mmusculus}_gene_ensembl'
 #' @param force  Re-generate table if it already exists
 #' @return       A data.frame with gene and transcript-level information
 gene_table = function(dset="hsapiens_gene_ensembl", force=FALSE) {
