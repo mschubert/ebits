@@ -30,7 +30,7 @@
                 keep.extra.columns = TRUE)
     }
 
-    coords
+    unique(coords)
 }
 
 #' Get gene or trascript coordinates as GRanges object
