@@ -10,3 +10,6 @@ export_submodule('./intersect')
 probeset_table = import('./probeset_table')$probeset_table
 gene_table = import('./gene_table')$gene_table
 coords = import('./coords')
+
+info = GenomicRanges::seqinfo
+lengths = GenomicRanges::seqlengths
