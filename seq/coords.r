@@ -5,7 +5,8 @@
 # add seqlengths to GRanges object
 
 #' @rdname gene
-.process = function(coords, chromosomes, type, granges, start_field, end_field) {
+.process = function(coords, chromosomes, type=NULL, granges=FALSE,
+                    start_field="start_position", end_field="end_position") {
     coords %>%
         dplyr::distinct() %>%
         dplyr::arrange(chromosome_name, start_position)
@@ -50,18 +51,18 @@ gene = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
 
     keep = c(idtype, "band", "chromosome_name", "start_position",
              "end_position", "strand", "gene_biotype")
-    .process(.gene_table(dset=dset)[,keep], chromosomes, type, granges,
-             "start_position", "end_position")
+    .process(.gene_table(dset=dset)[,keep], chromosomes=chromosomes,
+             type=type, granges=granges)
 }
 
 #' @rdname gene
 transcript = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
-                      assembly="fixthis", granges=FALSE, chromosomes=NULL) {
+                      assembly="fixthis", granges=FALSE, chromosomes=NULL, type=NULL) {
     if (idtype %in% c("hgnc_symbol", "mgi_symbol"))
         idtype = "external_gene_name"
 
-    .process(.gene_table(dset=dset), chromosomes, type, granges,
-             "transcript_start", "transcript_end")
+    .process(.gene_table(dset=dset), chromosomes=chromosomes,
+             type=type, granges=granges)
 }
 
 #' @rdname gene

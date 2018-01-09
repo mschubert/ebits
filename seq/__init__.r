@@ -12,4 +12,4 @@ gene_table = import('./gene_table')$gene_table
 coords = import('./coords')
 
 info = GenomicRanges::seqinfo
-lengths = GenomicRanges::seqlengths
+lengths = GenomeInfoDb::seqlengths
