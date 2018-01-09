@@ -46,8 +46,7 @@
 #' @return            A data.frame or GRanges object with gene coordinates
 gene = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
                 assembly="fixthis", granges=FALSE, chromosomes=NULL, type=NULL) {
-    if (idtype %in% c("hgnc_symbol", "mgi_symbol"))
-        idtype = "external_gene_name"
+    idtype[idtype %in% c("hgnc_symbol", "mgi_symbol")] = "external_gene_name"
 
     keep = c(idtype, "band", "chromosome_name", "start_position",
              "end_position", "strand", "gene_biotype")
@@ -58,8 +57,7 @@ gene = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
 #' @rdname gene
 transcript = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
                       assembly="fixthis", granges=FALSE, chromosomes=NULL, type=NULL) {
-    if (idtype %in% c("hgnc_symbol", "mgi_symbol"))
-        idtype = "external_gene_name"
+    idtype[idtype %in% c("hgnc_symbol", "mgi_symbol")] = "external_gene_name"
 
     .process(.gene_table(dset=dset), chromosomes=chromosomes,
              type=type, granges=granges)
