@@ -34,9 +34,9 @@ read_table = function (file, ..., stringsAsFactors = FALSE, na.strings = c(NA, '
         call$sep = separators[[extension]]
     }
 
-    call[[1]] = if (grepl(extension, 'xls[x]')) {
+    call[[1]] = if (identical(extension, 'xlsx')) {
         call$na.strings = NULL
-        quote(readxl::read_excel)
+        quote(xlsx::read.xlsx)
     } else quote(read.table)
     .b$add_class(eval.parent(call), 'tbl_df')
 }
