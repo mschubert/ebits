@@ -16,7 +16,7 @@ cache:
 # modules should work from DESCRIPTION remote, but doesn't
 install:
  - make deps
- - Rscript -e "devtools::install_github('mschubert/modules')"
+ - Rscript -e "devtools::install_github('klmr/modules')"
  - make -C stats nmf_mu.so
 
 script: make test
