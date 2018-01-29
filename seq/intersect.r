@@ -25,7 +25,9 @@ intersect = function(query, subject, type="any", minoverlap=0L,
 
     re = GenomicRanges::findOverlaps(
         query, subject, type=type, minoverlap=minoverlap, select=select, ...)
-#    re$width = IRanges::ranges(re, query, subject)$width
+    # ranges() is deprecated in IRanges, should replace when GRanges supports
+    #FIXME: this does not separate by seqnames, hence is wrong and disabled
+    #re$width = IRanges::overlapsRanges(query@ranges, subject@ranges)@width
     re = re %>%
         as.data.frame() %>%
         dplyr::left_join(cols_query, by="queryHits") %>%
