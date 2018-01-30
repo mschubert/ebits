@@ -13,12 +13,13 @@
 #' @param keep_index  Return indices in query and subject
 #' @param ...         Further arguments passed to findOverlaps
 #' @return            Merged data.frame based on overlaps
-intersect = function(query, subject, type="any", minoverlap=0L,
-                     select="all", return_widths=FALSE, keep_index=FALSE, ...) {
+intersect = function(query, subject, type="any", minoverlap=0L, select="all",
+                     return_widths=FALSE, keep_index=FALSE, ...) {
 
     cols_query = GenomicRanges::mcols(query) %>%
         as.data.frame() %>%
-        dplyr::mutate(queryHits = seq_len(nrow(.)))
+        dplyr::mutate(seqnames = as.character(GenomicRanges::seqnames(query)),
+                      queryHits = seq_len(nrow(.)))
 
     cols_subject = GenomicRanges::mcols(subject) %>%
         as.data.frame() %>%
