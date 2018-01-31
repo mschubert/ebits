@@ -1,4 +1,4 @@
-seq = import('seq')
+seq = import('../../seq')
 
 #' Run chromstar using a clean API and no side effects
 #'

@@ -3,11 +3,11 @@ bin_reads = import('./bin_reads')$bin_reads
 blacklist_from_ref = import('./blacklist_from_ref')$blacklist_from_ref
 consensus_ploidy = import('./consensus_ploidy')$consensus_ploidy
 plot = import('./plot')$plot
-.sys = import('sys')
+.sys = import('../../sys')
 
 .sys$run({
     import_package('dplyr', attach=TRUE)
-    io = import('io')
+    io = import('../../io')
 
     args = .sys$cmd$parse(
         opt('d', 'directory', 'directory prefix to look for files', '.'),

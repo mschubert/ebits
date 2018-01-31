@@ -1,4 +1,4 @@
-seq = import('seq')
+seq = import('../../../seq')
 
 #' Plots mark enrichment around a set of coordinates
 #'

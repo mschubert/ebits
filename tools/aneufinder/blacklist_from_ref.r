@@ -1,4 +1,4 @@
-seq = import('seq')
+seq = import('../../seq')
 
 #' Create a blacklist from WGS read numbers
 #'

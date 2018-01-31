@@ -1,4 +1,4 @@
-seq = import('seq')
+seq = import('../../seq')
 
 #' Bin reads into segments with read counts
 #'

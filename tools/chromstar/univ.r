@@ -1,4 +1,4 @@
-seq = import('seq')
+seq = import('../../seq')
 
 `.seqinfo<-` = function(x, value) {
     idx = unique(as.character(GenomeInfoDb::seqnames(x)))

@@ -7,10 +7,10 @@ combine = import('./combine')$combine
 filter_peaks = import('./filter_peaks')$filter_peaks
 plot = import('./plot')
 
-.sys = import('sys')
+.sys = import('../../sys')
 
 .sys$run({
-    io = import('io')
+    io = import('../../io')
 
     args = .sys$cmd$parse(
         opt('d', 'directory', 'directory containing source files', '.'),

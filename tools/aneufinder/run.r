@@ -1,5 +1,5 @@
 import_package('dplyr', attach=TRUE)
-seq = import('seq')
+seq = import('../../seq')
 
 #' Run aneufinder with clean output structure
 #'
