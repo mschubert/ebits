@@ -1,5 +1,13 @@
 seq = import('../../seq')
 
+`.seqinfo<-` = function(x, value) {
+    idx = unique(as.character(GenomeInfoDb::seqnames(x)))
+    x@seqinfo = value[idx]
+    if (inherits(x, "GRanges"))
+        x@seqnames = droplevels(x@seqnames)
+    x
+}
+
 #' Run chromstar using a clean API and no side effects
 #'
 #' @param exp_table    A data.frame or tabular file with fields:
