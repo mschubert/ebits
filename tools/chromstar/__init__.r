@@ -18,7 +18,7 @@ plot = import('./plot')
         opt('o', 'outfile', 'file to save model to', '/dev/null'),
         opt('u', 'unifile', 'file to save univariate model to', '/dev/null'),
         opt('r', 'readfile', 'file to save reads to', '/dev/null'),
-        opt('b', 'bedfile', 'file to save track to', '/dev/null'),
+        opt('b', 'beddir', 'dir to save tracks to', '/dev/null'),
         opt('p', 'plotfile', 'file to save plots to', '/dev/null'))
 
     print(args)
@@ -43,10 +43,14 @@ plot = import('./plot')
     if (!is.null(args$outfile))
         save(models, file=args$outfile)
 
-#    if (!is.null(args$bedfile))
-#        chromstaR:::exportCombinedMultivariatePeaks(model, filename=args$bedfile,
-#            trackname=paste(basename(args$samples), args$mode, sep="-"),
-#            separate.files=FALSE)
+    if (!is.null(args$beddir)) {
+        dir.create(args$beddir)
+        for (i in seq_along(models)) {
+            try(chromstaR:::exportCombinedMultivariatePeaks(models[[i]],
+                filename=file.path(args$beddir, names(models)[i]),
+                separate.files=FALSE))
+        }
+    }
 
     if (!is.null(args$plotfile)) {
         if (grepl("GRCh|hg", config$assembly))
