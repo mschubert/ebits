@@ -1,3 +1,4 @@
+import_package('ggplot2', attach=TRUE)
 seq = import('../../../seq')
 
 #' Plots mark enrichment around a set of coordinates

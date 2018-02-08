@@ -80,13 +80,13 @@ plot = import('./plot')
                                paste(unique(m$info$mark), collapse=","),
                                paste(unique(m$info$condition), collapse=","))
             print(plot$frequencies(m) +
-                  labs(title=mod_tit, subtitle=mod_desc))
+                  ggplot2::labs(title=mod_tit, subtitle=mod_desc))
 
             message(sprintf("enrichment: %s (%i/%i)", mn, i, length(models)))
             ps = plot$enrichment(m, dset=dset, ref="gene")
             for (j in seq_along(ps)) {
                 tit = paste(names(ps)[j], mod_tit)
-                print(ps[[j]] + labs(title=tit, subtitle=mod_desc))
+                print(ps[[j]] + ggplot2::labs(title=tit, subtitle=mod_desc))
             }
         }
         dev.off()
