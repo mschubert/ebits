@@ -38,7 +38,7 @@ plot = import('./plot')
         save(univ, file=args$unifile)
 
     do_cmp = function(cmp) do.call(combine, c(list(models=univ), cmp))
-    models = lapply(config$comparisons, do_cmp)
+    models = lapply(config$comparisons, do_cmp) #TODO: filter models here if they fail later?
 
     if (!is.null(args$outfile))
         save(models, file=args$outfile)
@@ -46,6 +46,7 @@ plot = import('./plot')
     if (!is.null(args$beddir)) {
         dir.create(args$beddir)
         for (i in seq_along(models)) {
+            message(i,"/",length(models))
             try(chromstaR:::exportCombinedMultivariatePeaks(models[[i]],
                 filename=file.path(args$beddir, names(models)[i]),
                 separate.files=FALSE))
@@ -61,39 +62,33 @@ plot = import('./plot')
             stop("do not know which gene annotation to use, can not plot")
 
         pdf(args$plotfile)
-
+        message("read count cor")
         print(plot$cor(univ))
-        for (u in univ)
-            print(chromstaR::plotHistogram(u))
+        for (i in seq_along(univ)) {
+            message(sprintf("univariate fits (%i/%i)", i, length(univ)))
+            print(chromstaR::plotHistogram(univ[[i]]))
+        }
 
         for (i in seq_along(models)) {
             m = models[[i]]
             mn = names(models)[i]
+            message(sprintf("freqs: %s (%i/%i)", mn, i, length(models)))
 
-#            for (pp in c(NA, 1e-4, 1e-10)) {
-#                if (is.na(pp))
-                    mod_tit = sprintf("%s (mode=%s, max posterior probability)",
-                                      mn, config$comparisons[[mn]]$mode)
-#                else {
-#                    mod_tit = sprintf("%s (mode=%s, pp=%.0g)",
-#                                      mn, config$comparisons[[mn]]$mode, pp)
-#                    m = filter_peaks(m, pp)
-#                }
-                mod_desc = sprintf("%s; %s",
-                                   paste(unique(m$info$mark), collapse=","),
-                                   paste(unique(m$info$condition), collapse=","))
-                print(plot$frequencies(m) +
-                      labs(title=mod_tit, subtitle=mod_desc))
+            mod_tit = sprintf("%s (mode=%s, max posterior probability)",
+                              mn, config$comparisons[[mn]]$mode)
+            mod_desc = sprintf("%s; %s",
+                               paste(unique(m$info$mark), collapse=","),
+                               paste(unique(m$info$condition), collapse=","))
+            print(plot$frequencies(m) +
+                  labs(title=mod_tit, subtitle=mod_desc))
 
-        #        print(plot$enrichment(model, ref="TSS"))
-                ps = plot$enrichment(m, dset=dset, ref="gene")
-                for (j in seq_along(ps)) {
-                    tit = paste(names(ps)[j], mod_tit)
-                    print(ps[[j]] + labs(title=tit, subtitle=mod_desc))
-                }
-#            }
+            message(sprintf("enrichment: %s (%i/%i)", mn, i, length(models)))
+            ps = plot$enrichment(m, dset=dset, ref="gene")
+            for (j in seq_along(ps)) {
+                tit = paste(names(ps)[j], mod_tit)
+                print(ps[[j]] + labs(title=tit, subtitle=mod_desc))
+            }
         }
-
         dev.off()
     }
 })

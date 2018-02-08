@@ -13,7 +13,7 @@ cor = function(models, cluster=TRUE) {
         colnames(bin_counts) = sapply(models, function(m) m$info$ID)
     }
 
-    mat = cor(bin_counts)
+    mat = stats::cor(bin_counts)
     df = reshape2::melt(mat, value.name='cor')
 
     if (cluster) {
