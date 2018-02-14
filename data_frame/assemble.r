@@ -1,5 +1,4 @@
 import('../base/operators')
-.ar = import('../array')
 
 #' Creates a data.frame from named vectors
 #'
@@ -13,7 +12,7 @@ assemble = function(...) {
 
     myclasses = sapply(l., class)
 
-    re = as.data.frame(.ar$stack(l., along=2), stringsAsFactors=FALSE)
+    re = as.data.frame(narray::stack(l., along=2), stringsAsFactors=FALSE)
     for (i in seq_along(re)) {
         cc = myclasses[names(re)[i]]
         if (cc == "factor")

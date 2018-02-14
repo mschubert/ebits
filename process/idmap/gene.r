@@ -1,7 +1,6 @@
 library(dplyr)
 .b = import('../../base')
 .io = import('../../io')
-.ar = import('../../array')
 .guess_id_type = import('./guess_id_type')$guess_id_type
 .gene_table = import('../../seq/gene_table')$gene_table
 
@@ -31,7 +30,7 @@ gene.character = function(obj, to, from=.guess_id_type(obj),
     .b$match(obj, from=df$from, to=df$to)
 }
 
-gene.default = function(obj, to, from=.guess_id_type(.ar$dimnames(obj, along=1)),
+gene.default = function(obj, to, from=.guess_id_type(narray::dimnames(obj, along=1)),
                         dset="hsapiens_gene_ensembl", summarize=mean) {
     if (to %in% c("hgnc_symbol", "mgi_symbol"))
         to = "external_gene_name"
@@ -48,7 +47,7 @@ gene.default = function(obj, to, from=.guess_id_type(.ar$dimnames(obj, along=1))
             names(obj) = sub("\\.[0-9]+$", "", dimnames(obj)[[1]])
     }
 
-    .ar$summarize(obj, along=1, from=df$from, to=df$to, FUN=summarize)
+    narray::translate(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
 gene.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj))),

@@ -1,5 +1,4 @@
 .b = import('../base')
-.ar = import('../array')
 
 #' Cluster the rows and columns, order factor levels to respect that
 #'
@@ -10,7 +9,7 @@
 #' @param size     A size c(rows,cols) to limit the result clustering to
 #' @param fill     Fill array if data.frame does not have all values
 cluster = function(df, formula, cols=TRUE, rows=TRUE, size=NULL, fill=NA) {
-    mat = .ar$construct(data=df, formula=formula, fun.aggregate=mean)
+    mat = narray::construct(data=df, formula=formula, fun.aggregate=mean)
     indep_vars = all.vars(formula[[3]])
     rname = indep_vars[1] #FIXME: ar$construct should order by std. axis ordering
     cname = indep_vars[2] # order: 1,2 && remove t()

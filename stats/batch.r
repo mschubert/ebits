@@ -1,5 +1,3 @@
-.ar = import('../array')
-
 merge = function(method, X, batch, covariate=NULL) {
     if (method == "combat")
         combat(X, batch, covariate)
@@ -32,14 +30,14 @@ none = function(X, batch=NA) {
 
 .list2mat = function(ll) {
     if (is.list(ll))
-        .ar$stack(ll, along=2)
+        narray::stack(ll, along=2)
     else
         ll
 }
 
 .mat2list = function(X, subsets) {
     if (is.matrix(X))
-        .ar$split(X, along=2, subsets=subsets)
+        narray::split(X, along=2, subsets=subsets)
     else
         X
 }
