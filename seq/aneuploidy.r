@@ -17,25 +17,29 @@ aneuploidy = function(ranges, assembly, per_chromosome=FALSE,
 
 #' @rdname aneuploidy
 aneuploidy.GRanges = function(ranges, per_chromosome=FALSE, assembly="GRCh38",
-            chromosomes=NULL, chr_exclude = c("X", "Y", "MT")) {
+            chromosomes=NULL, chr_exclude = c("X", "Y", "MT"), ...) {
     aneuploidy(as.data.frame(ranges))
 }
 
 #' @rdname aneuploidy
 aneuploidy.data.frame = function(ranges, per_chromosome=FALSE, assembly="GRCh38",
          chromosomes=NULL, chr_exclude = c("X", "Y", "MT"), width="width",
-         chromosome="seqnames", copies="ploidy", sample="Sample") {
+         seqnames="seqnames", ploidy="ploidy", sample="Sample") {
     chrs = .lengths$chr_lengths(assembly)
     chrs = data.frame(seqnames=names(chrs), size=unname(as.numeric(chrs)))
 
+    syms = rlang::syms(c(seqnames, ploidy, sample, width)) %>%
+        setNames(c("seqnames", "ploidy", "sample", "width"))
+
     if (is.null(chromosomes))
-        chromosomes = setdiff(ranges$seqnames, chr_exclude)
+        chromosomes = setdiff(ranges[[seqnames]], chr_exclude)
 
     cna = ranges %>%
+        mutate(seqnames = !! syms[["seqnames"]],
+               width = as.numeric(!! syms[["width"]]),
+               euploid_dev = abs(2 - !! syms[["ploidy"]])) %>%
         filter(seqnames %in% chromosomes) %>%
-        mutate(width = as.numeric(width),
-               euploid_dev = abs(2 - ploidy)) %>%
-        group_by(Sample, seqnames) %>%
+        group_by(!! syms[["sample"]], seqnames) %>%
         summarize(covered = sum(width),
                   aneuploidy = stats::weighted.mean(euploid_dev, width)) %>%
         left_join(chrs, by="seqnames") %>%
@@ -47,7 +51,7 @@ aneuploidy.data.frame = function(ranges, per_chromosome=FALSE, assembly="GRCh38"
             select(-covered, -size)
     } else {
         re = cna %>%
-            group_by(Sample) %>%
+            group_by(!! syms[["sample"]]) %>%
             summarize(aneuploidy = stats::weighted.mean(aneuploidy, covered),
                       coverage = sum(covered) / sum(size))
     }
