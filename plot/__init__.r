@@ -5,6 +5,7 @@ library(cowplot)
 #export_submodule('./box') # broken
 export_submodule('./volcano')
 export_submodule('./linear_fit')
+export_submodule('./pca')
 #export_submodule('./heatmap') # empty
 export_submodule('./matrix')
 export_submodule('./venn') # bad style
