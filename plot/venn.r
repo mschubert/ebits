@@ -6,14 +6,17 @@ import_package('dplyr', attach=TRUE)
 #' @param sets  List of set vectors or other input supported by 'eulerr'
 #' @param ...   Parameters passed to 'eulerr::euler' fit
 #' @return      ggplot2 object
-venn = function(sets, ..., shape="circle") {
-    fit = eulerr::euler(sets, ..., shape=shape)
+venn = function(sets, ...) {
+    fit = eulerr::euler(sets, ...)
     df = as.data.frame(fit[c('original.values', 'fitted.values',
                              'residuals', 'regionError')]) %>%
         tibble::rownames_to_column("set") %>%
-        mutate(label = ifelse(grepl("\\&", set),
-            sprintf("atop('%s')", original.values),
-            sprintf("atop(bold('%s'),'%s')", set, original.values)))
+        mutate(label = case_when(
+            !grepl("\\&", set) & original.values == 0 ~ sprintf("atop(bold('%s'))", set),
+            !grepl("\\&", set) ~ sprintf("atop(bold('%s'),'%i')", set, original.values),
+            original.values != 0 ~ sprintf("atop('%i')", original.values),
+            TRUE ~ as.character(NA)
+        ))
     cargs = c(fit$ellipses, fitted=list(fit$fitted.values))
     centers = t(do.call(eulerr:::locate_centers, cargs))
     df$x = centers[,1]
@@ -25,10 +28,11 @@ venn = function(sets, ..., shape="circle") {
         bind_rows(.id="set")
 
     ggplot(ellipses, aes(x=x, y=y)) +
-        geom_polygon(aes(fill=set), color="black", alpha=0.2) +
+        geom_polygon(aes(fill=set), color="#686868", alpha=0.2) +
         ggrepel::geom_text_repel(data=na.omit(df), aes(label=label), parse=TRUE) +
         theme_void() +
-        guides(size=FALSE, fill=FALSE)
+        guides(size=FALSE, fill=FALSE) +
+        coord_fixed()
 }
 
 if (is.null(module_name())) {
