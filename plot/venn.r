@@ -5,17 +5,14 @@ import_package('dplyr', attach=TRUE)
 #'
 #' @param sets   List of set vectors or other input supported by 'eulerr'
 #' @param ...    Parameters passed to 'eulerr::euler' fit
-#' @param repel  Use ggrepel to adjust label positions (default: FALSE)
 #' @return       ggplot2 object
-venn = function(sets, ..., repel=FALSE) {
+venn = function(sets, ...) {
     fit = eulerr::euler(sets, ...)
     df = as.data.frame(fit[c('original.values', 'fitted.values',
                              'residuals', 'regionError')]) %>%
         tibble::rownames_to_column("set") %>%
         mutate(label = case_when(
-            !grepl("\\&", set) & original.values == 0 ~ sprintf("atop(bold('%s'))", set),
-            !grepl("\\&", set) ~ sprintf("atop(bold('%s'),'%i')", set, original.values),
-            original.values != 0 ~ sprintf("atop('%i')", original.values),
+            !grepl("\\&", set) ~ sprintf("atop(bold('%s'))", set),
             TRUE ~ as.character(NA)
         ))
     cargs = c(fit$ellipses, fitted=list(fit$fitted.values))
@@ -28,14 +25,10 @@ venn = function(sets, ..., repel=FALSE) {
         setNames(rownames(fit$ellipses)) %>%
         bind_rows(.id="set")
 
-    if (repel)
-        text = ggrepel::geom_text_repel(data=na.omit(df), aes(label=label), parse=TRUE)
-    else
-        text = geom_text(data=na.omit(df), aes(label=label), parse=TRUE)
-
     ggplot(ellipses, aes(x=x, y=y)) +
         geom_polygon(aes(fill=set), color="#686868", alpha=0.2) +
-        text +
+        geom_text(data=na.omit(df %>% select(-label)), aes(label=original.values)) +
+        ggrepel::geom_text_repel(data=na.omit(df), aes(label=label), parse=TRUE) +
         theme_void() +
         guides(size=FALSE, fill=FALSE) +
         coord_fixed()
