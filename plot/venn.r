@@ -11,8 +11,9 @@ venn = function(sets, ..., shape="circle") {
     df = as.data.frame(fit[c('original.values', 'fitted.values',
                              'residuals', 'regionError')]) %>%
         tibble::rownames_to_column("set") %>%
-        mutate(label = ifelse(grepl("\\&", set), original.values,
-                              paste(set, original.values, sep="\n")))
+        mutate(label = ifelse(grepl("\\&", set),
+            sprintf("atop('%s')", original.values),
+            sprintf("atop(bold('%s'),'%s')", set, original.values)))
     cargs = c(fit$ellipses, fitted=list(fit$fitted.values))
     centers = t(do.call(eulerr:::locate_centers, cargs))
     df$x = centers[,1]
@@ -25,7 +26,7 @@ venn = function(sets, ..., shape="circle") {
 
     ggplot(ellipses, aes(x=x, y=y)) +
         geom_polygon(aes(fill=set), color="black", alpha=0.2) +
-        ggrepel::geom_text_repel(data=na.omit(df), aes(label=label)) +
+        ggrepel::geom_text_repel(data=na.omit(df), aes(label=label), parse=TRUE) +
         theme_void() +
         guides(size=FALSE, fill=FALSE)
 }
