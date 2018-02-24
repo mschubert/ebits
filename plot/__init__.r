@@ -8,7 +8,7 @@ export_submodule('./linear_fit')
 export_submodule('./pca')
 #export_submodule('./heatmap') # empty
 export_submodule('./matrix')
-export_submodule('./venn') # bad style
+export_submodule('./venn')
 export_submodule('./color')
 export_submodule('./symmetrise_scale')
 
