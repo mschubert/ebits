@@ -26,6 +26,9 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
         stop("models must all have same seqinfo: ", paste(sinfo, collapse=", "))
     sinfo = sinfo[[1]]
 
+    if (! mode %in% c("combinatorial", "separate", "differential", "full"))
+        stop("Invalid mode: ", mode)
+
     # use only models that have requested marks and conditions
     if (!is.null(marks))
         models = models[sapply(models, function(m) m$info$mark %in% marks)]
@@ -34,6 +37,8 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
 
     # create combined experiment table
     exp_table = dplyr::bind_rows(lapply(models, function(m) m$info))
+    if (nrow(exp_table) == 0)
+        stop("No experiments left after filtering")
     names(models) = exp_table$ID
     brew_mode = mode
 
@@ -75,6 +80,7 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
 
 .sys$run({
     io = import('../../io')
+    import_package('GenomicRanges', attach=TRUE)
     import('.', attach=TRUE)
 
     args = .sys$cmd$parse(
