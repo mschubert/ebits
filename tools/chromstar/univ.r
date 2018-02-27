@@ -12,8 +12,15 @@ seq = import('../../seq')
 #' Run chromstar in univariate mode
 #'
 #' @param binned_reads  A list of GRanges objects represnting binned reads
+#' @param exp_tabl      Experiment table as required by chromstar
+#' @param assembly      Character vector describing assembly
 #' @return              A list of univariate Chromstar model objects
-univ = function(binned_reads, exp_table) {
+univ = function(binned_reads, exp_table, assembly) {
+    # make sure all binned_reads have the same genome
+    sinfo = unique(lapply(binned_reads, seq$info))
+    if (length(sinfo) != 1)
+        stop("models must all have same seqinfo: ", paste(sinfo, collapse=", "))
+
     exp_table$ID = sprintf("%s-%s-rep%s", exp_table$mark,
                            exp_table$condition, exp_table$replicate)
     univ = split(exp_table, seq_len(nrow(exp_table)))
@@ -22,9 +29,8 @@ univ = function(binned_reads, exp_table) {
             binned.data = binned_reads[[exp$file]],
             input.data = binned_reads[[exp$controlFiles]],
             keep.posteriors = FALSE)
-        # lengths are copied, genome is not
-        .seqinfo(m$bins) = seq$info(binned_reads[[1]])
-        .seqinfo(m$peaks) = seq$info(binned_reads[[1]])
+        .seqinfo(m$bins) = sinfo[[1]]
+        .seqinfo(m$peaks) = sinfo[[1]]
         m$info = exp
         m
     })

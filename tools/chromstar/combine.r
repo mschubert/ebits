@@ -93,7 +93,6 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
     print(args)
 
     config = io$read_yaml(args$samples)
-    #TODO: check if all models same assembly
     univ = io$load(args$unifile)
 
     do_cmp = function(cmp) do.call(combine, c(list(models=univ), cmp))
@@ -113,9 +112,9 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
     }
 
     if (!is.null(args$plotfile)) {
-        if (grepl("GRCh|hg", config$assembly))
+        if (grepl("GRCh|hg", seq$info(models[[1]])$genome[[1]]))
             dset = "hsapiens_gene_ensembl"
-        else if (grepl("GRCm|mm", config$assembly))
+        else if (grepl("GRCm|mm", seq$info(models[[1]])$genome[[1]]))
             dset = "mmusculus_gene_ensembl"
         else
             stop("do not know which gene annotation to use, can not plot")
