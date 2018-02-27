@@ -93,6 +93,7 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
     print(args)
 
     config = io$read_yaml(args$samples)
+    #TODO: check if all models same assembly
     univ = io$load(args$unifile)
 
     do_cmp = function(cmp) do.call(combine, c(list(models=univ), cmp))
@@ -105,7 +106,7 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
         dir.create(args$beddir)
         for (i in seq_along(models)) {
             message(i,"/",length(models))
-            try(chromstaR:::exportCombinedMultivariateCombination(models[[i]],
+            try(chromstaR:::exportCombinations(models[[i]],
                 filename=file.path(args$beddir, names(models)[i]),
                 separate.files=FALSE))
         }
