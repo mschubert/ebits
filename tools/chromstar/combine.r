@@ -80,6 +80,7 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
 
 .sys$run({
     io = import('../../io')
+    seq = import('../../seq')
     import_package('GenomicRanges', attach=TRUE)
     import('.', attach=TRUE)
 
@@ -94,6 +95,7 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
 
     config = io$read_yaml(args$samples)
     univ = io$load(args$unifile)
+    assembly = seq$info(univ[[1]]$peaks)@genome[[1]]
 
     do_cmp = function(cmp) do.call(combine, c(list(models=univ), cmp))
     models = lapply(config$comparisons, do_cmp) #TODO: filter models here if they fail later?
@@ -112,9 +114,9 @@ combine = function(models, mode, marks=NULL, samples=NULL) {
     }
 
     if (!is.null(args$plotfile)) {
-        if (grepl("GRCh|hg", seq$info(models[[1]])$genome[[1]]))
+        if (grepl("GRCh|hg", assembly))
             dset = "hsapiens_gene_ensembl"
-        else if (grepl("GRCm|mm", seq$info(models[[1]])$genome[[1]]))
+        else if (grepl("GRCm|mm", assembly))
             dset = "mmusculus_gene_ensembl"
         else
             stop("do not know which gene annotation to use, can not plot")
