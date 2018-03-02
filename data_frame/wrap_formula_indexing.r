@@ -4,6 +4,8 @@
 #' @return     A function that calls the supplied
 wrap_formula_indexing = function(FUN) {
     new_FUN = function() {
+        warning("Wrapping formula indexing is deprecated and will be removed")
+
         #' @param ...   Arguments as defined in the data.frame row
         one_item = function(..., data, subsets=NULL) {
             args = list(...)
