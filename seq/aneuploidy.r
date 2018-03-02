@@ -35,7 +35,7 @@ aneuploidy.data.frame = function(ranges, per_chromosome=FALSE, assembly="GRCh38"
         chromosomes = setdiff(ranges[[seqnames]], chr_exclude)
 
     cna = ranges %>%
-        mutate(seqnames = !! syms[["seqnames"]],
+        mutate(seqnames = as.character(!! syms[["seqnames"]]),
                width = as.numeric(!! syms[["width"]]),
                euploid_dev = abs(2 - !! syms[["ploidy"]])) %>%
         filter(seqnames %in% chromosomes) %>%
