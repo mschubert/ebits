@@ -1,7 +1,10 @@
 import_package('dplyr', attach=TRUE)
 .lengths = import('./chr_lengths')
 
-#' Provide AneuFinder-like aneuploidy score
+#' Calculate aneuploidy score from diploid deviation along chromosomes
+#'
+#' This will calculated the average deviation from the diploid state of copy
+#' number segments inferred by e.g. SNP6 arrays or DNA-seq.
 #'
 #' @param ranges  GRanges object or data.frame with copy numbers
 #' @param per_chromosome  Calculate aneuploidy score per chromosome or genome
