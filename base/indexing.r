@@ -28,10 +28,10 @@ descriptive_index = function(x, along=NULL) {
 #' Subsets an object, either with numeric indices or names if available
 #'
 #' @param x       An object to get a subset from
-#' @param index   The index to subset with
+#' @param index   The index to subset with (default: last dimension)
 #' @param atomic  Character vector of classes that should not be split ('vector','matrix','list')
 #' @param along   The axis along which to index for array-like objects; default: last dimension
-subset = function(x, index, along=NULL, atomic=NULL, drop=FALSE) {
+subset = function(x, index, along=-1, atomic=NULL, drop=FALSE) {
     if (is.null(dim(x)) && !is.list(x) && !'vector' %in% atomic)
         x[index, drop=drop]
     else if (is.list(x) && !is.data.frame(x) && !'list' %in% atomic) {
