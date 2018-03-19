@@ -33,7 +33,13 @@ plot = import('./plot')$plot
                      assembly = args$assembly,
                      bin_width_ref = args$bin_width_ref,
                      blacklist = args$blacklist)
-    names(all_models) = sapply(all_models, function(x) x$ID)
+    if (exists("config") && !is.null(names(config$files)))
+        for (i in seq_along(all_models)) {
+            all_models[[i]]$file = all_models[[i]]$ID
+            all_models[[i]]$ID = names(config$files)[i]
+        }
+    model_ids = sapply(all_models, function(m) m$ID)
+    names(all_models) = model_ids
 
     nreads = sapply(all_models, function(m) sum(m$bincounts[[1]]$counts)) %>%
         setNames(names(all_models))
@@ -41,15 +47,14 @@ plot = import('./plot')$plot
     excl_reads = setNames(paste(excl_reads, "reads"), names(excl_reads))
     exclude = c(unlist(config$exclude), excl_reads)
 
-    models = all_models[!names(all_models) %in% names(exclude)]
+    models = all_models[!model_ids %in% names(exclude)]
     if (length(exclude) > 0) {
         warning("Dropping models: ", paste(names(exclude), collapse=", "))
         for (i in seq_along(all_models)) {
-            model_name = names(all_models)[i]
-            excl_idx = which(names(exclude) == model_name)
+            excl_idx = which(names(exclude) == model_ids[i])
             if (length(excl_idx) > 0) {
                 reason = paste(exclude[excl_idx], collapse=", ")
-                all_models[[i]]$ID = sprintf("%s [%s]", model_name, reason)
+                all_models[[i]]$ID = sprintf("%s [%s]", model_ids[i], reason)
             }
         }
     }
