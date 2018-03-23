@@ -35,7 +35,7 @@ run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
     genome = seq$genome(assembly)
     chr_lengths = seq$chr_lengths(genome)
     if (is.null(chromosomes))
-        chromosomes = grep("^((chr)?[0-9]+|X)$", names(chr_lengths), value=TRUE)
+        chromosomes = grep("^((chr)?[0-9]+|X|Y)$", names(chr_lengths), value=TRUE)
     assembly_df = data.frame(chromosome = names(chr_lengths), length=chr_lengths)
 
     # partition the reads into bins
