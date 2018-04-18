@@ -16,7 +16,7 @@ consensus_ploidy = function(mods) {
         lapply(as_tibble) %>%
         dplyr::bind_rows() %>%
         group_by(seqnames) %>%
-        summarize(ploidy = weighted.mean(copy.number, weights=width),
+        summarize(ploidy = weighted.mean(copy.number, width),
                   bases_covered = sum(as.numeric(width)) / length(mods)) %>%
         transmute(seqnames = as.character(seqnames),
                   length = unname(GenomeInfoDb::seqlengths(mods[[1]])[seqnames]),
