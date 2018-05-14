@@ -1,0 +1,22 @@
+geo_id	ae_id	platform_pkg	annot_ensembl	annot_bioc
+		pd.hg.u95a	affy_hg_u95a	hgu95a.db
+		pd.hg.u95b	affy_hg_u95b	hgu95b.db
+GPL8300	A-AFFY-1	pd.hg.u95av2	affy_hg_u95av2	hgu95av2.db
+	A-GEOD-14668	hgu133a	affy_hg_u133a	hgu133a.db
+GPL96	A-AFFY-33	pd.hg.u133a	affy_hg_u133a	hgu133a.db
+GPL97	A-AFFY-34	pd.hg.u133b	affy_hg_u133b	hgu133b.db
+GPL570	A-AFFY-44	pd.hg.u133.plus.2	affy_hg_u133_plus_2	hgu133plus2.db
+GPL571	A-AFFY-37	pd.hg.u133a.2	affy_hg_u133a_2	hgu133a2.db
+GPL13667	A-GEOD-13667	pd.hg.u219		hgu219.db
+GPL6244	A-AFFY-141	pd.hugene.1.0.st.v1	affy_hugene_1_0_st_v1	hugene10sttranscriptcluster.db
+		pd.hugene.1.0.st.v1		hugene10sttranscriptcluster.db
+		pd.hugene.1.1.st.v1		hugene11sttranscriptcluster.db
+		pd.hugene.2.0.st		hugene20sttranscriptcluster.db
+		pd.hugene.2.1.st		hugene21sttranscriptcluster.db
+	A-AFFY-143	pd.huex.1.0.st.v1		huex10sttranscriptcluster.db
+		pd.huex.1.0.st.v2		huex10sttranscriptcluster.db
+	A-AFFY-76	pd.ht.hg.u133a		hthgu133a.db
+		pd.ht.hg.u133.plus.pm	
+		pd.hta.2.0		hta20sttranscriptcluster.db
+		u133aaofav2
+		hthgu133a.db
