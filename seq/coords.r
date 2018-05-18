@@ -1,3 +1,4 @@
+`%>%` = magrittr::`%>%`
 .gene_table = import('./gene_table')$gene_table
 
 #TODO:
@@ -67,4 +68,26 @@ transcript = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
 probeset = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
                     assembly="fixthis", granges=FALSE, chromosomes=NULL) {
     stop("not implemented")
+}
+
+chrs = function(assembly="GRCh38", granges=FALSE, chr_excl=c("Y","MT")) {
+    ldf = as.data.frame(GenomeInfoDb::keepStandardChromosomes(
+        GenomeInfoDb::seqinfo(seq$genome(assembly))))
+    ldf$seqnames = rownames(lengths)
+    ldf$start = 1
+    ldf$end = ldf$seqlengths
+    rownames(ldf) = NULL
+    ldf = ldf[!ldf$seqnames %in% chr_excl]
+    if (granges)
+        ldf = GenomicRanges::makeGRangesFromDataFrame(ldf)
+    ldf
+}
+
+#' hg19 cytobands
+bands = function(assembly="GRCh38", granges=FALSE) {
+    if (assembly != "hg19")
+        warning("bands are hg19")
+    env = new.env()
+    data(hg19IdeogramCyto, package = "biovizBase", envir=env)
+    env$hg19IdeogramCyto
 }
