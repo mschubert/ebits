@@ -83,11 +83,34 @@ chrs = function(assembly="GRCh38", granges=FALSE, chr_excl=c("Y","MT")) {
     ldf
 }
 
+#' hg19 arms from cytoband
+chr_arms = function(assembly="GRCh38", granges=FALSE) {
+    if (assembly != "hg19")
+        warning("bands are hg19")
+    env = new.env()
+    data(hg19IdeogramCyto, package = "biovizBase", envir=env)
+    bdf = as.data.frame(env$hg19IdeogramCyto) %>%
+        dplyr::mutate(seqnames = sub("^chr", "", seqnames),
+                      arm = paste(seqnames, substr(name, 0, 1), sep=".")) %>%
+        dplyr::group_by(seqnames, strand, arm) %>%
+        dplyr::summarize(start=min(start), end=max(end)) %>%
+        dplyr::ungroup()
+    if (granges)
+        GenomicRanges::makeGRangesFromDataFrame(bdf, keep.extra.columns=TRUE)
+    else
+        bdf
+}
+
 #' hg19 cytobands
 bands = function(assembly="GRCh38", granges=FALSE) {
     if (assembly != "hg19")
         warning("bands are hg19")
     env = new.env()
     data(hg19IdeogramCyto, package = "biovizBase", envir=env)
-    env$hg19IdeogramCyto
+    bdf = as.data.frame(env$hg19IdeogramCyto) %>%
+        dplyr::mutate(seqnames = sub("^chr", "", seqnames))
+    if (granges)
+        bdf
+    else
+        as.data.frame(bdf)
 }
