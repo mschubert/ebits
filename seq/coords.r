@@ -1,5 +1,7 @@
+import_package('GenomicRanges', attach=TRUE)
 `%>%` = magrittr::`%>%`
 .gene_table = import('./gene_table')$gene_table
+.genome = import('./genome')$genome
 
 #TODO:
 # keep track of assembly
@@ -72,14 +74,16 @@ probeset = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
 
 chrs = function(assembly="GRCh38", granges=FALSE, chr_excl=c("Y","MT")) {
     ldf = as.data.frame(GenomeInfoDb::keepStandardChromosomes(
-        GenomeInfoDb::seqinfo(seq$genome(assembly))))
-    ldf$seqnames = rownames(lengths)
+        GenomeInfoDb::seqinfo(.genome(assembly))))
+    ldf$chrs = ldf$seqnames = rownames(ldf)
     ldf$start = 1
     ldf$end = ldf$seqlengths
+    ldf$isCircular = NULL
+    ldf$seqlengths = NULL
     rownames(ldf) = NULL
-    ldf = ldf[!ldf$seqnames %in% chr_excl]
+    ldf = ldf[!ldf$seqnames %in% chr_excl,]
     if (granges)
-        ldf = GenomicRanges::makeGRangesFromDataFrame(ldf)
+        ldf = GenomicRanges::makeGRangesFromDataFrame(ldf, keep.extra.columns=TRUE)
     ldf
 }
 
@@ -102,15 +106,16 @@ chr_arms = function(assembly="GRCh38", granges=FALSE) {
 }
 
 #' hg19 cytobands
-bands = function(assembly="GRCh38", granges=FALSE) {
+chr_bands = function(assembly="GRCh38", granges=FALSE) {
     if (assembly != "hg19")
         warning("bands are hg19")
     env = new.env()
     data(hg19IdeogramCyto, package = "biovizBase", envir=env)
     bdf = as.data.frame(env$hg19IdeogramCyto) %>%
-        dplyr::mutate(seqnames = sub("^chr", "", seqnames))
+        dplyr::mutate(seqnames = sub("^chr", "", seqnames)) %>%
+        dplyr::rename(band=name)
     if (granges)
-        bdf
+        GenomicRanges::makeGRangesFromDataFrame(bdf, keep.extra.columns=TRUE)
     else
-        as.data.frame(bdf)
+        bdf
 }
