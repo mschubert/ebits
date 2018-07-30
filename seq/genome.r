@@ -16,6 +16,7 @@ genome = function(assembly_id, masked=FALSE, chrs=NULL) {
     if (assembly_id %in% names(genome_lookup)) {
         ncbi_id = assembly_id
         assembly_id = genome_lookup[ncbi_id]
+        chrs = paste0("chr", chrs)
     }
 
     if (masked)
@@ -26,6 +27,9 @@ genome = function(assembly_id, masked=FALSE, chrs=NULL) {
         stop("BSgenome not found for: ", assembly_id)
 
     g = getFromNamespace(gname, ns=gname)
+
+    if (!is.null(chrs))
+        g = .subs(g, as.character(chrs))
 
     if (!is.null(ncbi_id)) {
         newlvl = GenomeInfoDb::mapSeqlevels(GenomeInfoDb::seqlevels(g), "NCBI")
@@ -40,9 +44,5 @@ genome = function(assembly_id, masked=FALSE, chrs=NULL) {
                 stop("We're mapping from hg19 and MT is not the same")
         }
     }
-
-    if (!is.null(chrs))
-        g = .subs(g, as.character(chrs))
-
     g
 }
