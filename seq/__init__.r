@@ -11,6 +11,7 @@ probeset_table = import('./probeset_table')$probeset_table
 gene_table = import('./gene_table')$gene_table
 coords = import('./coords')
 aneuploidy = import('./aneuploidy')$aneuploidy
+count_pattern = import('./count_pattern')$count_pattern
 
 names = GenomeInfoDb::seqnames
 lengths = GenomeInfoDb::seqlengths
