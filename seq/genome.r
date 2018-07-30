@@ -41,9 +41,8 @@ genome = function(assembly_id, masked=FALSE, chrs=NULL) {
         }
     }
 
-#FIXME: this doesn't quite work
-#    if (!is.null(chrs))
-#        g = .subs(g, chrs)
+    if (!is.null(chrs))
+        g = .subs(g, as.character(chrs))
 
     g
 }
