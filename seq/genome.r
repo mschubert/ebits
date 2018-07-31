@@ -16,7 +16,8 @@ genome = function(assembly_id, masked=FALSE, chrs=NULL) {
     if (assembly_id %in% names(genome_lookup)) {
         ncbi_id = assembly_id
         assembly_id = genome_lookup[ncbi_id]
-        chrs = paste0("chr", chrs)
+        if (length(chrs) > 0)
+            chrs = paste0("chr", chrs)
     }
 
     if (masked)
