@@ -21,14 +21,14 @@ plot_cor_matrix = function(mat, title=NULL) {
 
 #' Infer partial correlation network using GeneNet
 #'
-#' @param mat  data matrix [samples x features]
+#' @param mat  data matrix [features x samples]
 #' @param fdr  FDR cutoff for each individual bootstrap
 #' @return     data.frame with node1, node2, pval, qval
 pcor = function(mat, fdr=1) {
-    pm = GeneNet::ggm.estimate.pcor(mat, lambda=0)
+    pm = GeneNet::ggm.estimate.pcor(t(mat), lambda=0)
     pm = GeneNet::network.test.edges(pm, direct=FALSE, plot=FALSE, verbose=TRUE)
-    pm$node1 = factor(colnames(mat)[pm$node1])
-    pm$node2 = factor(colnames(mat)[pm$node2])
+    pm$node1 = factor(rownames(mat)[pm$node1])
+    pm$node2 = factor(rownames(mat)[pm$node2])
 
     pm %>%
         filter(qval < fdr + .Machine$double.eps) %>%
