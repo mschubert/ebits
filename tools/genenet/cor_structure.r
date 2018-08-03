@@ -32,31 +32,35 @@ pcor = function(mat, fdr=1) {
 
     pm %>%
         filter(qval < fdr + .Machine$double.eps) %>%
-        select(node1, node2, pcor, pval, qval) %>%
-        mutate(dir=factor(sign(pcor)),
-               lab=sprintf("pcor %.2f\nFDR %.2g", pcor, qval))
+        select(node1, node2, pcor, pval, qval)
 }
 
 #' Plot correlation network
 #'
 #' @param mat  data matrix [samples x features]
-#' @param p    p-value cutoff
+#' @param pval p-value cutoff
 #' @param fdr  FDR cutoff for each individual bootstrap
 #' @return     ggplot2 object
-plot_pcor_net = function(pm, p=1, fdr=1, node_text=6, edge_text=2.5) {
-    g = tidygraph::as_tbl_graph(pm) %>%
+plot_pcor_net = function(pm, pval=1, fdr=1, node_text=6, edge_text=2.5) {
+    pval_filter = pval
+    dirx = factor(sign(pm$pcor))
+    levels(dirx) = c("red", "blue")
+    g = pm %>%
+        mutate(dir = dirx, #factor(sign(pcor)),
+               lab = sprintf("pcor %.2f\np %.2g", pcor, pval)) %>%
+        tidygraph::as_tbl_graph() %>%
         tidygraph::activate(edges) %>%
-        tidygraph::filter(pval <= p, qval <= fdr)
+        tidygraph::filter(pval <= pval_filter, qval <= fdr)
 
     p = ggraph::ggraph(g) # no edges produce plotting error if geom_edge_link set
     if (igraph::gsize(g) > 0)
         p = p +
-            ggraph::geom_edge_link(aes(label=lab, width=abs(pcor)/10,
-                alpha=1-abs(pcor)), angle_calc='along', size=edge_text)
+            ggraph::geom_edge_link(aes(label=lab, width=pcor^2*10, color=dir,
+                alpha=abs(pcor)/2), angle_calc='along', label_size=edge_text)
     p = p +
         ggraph::geom_node_text(aes(label=name), size=node_text) +
         theme_void() +
-        ggtitle(sprintf("p<%.2g, FDR<%.2g", p, fdr))
+        ggtitle(sprintf("p<%.2g, FDR<%.2g", pval, fdr))
 }
 
 #' Plot bootstrapped correlation network
