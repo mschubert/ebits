@@ -45,7 +45,8 @@ pcor = function(mat, fdr=1) {
 plot_pcor_net = function(pm, fdr=0.3) {
     g = tidygraph::as_tbl_graph(pm) %>%
         tidygraph::activate(edges) %>%
-        tidygraph::filter(qval < fdr)
+        tidygraph::filter(qval < fdr) %>%
+        tidygraph::mutate(dir = factor(dir))
 
     p = ggraph::ggraph(g) # no edges produce plotting error if geom_edge_link set
     if (g %>% tidygraph::as_tibble() %>% nrow() > 0)
