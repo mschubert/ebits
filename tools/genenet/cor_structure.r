@@ -40,23 +40,23 @@ pcor = function(mat, fdr=1) {
 #' Plot correlation network
 #'
 #' @param mat  data matrix [samples x features]
+#' @param p    p-value cutoff
 #' @param fdr  FDR cutoff for each individual bootstrap
 #' @return     ggplot2 object
-plot_pcor_net = function(pm, fdr=0.3) {
+plot_pcor_net = function(pm, p=1, fdr=1, node_text=6, edge_text=2.5) {
     g = tidygraph::as_tbl_graph(pm) %>%
         tidygraph::activate(edges) %>%
-        tidygraph::filter(qval < fdr) %>%
-        tidygraph::mutate(dir = factor(dir))
+        tidygraph::filter(pval <= p, qval <= fdr)
 
     p = ggraph::ggraph(g) # no edges produce plotting error if geom_edge_link set
-    if (g %>% tidygraph::as_tibble() %>% nrow() > 0)
+    if (igraph::gsize(g) > 0)
         p = p +
-            ggraph::geom_edge_link(aes(label=lab, color=dir, width=abs(pcor)/10, alpha=1-qval),
-                           angle_calc='along', size=2.5)
+            ggraph::geom_edge_link(aes(label=lab, width=abs(pcor)/10,
+                alpha=1-abs(pcor)), angle_calc='along', size=edge_text)
     p = p +
-        ggraph::geom_node_text(aes(label=name), size=6) +
+        ggraph::geom_node_text(aes(label=name), size=node_text) +
         theme_void() +
-        ggtitle(sprintf("original data, FDR cutoff %.2g", fdr))
+        ggtitle(sprintf("p<%.2g, FDR<%.2g", p, fdr))
 }
 
 #' Plot bootstrapped correlation network
