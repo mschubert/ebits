@@ -13,3 +13,4 @@ export_submodule('./color')
 export_submodule('./symmetrise_scale')
 
 brew = import('./brew')
+theme = import('./theme')
