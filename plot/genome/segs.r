@@ -17,12 +17,14 @@ segs = function(segs, aes, fml, ..., breaks=NULL) {
     defaults = defaults[!names(defaults) %in% names(aes_segs)]
     args = utils::modifyList(defaults, args)
 
+    fscale = eval(fml[[2]][[3]], envir=environment(fml))
     if (is.null(breaks))
-        breaks = 1:3
-    breaks = breaks * eval(fml[[2]][[3]], envir=environment(fml))
+        breaks = 1:ceiling(max(segs[[as.character(aes[['y']][[2]])]])/fscale)
+    breaks = breaks * fscale
 
     sn = "ploidy"
-    list(do.call(geom_segment, c(list(data=segs, mapping=aes_segs), args)),
+    list(geom_hline(yintercept=breaks, color="grey", linetype="dashed"),
+         do.call(geom_segment, c(list(data=segs, mapping=aes_segs), args)),
          facet_grid(. ~ seqnames, scales="free_x"),
          scale_y_continuous(sec.axis=sec_axis(fml, breaks=breaks, name=sn)))
 }
