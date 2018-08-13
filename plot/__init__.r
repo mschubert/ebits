@@ -14,3 +14,4 @@ export_submodule('./symmetrise_scale')
 
 brew = import('./brew')
 theme = import('./theme')
+genome = import('./genome')
