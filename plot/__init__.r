@@ -11,6 +11,7 @@ export_submodule('./matrix')
 export_submodule('./venn')
 export_submodule('./color')
 export_submodule('./symmetrise_scale')
+export_submodule('./build_or_spacer')
 
 brew = import('./brew')
 theme = import('./theme')
