@@ -5,9 +5,8 @@
 #' @param fml  formula for mapping between pts and segs
 #' @param breaks  dashed line breaks indicating secondary axis
 #' @param name  name of the secondary axis
-#' @param trans  transformation of seconary axis
 #' @return  ggplot2 object
-segs = function(segs, aes, fml, ..., breaks=NULL, name=waiver(), trans=NULL) {
+segs = function(segs, aes, fml, ..., breaks=NULL, name=waiver()) {
     if ("GRanges" %in% class(segs))
         segs = as.data.frame(segs)
 
@@ -28,6 +27,5 @@ segs = function(segs, aes, fml, ..., breaks=NULL, name=waiver(), trans=NULL) {
     list(geom_hline(yintercept=breaks, color="grey", linetype="dashed"),
          do.call(geom_segment, c(list(data=segs, mapping=aes_segs), args)),
          facet_grid(. ~ seqnames, scales="free_x"),
-         scale_y_continuous(sec.axis=sec_axis(fml, breaks=breaks,
-                                              name=name, trans=trans)))
+         scale_y_continuous(sec.axis=sec_axis(fml, breaks=breaks, name=name)))
 }
