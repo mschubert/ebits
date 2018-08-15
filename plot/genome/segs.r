@@ -18,7 +18,7 @@ segs = function(segs, aes, fml, ..., breaks=NULL) {
     args = utils::modifyList(defaults, args)
 
     fscale = eval(fml[[2]][[3]], envir=environment(fml))
-    if (is.null(breaks))
+    if (is.null(breaks) && nrow(segs) > 0)
         breaks = 1:ceiling(max(segs[[as.character(aes[['y']][[2]])]])/fscale)
     breaks = breaks * fscale
 
