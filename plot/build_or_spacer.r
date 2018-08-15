@@ -6,6 +6,6 @@
 build_or_spacer = function(..., envir=parent.frame()) {
     dots = pryr::named_dots(...)
     for (pn in names(dots))
-        if (class(try(ggplot_build(dots[[pn]]))) == "try-error")
+        if (class(try(ggplot_build(eval(dots[[pn]], envir=envir)))) == "try-error")
             assign(pn, patchwork::plot_spacer(), envir=envir)
 }
