@@ -56,7 +56,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
     if (simplify && sum(df$.y > p, na.rm=TRUE) > 300) {
         set.seed(123456)
         idx = which(df$.y >= .b$minN(df$.y[df$.y > p], 100))
-        keep = sample(idx, size=200, replace=FALSE, prob=1-df$.y[idx])
+        keep = sample(idx, size=200, replace=FALSE, prob=1-df$.y[idx]+.Machine$double.eps*2)
         df$.y[setdiff(idx, keep)] = NA
         df$label[idx] = NA
     }
@@ -79,7 +79,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
 
     if (repel)
         p + ggrepel::geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
-                colour = "#353535", size = text.size, na.rm = TRUE)
+                colour = "#353535", size = text.size, na.rm = TRUE, segment.alpha=0.5)
     else
         p + geom_text(mapping = aes(x = .x, y = .y, label = label),
                 colour = "#353535", size = text.size, vjust = -1, na.rm = TRUE, check_overlap=check_overlap)
