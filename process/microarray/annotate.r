@@ -1,3 +1,5 @@
+.idmap = import('../idmap')
+
 #' Mapping of annotation identifier to annotation package
 #'
 #' there should be a mapping between the two available somewhere?
@@ -65,9 +67,8 @@ annotate.NChannelSet = function(normData, summarize="hgnc_symbol") {
     # array ID is not saved in normData@annotation
 	map_channel = function(expr, ids, from="agilent", to=summarize) {
 		rownames(expr) = ids
-		idmap$probeset(expr, from=from, to=summarize)
+		.idmap$probeset(expr, from=from, to=summarize)
 	}
-    idmap = import('../idmap')
     ad = as.list(Biobase::assayData(normData))
 	mapped = sapply(ad, map_channel, ids=fData(normData)$ProbeName,
                     simplify=FALSE, USE.NAMES=TRUE)
@@ -79,18 +80,22 @@ annotate.NChannelSet = function(normData, summarize="hgnc_symbol") {
 
 annotate.matrix = function(normData, annotation, summarize="hgnc_symbol") {
     # load annotation package
-    if (!require(annotation, character.only=TRUE)) {
-        source("http://bioconductor.org/biocLite.R")
-        biocLite(annotation)
-        library(annotation, character.only=TRUE)
-    }
+    if (summarize %in% c("hgnc_symbol", "entrezgene"))
+        if (!require(annotation, character.only=TRUE)) {
+            source("http://bioconductor.org/biocLite.R")
+            biocLite(annotation)
+            library(annotation, character.only=TRUE)
+        }
 
     # work on expression matrix, summarize using limma
     if (summarize == "hgnc_symbol")
         rownames(normData) = annotate::getSYMBOL(as.vector(rownames(normData)), annotation)
     else if (summarize == "entrezgene")
         rownames(normData) = annotate::getEG(as.vector(rownames(normData)), annotation)
+    else if (summarize == "ensembl_gene_id")
+        rownames(normData) = unname(.idmap$gene(rownames(normData), to="ensembl_gene_id"))
     else
-        stop("Method", summarize, "not supported, only 'hgnc_symbol', 'entrezgene'")
+        stop("Method ", sQuote(summarize), " not supported, only ",
+             "'ensembl_gene/transcript_id'", "'hgnc_symbol', 'entrezgene'")
     limma::avereps(normData[!is.na(rownames(normData)),])
 }

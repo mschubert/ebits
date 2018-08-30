@@ -15,28 +15,28 @@ probeset = function(obj, from=NULL, to, summarize=mean) {
 }
 
 probeset.character = function(obj, to, from=.guess_id_type(obj), summarize=mean) {
-    lookup = probeset_table()[[from]]
+    lookup = .probeset_table()[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     .b$match(obj, from=df$from, to=df$to)
 }
 
 probeset.numeric = function(obj, to, from=.guess_id_type(names(obj)), summarize=mean) {
-    lookup = probeset_table()[[from]]
+    lookup = .probeset_table()[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     narray::translate(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
 probeset.matrix = function(obj, to, from=.guess_id_type(rownames(obj)), summarize=mean) {
-    lookup = probeset_table()[[from]]
+    lookup = .probeset_table()[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     narray::translate(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
 probeset.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj))),  summarize=mean) {
-    lookup = probeset_table()[[from]]
+    lookup = .probeset_table()[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     exprs(obj) = narray::translate(exprs(obj), along=1, from=df$from, to=df$to, FUN=summarize)
@@ -50,7 +50,7 @@ probeset.list = function(obj, to, from, summarize=mean) {
 if (is.null(module_name())) {
     library(testthat)
 
-    cache = file.path("cache", "probeset_table.RData")
+    cache = file.path("../../seq/cache", "probeset_table.RData")
     if (!file.exists(cache)) {
         warning("no cache available: skipping probeset test")
         quit(save="no", status=0)
@@ -71,4 +71,9 @@ if (is.null(module_name())) {
     Mref = structure(c(1, 1), .Dim = 1:2,
                      .Dimnames = list("OTC", c("x", "y")))
     expect_equal(M, Mref)
+
+    M2 = probeset(m, to="ensembl_gene_id")
+    M2ref = structure(c(1, 1), .Dim = 1:2,
+                      .Dimnames = list("ENSG00000036473", c("x", "y")))
+    expect_equal(M2, M2ref)
 }
