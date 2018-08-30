@@ -93,7 +93,7 @@ annotate.matrix = function(normData, annotation, summarize="hgnc_symbol") {
     else if (summarize == "entrezgene")
         rownames(normData) = annotate::getEG(as.vector(rownames(normData)), annotation)
     else if (summarize == "ensembl_gene_id")
-        rownames(normData) = unname(.idmap$gene(rownames(normData), to="ensembl_gene_id"))
+        rownames(normData) = unname(.idmap$probeset(rownames(normData), to="ensembl_gene_id"))
     else
         stop("Method ", sQuote(summarize), " not supported, only ",
              "'ensembl_gene/transcript_id'", "'hgnc_symbol', 'entrezgene'")
