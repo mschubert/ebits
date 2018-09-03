@@ -1,4 +1,5 @@
 io = import('ebits/io')
+`%dopar%` = foreach::`%dopar%`
 
 #' Calculate ARACNe network from gene expression matrix
 #'
@@ -36,8 +37,8 @@ aracne = function(mat, tfs=NULL, folder=tempdir(), dpi=!is.null(tfs),
     if (bootstrap == 0) {
         system(sprintf("%s --seed 1 --nobootstrap", cmd_mat))
     } else {
-        for (i in seq_len(bootstrap))
-            system(sprintf("%s --seed %i", cmd_mat, i))
+        cmd = sprintf("%s --seed %i", cmd_mat, seq_len(bootstrap))
+        foreach::foreach(cmd = cmd) %dopar% system(cmd)
     }
 
     # consolidate network or return all bootstraps
