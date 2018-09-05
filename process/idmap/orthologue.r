@@ -23,8 +23,10 @@ orthologue.character = function(obj, to, from=.guess_id_type(obj),
                           dset="hsapiens_gene_ensembl", summarize=mean) {
     if (to == "mgi_symbol")
         to = "mmusculus_homolog_associated_gene_name"
+    else if (to == "hgnc_symbol")
+        to = "hsapiens_homolog_associated_gene_name"
 
-    lookup = .ortho_table(dset)
+    lookup = .ortho_table(dset, to=sub("^([^_]+).*", "\\1", to))
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
     .b$match(obj, from=df$from, to=df$to)
@@ -34,8 +36,10 @@ orthologue.default = function(obj, to, from=.guess_id_type(narray::dimnames(obj,
                         dset="hsapiens_gene_ensembl", summarize=mean) {
     if (to == "mgi_symbol")
         to = "mmusculus_homolog_associated_gene_name"
+    else if (to == "hgnc_symbol")
+        to = "hsapiens_homolog_associated_gene_name"
 
-    lookup = .ortho_table(dset)
+    lookup = .ortho_table(dset, to=sub("^([^_]+).*", "\\1", to))
     df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
     df = df[!duplicated(df),]
 
