@@ -1,13 +1,13 @@
 import_package('igraph', attach=TRUE)
 b = import('base')
 io = import('io')
-aracne = import('../util/aracne')
-tfs = import('../util/tfs')$tfs
+aracne = import('.')
 
 INFILE = commandArgs(TRUE)[1] %or% "../data/expr/LUAD/cancer.RData"
 OUTFILE = commandArgs(TRUE)[2] %or% "aracne/LUAD/cancer.RData"
 
 expr = io$load(INFILE)
+tfs = io$read_table('./tfs.txt', header=FALSE)
 
 net = aracne$aracne(mat = expr, tfs = tfs)
 
