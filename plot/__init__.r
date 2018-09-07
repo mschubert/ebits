@@ -13,6 +13,8 @@ export_submodule('./color')
 export_submodule('./symmetrise_scale')
 export_submodule('./build_or_spacer')
 
+error = import('./error')$error
+
 brew = import('./brew')
 theme = import('./theme')
 genome = import('./genome')
