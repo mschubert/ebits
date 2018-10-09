@@ -56,7 +56,9 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
     if (simplify && sum(df$.y > p, na.rm=TRUE) > 300) {
         set.seed(123456)
         idx = which(df$.y >= .b$minN(df$.y[df$.y > p], 100))
-        keep = sample(idx, size=200, replace=FALSE, prob=1-df$.y[idx]+.Machine$double.eps*2)
+        prob = 1 - df$.y[idx]+.Machine$double.eps*2
+        prob[df$circle[idx]] = 1
+        keep = sample(idx, size=200, replace=FALSE, prob=prob)
         df$.y[setdiff(idx, keep)] = NA
         df$label[idx] = NA
     }
