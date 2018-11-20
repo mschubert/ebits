@@ -8,27 +8,31 @@ import_package('dplyr', attach=TRUE)
 #' @return       ggplot2 object
 venn = function(sets, ...) {
     fit = eulerr::euler(sets, ...)
+#    slens = sapply(sets, length)
     df = as.data.frame(fit[c('original.values', 'fitted.values',
                              'residuals', 'regionError')]) %>%
         tibble::rownames_to_column("set") %>%
         mutate(label = case_when(
+#            !grepl("\\&", set) ~ sprintf("atop(bold('%s')~~('%s'))", set, slens[set]),
             !grepl("\\&", set) ~ sprintf("atop(bold('%s'))", set),
             TRUE ~ as.character(NA)
         ))
-    cargs = c(fit$ellipses, fitted=list(fit$fitted.values))
-    centers = t(do.call(eulerr:::locate_centers, cargs))
-    df$x = centers[,1]
-    df$y = centers[,2]
 
-    ellipses = do.call(eulerr:::ellipse, fit$ellipses) %>%
+    ellipses = do.call(eulerr:::ellipse, fit$ellipses)
+    centers = lapply(ellipses, function(x) eulerr:::locate_centers(list(x))) %>%
+        dplyr::bind_rows()
+    polygons = ellipses %>%
         lapply(bind_rows) %>%
         setNames(rownames(fit$ellipses)) %>%
         bind_rows(.id="set")
+    meta = df %>%
+        filter(!is.na(label)) %>%
+        cbind(centers)
 
-    ggplot(ellipses, aes(x=x, y=y)) +
+    ggplot(polygons, aes(x=x, y=y)) +
         geom_polygon(aes(fill=set), color="#686868", alpha=0.2) +
-        geom_text(data=na.omit(df %>% select(-label)), aes(label=original.values)) +
-        ggrepel::geom_text_repel(data=na.omit(df), aes(label=label), parse=TRUE) +
+        geom_text(data=na.omit(meta %>% select(-label)), aes(label=original.values)) +
+        ggrepel::geom_text_repel(data=na.omit(meta), aes(label=label), parse=TRUE) +
         theme_void() +
         guides(size=FALSE, fill=FALSE) +
         coord_fixed()
