@@ -49,8 +49,8 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
     }
 
     # filter labels, but only for points we don't highlight
-    rel_effect = df$.x/max(abs(df$.x))
-    rel_pval = 2 * log10(df$.y) / min(log10(df$.y))
+    rel_effect = df$.x/max(abs(df$.x), na.rm=TRUE)
+    rel_pval = 2 * log10(df$.y) / min(log10(df$.y), na.rm=TRUE)
     point_dist = rel_effect^2 + rel_pval^2
     df$label[rank(-point_dist) > label_top & !df$circle] = NA
 
