@@ -19,8 +19,6 @@ Suggests:
     BiocManager,
     devtools,
     rmarkdown,
-    testthat,
-    tidyverse,
-    igraph
+    testthat
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1

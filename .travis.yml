@@ -6,6 +6,10 @@ addons:
     packages:
       - libarpack2-dev
 
+r_binary_packages:
+ - tidyverse
+ - igraph
+
 cache:
  - packages
  - directories:
