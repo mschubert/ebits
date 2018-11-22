@@ -1,5 +1,4 @@
 language: r
-sudo: required # for binary packages
 
 # apt_packages does not work here
 addons:
@@ -11,11 +10,6 @@ cache:
  - packages
  - directories:
     - seq/cache
-
-r_binary_packages:
- - tidyverse
-
-#r_github_packages: klmr/modules # this does not work either
 
 # modules should work from DESCRIPTION remote, but doesn't
 install:

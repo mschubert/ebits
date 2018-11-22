@@ -10,7 +10,8 @@ Depends:
     R (>= 3.0.2)
 Imports:
     devtools,
-    modules
+    modules,
+    tidyverse
 Remotes:
     klmr/modules@master
 License: Apache License (== 2.0) | file LICENSE
