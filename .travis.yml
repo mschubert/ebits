@@ -11,10 +11,8 @@ cache:
  - directories:
     - seq/cache
 
-# modules should work from DESCRIPTION remote, but doesn't
-install:
+before_script:
  - make deps
- - Rscript -e "devtools::install_github('klmr/modules')"
  - make -C stats nmf_mu.so
 
 script: make test

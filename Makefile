@@ -25,7 +25,7 @@ deps: dependencies.txt
 	R -e "source('https://bioconductor.org/biocLite.R')" \
 	  -e "req = read.table('dependencies.txt', header=FALSE)[[1]]" \
 	  -e "new = setdiff(req, installed.packages()[,'Package'])" \
-	  -e "cat(new, "'\\n'")" \
+	  -e "cat(new, \"\\n\")" \
 	  -e "biocLite(new)"
 
 dependencies.txt: dependencies.sh

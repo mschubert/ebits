@@ -9,17 +9,18 @@ BugReports: https://github.com/mschubert/ebits/issues
 Depends:
     R (>= 3.0.2)
 Imports:
-    devtools,
-    modules,
-    tidyverse
+    modules
 Remotes:
     klmr/modules@master
 License: Apache License (== 2.0) | file LICENSE
 LazyData: true
 Encoding: UTF-8
 Suggests:
+    BiocManager,
     devtools,
     rmarkdown,
-    testthat
+    testthat,
+    tidyverse,
+    igraph
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
