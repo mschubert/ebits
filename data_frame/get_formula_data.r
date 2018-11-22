@@ -3,6 +3,19 @@
 #' @param from  The formula
 #' @param data  A superset of the data; default: calling environment
 get_formula_data = function(form, data=parent.frame()) {
+    acall = R6::R6Class("call",
+        public = list(
+            initialize = function(sym, name, str) {
+                self$sym = sym
+                self$name = name
+                self$str = str
+            },
+            sym = NULL,
+            name = NULL,
+            str = NULL
+        )
+    )
+
     extract_calls = function(f, ops=c("~","+",":","*")) {
         if (length(f) > 1 && as.character(f[[1]]) %in% ops)
             sapply(f[2:length(f)], extract_calls)
@@ -11,29 +24,27 @@ get_formula_data = function(form, data=parent.frame()) {
                 name = paste(f[2:length(f)], collapse="_")
             else
                 name = as.character(f)
-            attr(f, "name") = name
-            attr(f, "str") = deparse(f)
-            f
+            acall$new(f, name, deparse(f))
         }
     }
 
     # extract all names/calls that are atomic for the formula
     vars = unlist(extract_calls(form))
-    vars = vars[!sapply(vars, is.numeric)] # exclude "0+" from parsing
+    vars = vars[!sapply(vars, function(v) is.numeric(v$sym))] # exclude "0+" from parsing
 
     # go through vars, create data list w/ all evals
     processed_data = lapply(vars, function(v)
-        if (as.character(v) %in% names(data))
-            base::eval(v, envir=data)
+        if (v$str %in% names(data))
+            base::eval(v$sym, envir=data)
         else
-            base::eval(v, envir=environment(form))
+            base::eval(v$sym, envir=environment(form))
     )
-    names(processed_data) = sapply(vars, function(v) attr(v, "name"))
+    names(processed_data) = sapply(vars, function(v) v$name)
 
     # go through formula, replace every call by name
     form_str = deparse(form)
     for (v in vars)
-        form_str = gsub(attr(v,"str"), attr(v,"name"), form_str, fixed=TRUE)
+        form_str = gsub(v$str, v$name, form_str, fixed=TRUE)
 
     list(form=formula(form_str), data=processed_data)
 }
@@ -63,6 +74,7 @@ if (is.null(module_name())) {
 
     # syntax for survival fits
     d3 = get_formula_data(status + time ~ 0 + x, data=test)
+    expect_false("0" %in% names(d3$data))
     expect_equal(d3$form, status + time ~ 0 + x)
     expect_equal(d3$data$time, test$time)
     expect_equal(d3$data$status, status)
