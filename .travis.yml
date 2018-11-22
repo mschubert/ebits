@@ -6,10 +6,12 @@ addons:
   apt:
     packages:
       - libarpack2-dev
+      - libudunits2-dev
 
 r_binary_packages:
  - tidyverse
  - igraph
+ - Rhdf5lib
 
 cache:
  - packages
