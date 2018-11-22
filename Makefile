@@ -26,7 +26,7 @@ deps: dependencies.txt
 	  -e "req = read.table('dependencies.txt', header=FALSE)[[1]]" \
 	  -e "new = setdiff(req, installed.packages()[,'Package'])" \
 	  -e "cat(new, \"\\n\")" \
-	  -e "biocLite(new)"
+	  -e "BiocManager::install(new)"
 
 dependencies.txt: dependencies.sh
 	bash $< > $@
