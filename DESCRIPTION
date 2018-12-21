@@ -17,6 +17,7 @@ LazyData: true
 Encoding: UTF-8
 Suggests:
     BiocManager,
+    rprojroot,
     devtools,
     rmarkdown,
     testthat
