@@ -22,8 +22,7 @@ test:
 	@$(foreach R,$(RSCRIPTS_T),echo $(R); $(Rscript) $(R)$(\n))
 
 deps: dependencies.txt
-	R -e "source('https://bioconductor.org/biocLite.R')" \
-	  -e "req = read.table('dependencies.txt', header=FALSE)[[1]]" \
+	R -e "req = read.table('dependencies.txt', header=FALSE)[[1]]" \
 	  -e "new = setdiff(req, installed.packages()[,'Package'])" \
 	  -e "cat(new, \"\\n\")" \
 	  -e "BiocManager::install(new)"
