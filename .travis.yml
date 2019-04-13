@@ -1,5 +1,4 @@
 language: r
-r: bioc-release
 sudo: required # for binary packages
 
 # apt_packages does not work here
@@ -8,13 +7,13 @@ addons:
     packages:
       - libarpack2-dev
       - libudunits2-dev
+      - r-bioc-rhdf5
+      - r-bioc-genomicranges
 
 r_binary_packages:
  - tidyverse
  - igraph
  - devtools
- - rhdf5
- - GenomicRanges
  - matrixStats
 
 cache:
