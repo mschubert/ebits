@@ -13,6 +13,9 @@ r_binary_packages:
  - tidyverse
  - igraph
  - devtools
+ - rhdf5
+ - GenomicRanges
+ - matrixStats
 
 cache:
  - packages
