@@ -1,4 +1,5 @@
 language: r
+r: bioc-release
 sudo: required # for binary packages
 
 # apt_packages does not work here
