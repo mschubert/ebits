@@ -14,6 +14,7 @@ export_submodule('./symmetrise_scale')
 export_submodule('./build_or_spacer')
 
 error = import('./error')$error
+text = import('./text')$text
 
 brew = import('./brew')
 theme = import('./theme')
