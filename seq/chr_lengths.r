@@ -27,6 +27,15 @@ chr_lengths.character = function(assembly, chrs=NULL) {
     chr_lengths
 }
 
+chr_lengths.Seqinfo = function(assembly, chrs=NULL) {
+    chr_lengths = GenomeInfoDb::seqlengths(assembly)
+
+    if (!is.null(chrs))
+        chr_lengths = chr_lengths[names(chr_lengths) %in% chrs]
+
+    chr_lengths
+}
+
 chr_lengths.BSgenome = function(assembly, chrs=NULL) {
     chr_lengths = GenomeInfoDb::seqlengths(assembly)
 
