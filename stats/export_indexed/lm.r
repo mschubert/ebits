@@ -10,6 +10,8 @@ import('../../base/operators')
 #' @return          A data.frame containing the model result
 lm = function(formula, data=environment(formula), min_pts=3, return_intercept=FALSE,
               atomic_class='vector') {
+    `%>%` = magrittr::`%>%`
+
     pts = model.frame(formula, data)
     size = lapply(pts, function(x) {
         # could potentially convert to factor first as well

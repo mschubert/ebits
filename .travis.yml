@@ -7,11 +7,14 @@ addons:
     packages:
       - libarpack2-dev
       - libudunits2-dev
+      - r-bioc-rhdf5
+      - r-bioc-genomicranges
 
 r_binary_packages:
  - tidyverse
  - igraph
  - devtools
+ - matrixStats
 
 cache:
  - packages

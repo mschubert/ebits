@@ -11,7 +11,7 @@ fisher_r2z = function(rho) 0.5 * log((1 + rho)/(1 - rho))
 test = function(mat, self=0) {
     mat = as.matrix(mat)
     n = ncol(mat)
-    p.mat = matrix(NA, n, n)
+    p.mat = matrix(NA, n, n, dimnames=dimnames(mat)[c(2,2)])
     diag(p.mat) = self
     for (i in 1:(n - 1))
         for (j in (i + 1):n)
