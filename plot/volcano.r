@@ -52,6 +52,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
     rel_effect = df$.x/max(abs(df$.x), na.rm=TRUE)
     rel_pval = 2 * log10(df$.y) / min(log10(df$.y), na.rm=TRUE)
     point_dist = rel_effect^2 + rel_pval^2
+    point_dist[is.na(df$label)] = NA # only keep points where we have labels
     df$label[rank(-point_dist) > label_top & !df$circle] = NA
 
     # make sure we don't plot too many insignificant points
