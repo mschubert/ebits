@@ -26,6 +26,8 @@ color = import('./color')
 volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=FALSE,
         text.size=3.5, xlim=c(NA,NA), ylim=c(NA,NA), simplify=TRUE, repel=FALSE,
         x_label_bias=1, pos_label_bias=1) {
+    if (nrow(df) == 0)
+        stop("No observations to plot")
     if (!'label' %in% colnames(df))
         stop("Column 'label' not found. You need to specify a label for your points")
     if (!'color' %in% colnames(df))
