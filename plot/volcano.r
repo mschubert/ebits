@@ -42,8 +42,9 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
     df = dplyr::mutate(df, size = size*base.size)
 
     # set very low p-values to the cutoff value and label point
+    # .Machine$double.eps too large, first != 0 too small
     if (ceil == 0 && any(df$.y == 0, na.rm=TRUE))
-        ceil = min(df$.y[df$.y > .Machine$double.eps], na.rm=TRUE)
+        ceil = min(df$.y[df$.y > 1e-300], na.rm=TRUE)
     pmin = df$.y < ceil
     if (any(pmin, na.rm=TRUE)) {
         df[pmin,] = mutate(df[pmin,],
