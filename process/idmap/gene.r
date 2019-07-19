@@ -36,7 +36,8 @@ gene.default = function(obj, to, from=.guess_id_type(narray::dimnames(obj, along
         to = "external_gene_name"
 
     lookup = .gene_table(dset)
-    df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
+    df = na.omit(data.frame(from = as.character(lookup[[from]]),
+                            to = as.character(lookup[[to]])))
     df = df[!duplicated(df),]
 
     # remove versions of gene ids
