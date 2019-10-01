@@ -15,6 +15,7 @@ export_submodule('./build_or_spacer')
 
 error = import('./error')$error
 text = import('./text')$text
+try = import('./try')$try
 
 brew = import('./brew')
 theme = import('./theme')
