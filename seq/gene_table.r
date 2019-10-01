@@ -13,12 +13,10 @@ gene_table = function(dset="hsapiens_gene_ensembl", version="latest",
         attr(dset, "ensembl_version"), attr(dset, "dataset_version")))
 
     grch = as.integer(sub("[^0-9]+([0-9]+)$", "\\1", assembly))
-    if (grch == 38)
-        grch = NULL # they don't allow to specify GRCh38 explicitly
     if (version == "latest")
         version = 97 #TODO: get this + be robust offline
 
-    fname = sprintf("gene_table-%s%i.rds", dset, version)
+    fname = sprintf("gene_table-%s-%i-%i.rds", dset, version, grch)
     cache = file.path(module_file(), "cache", fname)
     if (file.exists(cache) && !force) {
         mapping = readRDS(cache)
@@ -27,6 +25,8 @@ gene_table = function(dset="hsapiens_gene_ensembl", version="latest",
     }
 
     message("Generating cache file ", fname)
+    if (grch == 38)
+        grch = NULL # they don't allow to specify GRCh38 explicitly
 
     ensembl = biomaRt::useEnsembl("ensembl", dataset=dset, GRCh=grch)
     datasets = biomaRt::listDatasets(ensembl, version)
