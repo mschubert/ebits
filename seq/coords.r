@@ -48,21 +48,21 @@ import_package('GenomicRanges', attach=TRUE)
 #' @param type        Only return genes of a certain type, e.g. 'protein_coding'
 #' @return            A data.frame or GRanges object with gene coordinates
 gene = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
-                assembly="fixthis", granges=FALSE, chromosomes=NULL, type=NULL) {
+                assembly="GRCh38", granges=FALSE, chromosomes=NULL, type=NULL) {
     idtype[idtype %in% c("hgnc_symbol", "mgi_symbol")] = "external_gene_name"
 
     keep = c(idtype, "band", "chromosome_name", "start_position",
              "end_position", "strand", "gene_biotype")
-    .process(.gene_table(dset=dset)[,keep], chromosomes=chromosomes,
+    .process(.gene_table(dset=dset, assembly=assembly)[,keep], chromosomes=chromosomes,
              type=type, granges=granges)
 }
 
 #' @rdname gene
 transcript = function(idtype="external_gene_name", dset="hsapiens_gene_ensembl",
-                      assembly="fixthis", granges=FALSE, chromosomes=NULL, type=NULL) {
+                      assembly="GRCh38", granges=FALSE, chromosomes=NULL, type=NULL) {
     idtype[idtype %in% c("hgnc_symbol", "mgi_symbol")] = "external_gene_name"
 
-    .process(.gene_table(dset=dset), chromosomes=chromosomes,
+    .process(.gene_table(dset=dset, assembly=assembly), chromosomes=chromosomes,
              type=type, granges=granges)
 }
 
