@@ -5,7 +5,7 @@
 #' @param p  ggplot2 object
 #' @return   ggplot2 object that does not produce errors
 try = function(p) {
-    built = try(ggplot2::ggplot_build(p))
+    built = base::try(ggplot2::ggplot_build(p))
     if (class(built) == "try-error")
         .text(x)
     else
