@@ -24,7 +24,7 @@ color = import('./color')
 #' @param pos_label_bias Multiplier to focus more on positive than negative labels
 #' @return           A ggplot2 object of the volcano plot
 volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=FALSE,
-        text.size=3.5, xlim=c(NA,NA), ylim=c(NA,NA), simplify=TRUE, repel=FALSE,
+        text.size=3.5, xlim=NULL, ylim=NULL, simplify=TRUE, repel=FALSE,
         x_label_bias=1, pos_label_bias=1) {
     if (nrow(df) == 0)
         stop("No observations to plot")
