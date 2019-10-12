@@ -1,4 +1,3 @@
-library(ggrepel)
 .b = import('../base')
 import('./helpers', attach=TRUE)
 color = import('./color')
@@ -34,6 +33,13 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
         stop("Column 'color' not found. Did you call plt$color$...?")
     if (!'circle' %in% colnames(df))
         df$circle = FALSE
+
+    # workaround display bugs for very small p-values
+    ylab = "Adjusted p-value (FDR)"
+    if (any(df$.y < 1e-300, na.rm=TRUE)) {
+        df$.y = 2^-abs(pmin(df$.y, 300))
+        ylab = "Pseudo p-value (values too close to zero)"
+    }
 
     # remove insignificant points outside x limits, adjust size
     if (any(df$.y < p, na.rm=TRUE))
@@ -86,7 +92,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
 #        annotate("text", x=min(df$.x), y=0.05, hjust=1, vjust=2, 
 #                 size=3.5, label="0.05", colour="black") +
         xlab("Effect size") + 
-        ylab("Adjusted P-value") +
+        ylab(ylab) +
         theme_bw()
 
     if (repel)
