@@ -1,6 +1,7 @@
 # not attaching this might have unforseen consequences
 # do it once, so we can refactor later
-library(cowplot)
+library(ggplot2)
+theme_set(cowplot::theme_cowplot())
 
 #export_submodule('./box') # broken
 export_submodule('./volcano')
