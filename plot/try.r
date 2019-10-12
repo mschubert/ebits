@@ -7,7 +7,7 @@
 try = function(p) {
     built = base::try(ggplot2::ggplot_build(p))
     if (class(built) == "try-error")
-        .text(x)
+        .text(conditionMessage(built))
     else
         p
 }
