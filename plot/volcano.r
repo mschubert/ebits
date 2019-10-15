@@ -36,8 +36,9 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
 
     # workaround display bugs for very small p-values
     ylab = "Adjusted p-value (FDR)"
-    if (any(df$.y < 1e-300, na.rm=TRUE)) {
-        df$.y = 2^-abs(pmin(df$.y, 300))
+    df$.y = pmax(df$.y, 1e-300)
+    if (any(df$.y <= 1e-300, na.rm=TRUE)) {
+        df$.y = 2^log10(pmin(df$.y, 300))
         ylab = "Pseudo p-value (values too close to zero)"
     }
 
