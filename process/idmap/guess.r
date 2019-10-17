@@ -26,8 +26,8 @@ id_type = function(from_ids) {
 #' @param from_ids  Character vector of IDs
 #' @return          Character string describing the data set
 dset = function(from_ids) {
-    id_type = tryCatch(id_type(from_ids), error = function(e) "unknown")
-    if (id_type == "mgi_symbol")
+    idt = tryCatch(id_type(from_ids), error = function(e) "unknown")
+    if (idt == "mgi_symbol")
         "mmusculus_gene_ensembl"
     else
         "hsapiens_gene_ensembl"
