@@ -1,6 +1,6 @@
 library(dplyr)
 .b = import('../../base')
-.guess_id_type = import('./guess_id_type')$guess_id_type
+.guess = import('./guess')
 .probeset_table = import('../../seq/probeset_table')$probeset_table
 
 #' probeset ID mapping function
@@ -14,28 +14,28 @@ probeset = function(obj, from=NULL, to, summarize=mean) {
     UseMethod("probeset")
 }
 
-probeset.character = function(obj, to, from=.guess_id_type(obj), summarize=mean) {
+probeset.character = function(obj, to, from=.guess$id_type(obj), summarize=mean) {
     lookup = .probeset_table()[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     .b$match(obj, from=df$from, to=df$to)
 }
 
-probeset.numeric = function(obj, to, from=.guess_id_type(names(obj)), summarize=mean) {
+probeset.numeric = function(obj, to, from=.guess$id_type(names(obj)), summarize=mean) {
     lookup = .probeset_table()[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     narray::translate(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
-probeset.matrix = function(obj, to, from=.guess_id_type(rownames(obj)), summarize=mean) {
+probeset.matrix = function(obj, to, from=.guess$id_type(rownames(obj)), summarize=mean) {
     lookup = .probeset_table()[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     narray::translate(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
-probeset.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj))),  summarize=mean) {
+probeset.ExpressionSet = function(obj, to, from=.guess$id_type(rownames(exprs(obj))),  summarize=mean) {
     lookup = .probeset_table()[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]

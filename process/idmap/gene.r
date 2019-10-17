@@ -1,7 +1,7 @@
 library(dplyr)
 .b = import('../../base')
 .io = import('../../io')
-.guess_id_type = import('./guess_id_type')$guess_id_type
+.guess = import('./guess')
 .gene_table = import('../../seq/gene_table')$gene_table
 
 #' Gene ID mapping function
@@ -19,18 +19,19 @@ gene = function(obj, from=NULL, to, dset="hsapiens_gene_ensembl", summarize=mean
     UseMethod("gene")
 }
 
-gene.character = function(obj, to, from=.guess_id_type(obj),
+gene.character = function(obj, to, from=.guess$id_type(obj),
                           dset="hsapiens_gene_ensembl", summarize=mean) {
     if (to %in% c("hgnc_symbol", "mgi_symbol"))
         to = "external_gene_name"
 
     lookup = .gene_table(dset)
-    df = na.omit(data.frame(from=lookup[[from]], to=lookup[[to]]))
+    df = na.omit(data.frame(from = as.character(lookup[[from]]),
+                            to = as.character(lookup[[to]])))
     df = df[!duplicated(df),]
     .b$match(obj, from=df$from, to=df$to)
 }
 
-gene.default = function(obj, to, from=.guess_id_type(narray::dimnames(obj, along=1)),
+gene.matrix = function(obj, to, from=.guess$id_type(narray::dimnames(obj, along=1)),
                         dset="hsapiens_gene_ensembl", summarize=mean) {
     if (to %in% c("hgnc_symbol", "mgi_symbol"))
         to = "external_gene_name"
@@ -51,7 +52,7 @@ gene.default = function(obj, to, from=.guess_id_type(narray::dimnames(obj, along
     narray::translate(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
-gene.ExpressionSet = function(obj, to, from=.guess_id_type(rownames(exprs(obj))),
+gene.ExpressionSet = function(obj, to, from=.guess$id_type(rownames(exprs(obj))),
                               dset="hsapiens_gene_ensembl", summarize=mean) {
     exprs(obj) = gene(Biobase::exprs(obj), from=from, to=to, dset=dset, summarize=summarize)
     obj
@@ -61,6 +62,9 @@ gene.list = function(obj, to, from, dset="hsapiens_gene_ensembl", summarize=mean
     lapply(obj, gene, to=to, from=from, dset=dset, summarize=summarize)
 }
 
+gene.default = function(obj, to, from, dset="hsapiens_gene_ensembl", summarize=mean) {
+    stop("Trying to map ", mode(obj), " object, did you forget as.character()?")
+}
 
 if (is.null(module_name())) {
     library(testthat)
