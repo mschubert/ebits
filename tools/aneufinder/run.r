@@ -1,4 +1,6 @@
 import_package('dplyr', attach=TRUE)
+bin_reads = import('./bin_reads')$bin_reads
+blacklist_from_ref = import('./blacklist_from_ref')$blacklist_from_ref
 seq = import('../../seq')
 
 #' Run aneufinder with clean output structure
