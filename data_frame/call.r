@@ -75,12 +75,12 @@ if (!is.null(module_name())) {
     f2 = function(x,y,z) x+y+z
     r2 = call(expand.grid(x=x,y=y), f2, const=list(z=10))
 
-    expect_equal(r1[c('x','y')], r2[c('x','y')])
-    expect_equal(r1$result, rowSums(expand.grid(x,y)))
-    expect_equal(r2$result, z + rowSums(expand.grid(x,y)))
+    testthat::expect_equal(r1[c('x','y')], r2[c('x','y')])
+    testthat::expect_equal(r1$result, rowSums(expand.grid(x,y)))
+    testthat::expect_equal(r2$result, z + rowSums(expand.grid(x,y)))
 
     # test correct ordering of empty results
     ferr = function(x) if (x %% 2 == 0) x
     r3 = call(data.frame(x=1:5), ferr)
-    expect_equal(r3$result, c(NA, 2, NA, 4, NA))
+    testthat::expect_equal(r3$result, c(NA, 2, NA, 4, NA))
 }

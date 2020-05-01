@@ -98,7 +98,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
 
     if (repel)
         p + ggrepel::geom_text_repel(mapping = aes(x = .x, y = .y, label = label),
-                colour= "#353535", size = text.size, na.rm = TRUE, segment.alpha=0.5, max.iter=20000)
+                colour= "#353535", size = text.size, na.rm = TRUE, segment.alpha=0.5, max.iter=50000)
     else
         p + geom_text(mapping = aes(x = .x, y = .y, label = label),
                 colour = "#353535", size = text.size, vjust = -1, na.rm = TRUE, check_overlap=check_overlap)
@@ -118,5 +118,5 @@ if (is.null(module_name())) {
     p = volcano(df)
 
     df$label[df$label %in% c("L", "N")] = NA
-    expect_equal(df, p$data)
+    testthat::expect_equal(df, p$data)
 }
