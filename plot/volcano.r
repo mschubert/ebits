@@ -62,39 +62,45 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
     }
 
     # filter labels, but only for points we don't highlight
-    rel_effect = df$.x/max(abs(df$.x), na.rm=TRUE)
-    rel_pval = 2 * log10(df$.y) / min(log10(df$.y), na.rm=TRUE)
-    point_dist = rel_effect^2 * x_label_bias + rel_pval^2
+    rel_effect = df$.x / abs(df$.x[rank(-abs(df$.x), ties.method="first") == 10])
+    rel_effect[is.na(rel_effect)] = 0
+    rel_pval = log10(df$.y) / log10(df$.y[rank(df$.y, ties.method="first") == 10])
+    point_dist = abs(rel_effect) * x_label_bias + abs(rel_pval)
     point_dist[rel_effect > 0] = point_dist[rel_effect > 0] * pos_label_bias
+    point_dist[df$.y > p] = NA
     point_dist[is.na(df$label)] = NA # only keep points where we have labels
     df$label[rank(-point_dist) > label_top & !df$circle] = NA
 
     # make sure we don't plot too many insignificant points
-    if (simplify && sum(df$.y > p, na.rm=TRUE) > 300) {
+    if (simplify && sum(df$.y > p, na.rm=TRUE) > 800) {
         set.seed(123456)
         idx = which(df$.y >= .b$minN(df$.y[df$.y > p], 100))
         prob = 1 - df$.y[idx]+.Machine$double.eps*2
         prob[df$circle[idx]] = 1
-        keep = sample(idx, size=200, replace=FALSE, prob=prob)
+        keep = sample(idx, size=500, replace=FALSE, prob=prob)
         df$.y[setdiff(idx, keep)] = NA
         df$label[idx] = NA
     }
 
+    x = p # no idea why this is required
+    breaks_with_thresh = function(...) c(x, scales::log_breaks(base=10)(df$.y, 5))
+
     # and do the actual plot
+    df = dplyr::arrange(df, -.y)
     p = ggplot(df, aes(x = .x, y = .y)) + 
-        scale_y_continuous(trans = reverselog_trans(10),
+        scale_y_continuous(trans = reverselog_trans(base=10),
                            label = scientific_10,
-                           limits = ylim) +
+                           limits = ylim,
+                           breaks = breaks_with_thresh) +
         scale_x_continuous(limits = xlim) +
-        geom_point(size = sqrt(df$size), colour = df$color, na.rm = TRUE) +
-        geom_point(size = ifelse(df$circle, sqrt(df$size), NA), shape=1, colour = '#00000088', na.rm = TRUE) +
-        geom_vline(xintercept = 0, lwd = 0.3) +
-        geom_hline(yintercept = p, lwd = 0.3, linetype = 2) +
-#        annotate("text", x=min(df$.x), y=0.05, hjust=1, vjust=2, 
-#                 size=3.5, label="0.05", colour="black") +
+        geom_point(size = sqrt(df$size), color=df$color, na.rm=TRUE) +
+        geom_point(size = ifelse(df$circle, sqrt(df$size), NA),
+                   shape=1, color='#00000088', na.rm=TRUE) +
+        geom_vline(xintercept=0, color="#858585") +
+        geom_hline(yintercept=p, linetype = "dashed", color="#858585") +
         xlab("Effect size") + 
         ylab(ylab) +
-        theme_bw()
+        theme_classic()
 
     if (repel)
         p + ggrepel::geom_text_repel(mapping = aes(x = .x, y = .y, label = label),

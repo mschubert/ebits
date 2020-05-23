@@ -12,7 +12,8 @@ reverselog_trans = function(base=exp(1)) {
 
 # function for relabeling the y-axis
 scientific_10 = function(x) {
-    parse(text=gsub("e", " %*% 10^", .scales$scientific_format()(x)))
+    fmt = ifelse(x < 0.01, .scales$scientific_format()(x), x)
+    parse(text=gsub("1e", "10^", fmt))
 }
 
 # http://stackoverflow.com/questions/6738085
