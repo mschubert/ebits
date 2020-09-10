@@ -33,6 +33,8 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
         stop("Column 'color' not found. Did you call plt$color$...?")
     if (!'circle' %in% colnames(df))
         df$circle = FALSE
+    if (!'fill' %in% colnames(df))
+        df$fill = TRUE
 
     # workaround display bugs for very small p-values
     ylab = "Adjusted p-value (FDR)"
@@ -69,7 +71,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
     point_dist[rel_effect > 0] = point_dist[rel_effect > 0] * pos_label_bias
     point_dist[df$.y > p] = NA
     point_dist[is.na(df$label)] = NA # only keep points where we have labels
-    df$label[rank(-point_dist) > label_top & !df$circle] = NA
+    df$label[rank(-point_dist) > label_top & xor(df$fill, df$circle)] = NA
 
     # make sure we don't plot too many insignificant points
     if (simplify && sum(df$.y > p, na.rm=TRUE) > 800) {
@@ -93,9 +95,9 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
                            limits = ylim,
                            breaks = breaks_with_thresh) +
         scale_x_continuous(limits = xlim) +
-        geom_point(size = sqrt(df$size), color=df$color, na.rm=TRUE) +
+        geom_point(size = ifelse(df$fill, sqrt(df$size), NA), color=df$color, na.rm=TRUE) +
         geom_point(size = ifelse(df$circle, sqrt(df$size), NA),
-                   shape=1, color='#00000088', na.rm=TRUE) +
+                   shape=1, color=ifelse(df$fill, '#00000088', df$color), na.rm=TRUE) +
         geom_vline(xintercept=0, color="#858585") +
         geom_hline(yintercept=p, linetype = "dashed", color="#858585") +
         xlab("Effect size") + 
