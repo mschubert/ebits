@@ -1,4 +1,5 @@
 seq = import('../../seq')
+bin_reads = import('./bin_reads')$bin_reads
 
 #' Create a blacklist from WGS read numbers
 #'
