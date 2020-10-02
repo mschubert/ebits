@@ -16,12 +16,13 @@ seq = import('../../seq')
 #' @param binsize        Average bin size for reads
 #' @param correction     "GC", "mappability" or both in a vector
 #' @param states         Max number of chromosome copies to model
+#' @param min_segment_size  Minimum number of bins for a copy segment to span
 #' @param bin_width_ref  Reference BAM file for creating variable width bins
 #'   value can either be NULL (fixed bins) or a path to a file to use for reference
 #' @param method         Aneufinder method: "edivisive", "HMM" or "dnacopy"
 #' @return               A list of models, one for each input file
 run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
-               binsize=1e6, correction="GC", states=10,
+               binsize=1e6, correction="GC", states=10, min_segment_size=10,
                mappability_reference=NULL, paired_reads=FALSE,
                duplicate_reads=FALSE, min_mapq=10, max_time=-1, n_trials=15,
                bin_width_ref=NULL, method="edivisive") {
@@ -76,6 +77,7 @@ run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
     models = lapply(binned_reads, function(br) {
         m = try(AneuFinder::findCNVs(br,
                 eps = 0.1,
+                min.segment.size = min_segment_size,
                 max.time = max_time,
                 max.iter = 5000,
                 num.trials = n_trials,
