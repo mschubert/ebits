@@ -20,12 +20,13 @@ seq = import('../../seq')
 #' @param bin_width_ref  Reference BAM file for creating variable width bins
 #'   value can either be NULL (fixed bins) or a path to a file to use for reference
 #' @param method         Aneufinder method: "edivisive", "HMM" or "dnacopy"
+#' @param ...            Additional parameters passed to 'findCNVs'
 #' @return               A list of models, one for each input file
 run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
                binsize=1e6, correction="GC", states=10, min_segment_size=10,
                mappability_reference=NULL, paired_reads=FALSE,
                duplicate_reads=FALSE, min_mapq=10, max_time=-1, n_trials=15,
-               bin_width_ref=NULL, method="edivisive") {
+               bin_width_ref=NULL, method="edivisive", ...) {
 
     stopifnot(length(files) >= 1)
     stopifnot(length(binsize) == 1) # change [[1]] below if removing
@@ -83,7 +84,8 @@ run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
                 num.trials = n_trials,
                 states = c("zero-inflation", sprintf("%i-somy", 0:states)),
                 most.frequent.state = "2-somy",
-                method = method))
+                method = method,
+                ...))
         if (class(m$segments) == "GRanges") {
             idx = unique(as.character(GenomeInfoDb::seqnames(m$segments)))
             GenomeInfoDb::seqinfo(m$segments) = GenomeInfoDb::seqinfo(genome)[idx]
