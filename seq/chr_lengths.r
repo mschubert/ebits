@@ -11,36 +11,14 @@ chr_lengths = function(assembly, chrs=NULL) {
 }
 
 chr_lengths.character = function(assembly, chrs=NULL) {
-    if (assembly == "GRCh37")
-        strip_chr_prefix = TRUE
-    else
-        strip_chr_prefix = FALSE
-
-    chr_lengths = GenomeInfoDb::seqlengths(.genome(assembly))
-
-    if (strip_chr_prefix)
-        names(chr_lengths) = sub("^chr", "", names(chr_lengths))
-
-    if (!is.null(chrs))
-        chr_lengths = chr_lengths[names(chr_lengths) %in% chrs]
-
-    chr_lengths
+    chr_lengths(.genome(assembly), chrs=chrs)
 }
 
-chr_lengths.Seqinfo = function(assembly, chrs=NULL) {
+# .Seqinfo, .BSgenome
+chr_lengths.default = function(assembly, chrs=NULL) {
+    if (is.null(chrs))
+        chrs = GenomeInfoDb::standardChromosomes(assembly)
+
     chr_lengths = GenomeInfoDb::seqlengths(assembly)
-
-    if (!is.null(chrs))
-        chr_lengths = chr_lengths[names(chr_lengths) %in% chrs]
-
-    chr_lengths
-}
-
-chr_lengths.BSgenome = function(assembly, chrs=NULL) {
-    chr_lengths = GenomeInfoDb::seqlengths(assembly)
-
-    if (!is.null(chrs))
-        chr_lengths = chr_lengths[names(chr_lengths) %in% chrs]
-
-    chr_lengths
+    chr_lengths[names(chr_lengths) %in% chrs]
 }

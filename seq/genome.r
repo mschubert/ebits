@@ -28,7 +28,6 @@ genome = function(assembly_id, masked=FALSE, chrs=NULL) {
         stop("BSgenome not found for: ", assembly_id)
 
     g = getFromNamespace(gname, ns=gname)
-
     if (!is.null(chrs))
         g = .subs(g, as.character(chrs))
 
