@@ -1,3 +1,5 @@
+.chr_lengths = import('./chr_lengths')$chr_lengths
+
 #' Read a BAM or BED file to read_bed object
 #'
 #' @param fname     A character vector of file name(s) of BED files
@@ -12,7 +14,13 @@ read_bed.list = function(fnames, assembly, ...) {
 }
 
 read_bed.character = function(fname, assembly, ...) {
-    AneuFinder::bam2GRanges(fname, assembly, ...)
+    if (!is.data.frame(assembly) && !is.vector(assembly))
+        assembly = .chr_lengths(assembly)
+    if (is.vector(assembly) && !is.null(names(assembly)))
+        assembly = data.frame(chromosome=names(assembly), length=unname(assembly))
+
+    # AneuFinder needs 'assembly' to be a data.frame with 'chromosomes', 'length'
+    AneuFinder::bed2GRanges(fname, assembly=assembly, ...)
 }
 
 read_bed.default = function(fname, assembly, ...) {

@@ -1,3 +1,6 @@
+.read_bed = import('./read_bed')$read_bed
+.read_bam = import('./read_bam')$read_bam
+
 #' Read a BAM or BED file to read_granges object
 #'
 #' @param fname  A character vector of file name(s) of BAM or BED files
@@ -13,32 +16,9 @@ read_granges.list = function(fnames, ...) {
 read_granges.character = function(fname, ...) {
     args = list(...)
     if (grepl("\\.bam$", fname)) {
-        if ("assembly" %in% names(args)) {
-            slen = GenomeInfoDb::seqlengths(Rsamtools::BamFile(fname))
-            assembly = args$assembly
-
-            if (is.data.frame(assembly))
-                assembly = setNames(assembly$length, assembly$chromosome)
-
-            if (!is.null(args$chromosomes))
-                assembly = assembly[names(assembly) %in% args$chromosomes]
-
-            cmp = merge(data.frame(chr=names(slen), file=slen),
-                        data.frame(chr=names(assembly), assembly=assembly),
-                        by="chr")
-
-            if (!all(cmp$file == cmp$assembly)) {
-                print(cmp)
-                stop("Assembly length mismatch")
-            }
-        }
-
-        used_args = args[setdiff(names(args), "assembly")]
-        do.call(AneuFinder::bam2GRanges, c(list(bamfile=fname), used_args))
-
+        .read_bam(fname, ...)
     } else if (grepl("\\.bed(\\.gz)?$", fname)) {
-        used_args = args[setdiff(names(args), "bamindex")]
-        do.call(AneuFinder::bed2GRanges, c(list(bedfile=fname), used_args))
+        .read_bed(fname, ...)
     } else
         stop("Do not know how to read file type: ", fname)
 }
