@@ -38,13 +38,10 @@ run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
     # get assembly information
     genome = seq$genome(assembly)
     chr_lengths = seq$chr_lengths(genome)
-    if (is.null(chromosomes))
-        chromosomes = grep("^((chr)?[0-9]+|X|Y)$", names(chr_lengths), value=TRUE)
-    assembly_df = data.frame(chromosome = names(chr_lengths), length=chr_lengths)
 
     # partition the reads into bins
     if (!is.null(bin_width_ref)) {
-        ref_reads = seq$read_granges(bin_width_ref, assembly=assembly_df)
+        ref_reads = seq$read_granges(bin_width_ref, assembly=genome)
 
         if (!is.null(blacklist) && grepl("\\.bam$", blacklist))
             blacklist = blacklist_from_ref(ref_reads, chr_lengths,
@@ -58,7 +55,7 @@ run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
 
     # load BAM or BED files to granges objects
     reads = seq$read_granges(as.list(files), chromosomes=chromosomes,
-                             pairedEndReads=paired_reads, assembly=assembly_df,
+                             pairedEndReads=paired_reads, assembly=genome,
                              remove.duplicate.reads=!duplicate_reads,
                              min.mapq=min_mapq, blacklist=blacklist)
 
@@ -78,7 +75,7 @@ run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
     models = lapply(binned_reads, function(br) {
         m = try(AneuFinder::findCNVs(br,
                 eps = 0.1,
-                min.segment.size = min_segment_size,
+#                min.segment.size = min_segment_size,
                 max.time = max_time,
                 max.iter = 5000,
                 num.trials = n_trials,
