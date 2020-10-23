@@ -91,7 +91,7 @@ volcano = function(df, base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=
     df = dplyr::arrange(df, -.y)
     p = ggplot(df, aes(x = .x, y = .y)) + 
         scale_y_continuous(trans = reverselog_trans(base=10),
-                           label = scientific_10,
+                           labels = scientific_10,
                            limits = ylim,
                            breaks = breaks_with_thresh) +
         scale_x_continuous(limits = xlim) +
