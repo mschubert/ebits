@@ -41,7 +41,7 @@ pcor = function(mat, fdr=1) {
 #' @param pval p-value cutoff
 #' @param fdr  FDR cutoff for each individual bootstrap
 #' @return     ggplot2 object
-plot_pcor_net = function(pm, pval=1, fdr=1, node_text=6, edge_text=2.5) {
+plot_pcor_net = function(pm, pval=1, fdr=1, node_text=6, edge_text=2.5, layout="auto") {
     pval_filter = pval
     dirx = factor(sign(pm$pcor))
     levels(dirx) = c("red", "blue")
@@ -52,7 +52,7 @@ plot_pcor_net = function(pm, pval=1, fdr=1, node_text=6, edge_text=2.5) {
         tidygraph::activate(edges) %>%
         tidygraph::filter(pval <= pval_filter, qval <= fdr)
 
-    p = ggraph::ggraph(g) # no edges produce plotting error if geom_edge_link set
+    p = ggraph::ggraph(g, layout=layout) # no edges produce plotting error if geom_edge_link set
     if (igraph::gsize(g) > 0)
         p = p +
             ggraph::geom_edge_link(aes(label=lab, width=pcor^2*10, color=dir,
@@ -70,7 +70,7 @@ plot_pcor_net = function(pm, pval=1, fdr=1, node_text=6, edge_text=2.5) {
 #' @param n    number of bootstraps
 #' @param show_edge_if  logical indicating how often an edge must be < fdr
 #' @return     ggplot2 object
-plot_bootstrapped_pcor = function(mat, fdr=0.3, n=100, show_edge_if=10) {
+plot_bootstrapped_pcor = function(mat, fdr=0.3, n=100, show_edge_if=10, layout="auto") {
     do_bs = function(mat) {
         mat = mat[sample(seq_len(nrow(mat)), replace=TRUE),]
         pm = pcor(mat, fdr=fdr)
@@ -84,7 +84,7 @@ plot_bootstrapped_pcor = function(mat, fdr=0.3, n=100, show_edge_if=10) {
         filter(n >= show_edge_if) %>%
         tidygraph::as_tbl_graph()
 
-    p = ggraph(g) +
+    p = ggraph(g, layout=layout) +
         geom_edge_link(aes(label=n, color=dir, alpha=abs(pcor), width=n/10)) +#,
                        #angle_calc='along', size=2.5) +
         geom_node_text(aes(label=name), size=6) +
