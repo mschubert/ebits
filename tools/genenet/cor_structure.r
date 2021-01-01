@@ -1,5 +1,6 @@
-library(dplyr)
-library(cowplot)
+import_package("dplyr", attach=TRUE)
+import_package("ggplot2", attach=TRUE)
+import_package("ggraph", attach=TRUE)
 .st = import('../../stats')
 
 #' Plot a correlation matrix
@@ -15,7 +16,7 @@ plot_cor_matrix = function(mat, title=NULL) {
         type="upper", order="hclust", mar=c(0,0,2,0), # title cut off otherwise
         addCoef.col = "black", # add coefficient of correlation
         tl.col="black", tl.srt=45, #text label color and rotation
-        p.mat = p.mat, sig.level = 0.05, insig = "blank", 
+        p.mat = p.mat, sig.level = 0.05, insig = "blank",
         diag=FALSE, title=title)
 }
 
@@ -68,14 +69,18 @@ plot_pcor_net = function(pm, pval=1, fdr=1, node_text=6, edge_text=2.5, layout="
 #' @param mat  data matrix [samples x features]
 #' @param fdr  FDR cutoff for each individual bootstrap
 #' @param n    number of bootstraps
+#' @param noise  Standard deviations of noise to add to data
 #' @param show_edge_if  logical indicating how often an edge must be < fdr
 #' @return     ggplot2 object
-plot_bootstrapped_pcor = function(mat, fdr=0.3, n=100, show_edge_if=10, layout="auto") {
+plot_bootstrapped_pcor = function(mat, fdr=0.3, n=100, noise=0.01, show_edge_if=round(n/10), layout="auto") {
     do_bs = function(mat) {
         mat = mat[sample(seq_len(nrow(mat)), replace=TRUE),]
-        pm = pcor(mat, fdr=fdr)
+        sds = apply(mat, 2, sd)
+        mat = t(t(mat) + sds * noise * rnorm(length(mat)))
+        pm = pcor(t(mat), fdr=fdr)
     }
-    g = replicate(100, do_bs(mat), simplify=FALSE) %>%
+    bs = replicate(n, do_bs(mat), simplify=FALSE)
+    g = bs %>%
         dplyr::bind_rows() %>%
         group_by(node1, node2) %>%
         summarize(pcor = median(pcor),
@@ -84,7 +89,7 @@ plot_bootstrapped_pcor = function(mat, fdr=0.3, n=100, show_edge_if=10, layout="
         filter(n >= show_edge_if) %>%
         tidygraph::as_tbl_graph()
 
-    p = ggraph(g, layout=layout) +
+    ggraph(g, layout=layout) +
         geom_edge_link(aes(label=n, color=dir, alpha=abs(pcor), width=n/10)) +#,
                        #angle_calc='along', size=2.5) +
         geom_node_text(aes(label=name), size=6) +
