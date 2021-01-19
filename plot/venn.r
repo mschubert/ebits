@@ -1,4 +1,4 @@
-import_package('cowplot', attach=TRUE)
+import_package('ggplot2', attach=TRUE)
 import_package('dplyr', attach=TRUE)
 
 #' Plot a Venn (Euler) diagram
