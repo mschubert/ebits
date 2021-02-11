@@ -1,3 +1,5 @@
+.normalize = import('./normalize')$normalize
+
 #' Quality control function
 #'
 #' @param rawData  An `oligo::batch` object
@@ -9,7 +11,7 @@ qc = function(rawData, NUSE=0.1, RLE=0.1) {
 }
 
 qc.list = function(rawData, NUSE=0.1, RLE=0.1) {
-    lapply(rawData, normalize)
+    lapply(rawData, .normalize)
 }
 
 qc.FeatureSet = function(rawData, NUSE=0.1, RLE=0.1) {
