@@ -12,7 +12,7 @@ gene_table = function(dset="hsapiens_gene_ensembl", version="latest",
 
     grch = as.integer(sub("[^0-9]+([0-9]+)$", "\\1", assembly))
     if (version == "latest")
-        version = 102 #TODO: get this + be robust offline
+        version = 103 #TODO: get this + be robust offline
 
     fname = sprintf("gene_table-%s-ens%i-%i.rds", dset, version, grch)
     cache = file.path(module_file(), "cache", fname)
@@ -22,13 +22,20 @@ gene_table = function(dset="hsapiens_gene_ensembl", version="latest",
         return(mapping)
     }
 
-    message("Generating cache file ", sQuote(fname))
+    grch2 = grch
     if (grch == 38)
-        grch = NULL # they don't allow to specify GRCh38 explicitly
-
-    ensembl = biomaRt::useEnsembl("ensembl", dataset=dset, GRCh=grch)
+        grch2 = NULL # they don't allow to specify GRCh38 explicitly
+    ensembl = biomaRt::useEnsembl("ensembl", dataset=dset, GRCh=grch2)
+    marts = biomaRt::listMarts(ensembl)
+    vstring = marts$version[marts$biomart == "ENSEMBL_MART_ENSEMBL"]
+    version = as.integer(sub(".* ([0-9]+)$", "\\1", vstring))
     datasets = biomaRt::listDatasets(ensembl, version)
     dataset_version = datasets$version[datasets$dataset == dset]
+
+    # if biomart has newer ensembl update cache file name
+    fname = sprintf("gene_table-%s-ens%s-%i.rds", dset, version, grch)
+    cache = file.path(module_file(), "cache", fname)
+    message("Generating cache file ", sQuote(fname))
 
     ids = c('external_gene_name', 'entrezgene_id', 'ensembl_gene_id',
             'band', 'chromosome_name', 'start_position', 'end_position',

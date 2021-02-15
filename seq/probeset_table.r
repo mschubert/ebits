@@ -11,7 +11,7 @@ probeset_table = function(dset="hsapiens_gene_ensembl", version="latest", force=
         attr(dset, "ensembl_version"), attr(dset, "dataset_version")))
 
     if (version == "latest")
-        version = 102 # #TODO: get this + be robust offline
+        version = 103 #TODO: get this + be robust offline
 
     fname = sprintf("probeset-%s-ens%s.rds", dset, version)
     cache = file.path(module_file(), "cache", fname)
@@ -20,8 +20,6 @@ probeset_table = function(dset="hsapiens_gene_ensembl", version="latest", force=
         printv(mapping)
         return(mapping)
     }
-
-    message("Generating cache file ", sQuote(fname))
 
     mart = biomaRt::useMart(biomart="ensembl", dataset=dset)
     marts = biomaRt::listMarts(mart)
@@ -33,6 +31,7 @@ probeset_table = function(dset="hsapiens_gene_ensembl", version="latest", force=
     # if biomart has newer ensembl update cache file name
     fname = sprintf("probeset-%s-ens%s.rds", dset, version)
     cache = file.path(module_file(), "cache", fname)
+    message("Generating cache file ", sQuote(fname))
 
     probes = list(
         affy = grep("^affy_", biomaRt::listAttributes(mart)$name, value=TRUE),
