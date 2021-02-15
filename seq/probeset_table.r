@@ -1,18 +1,38 @@
-io = import('../io')
+`%>%` = magrittr::`%>%`
 
 #' Creates a table of different identifiers and caches it
 #'
-#' @param force  Re-probesetrate table if it already exists
+#' @param dset   Ensembl organism, e.g.: 'hsapiens_gene_ensembl', 'mmusculus_gene_ensembl'
+#' @param force  Re-generate table if it already exists
 #' @return       A data.frame with the following columns:
-#'     hgnc_symbol, affy, illumina, genbank, entrezgene, ensembl_gene_id
-probeset_table = function(force=FALSE) {
-    cache = file.path(module_file(), "cache", "probeset_table.RData")
-    if (file.exists(cache) && !force)
-        return(io$load(cache))
+#'     external_gene_name, affy, illumina, genbank, entrezgene, ensembl_gene_id
+probeset_table = function(dset="hsapiens_gene_ensembl", version="latest", force=FALSE) {
+    printv = function(dset) message(sprintf("Using Ensembl %s (%s)",
+        attr(dset, "ensembl_version"), attr(dset, "dataset_version")))
 
-    warning("no cached file found, biomart query will take ~ 1h", immediate.=TRUE)
+    if (version == "latest")
+        version = 102 # #TODO: get this + be robust offline
 
-    mart = biomaRt::useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
+    fname = sprintf("probeset-%s-ens%s.rds", dset, version)
+    cache = file.path(module_file(), "cache", fname)
+    if (file.exists(cache) && !force) {
+        mapping = readRDS(cache)
+        printv(mapping)
+        return(mapping)
+    }
+
+    message("Generating cache file ", sQuote(fname))
+
+    mart = biomaRt::useMart(biomart="ensembl", dataset=dset)
+    marts = biomaRt::listMarts(mart)
+    vstring = marts$version[marts$biomart == "ENSEMBL_MART_ENSEMBL"]
+    version = as.integer(sub(".* ([0-9]+)$", "\\1", vstring))
+    datasets = biomaRt::listDatasets(mart, version)
+    dataset_version = datasets$version[datasets$dataset == dset]
+
+    # if biomart has newer ensembl update cache file name
+    fname = sprintf("probeset-%s-ens%s.rds", dset, version)
+    cache = file.path(module_file(), "cache", fname)
 
     probes = list(
         affy = grep("^affy_", biomaRt::listAttributes(mart)$name, value=TRUE),
@@ -20,7 +40,7 @@ probeset_table = function(force=FALSE) {
         agilent = grep("agilent_", biomaRt::listAttributes(mart)$name, value=TRUE)
     )
 
-    tablecols = c("hgnc_symbol", "entrezgene", "ensembl_gene_id")
+    tablecols = c("external_gene_name", "entrezgene_id", "ensembl_gene_id")
     getPS = function(p) {
         message(p)
         df = biomaRt::getBM(attributes=c(tablecols, p), mart=mart)
@@ -33,14 +53,23 @@ probeset_table = function(force=FALSE) {
             dplyr::bind_rows() %>%
             dplyr::filter(probe_id != "" & !is.na(probe_id)) %>%
             dplyr::distinct()
-        re$hgnc_symbol[re$hgnc_symbol == ""] = NA
+        re$external_gene_name[re$external_gene_name == ""] = NA
         re$entrezgene[re$entrezgene == ""] = NA
         re$ensembl_gene_id[re$ensembl_gene_id == ""] = NA
-        re
+        tibble::as_tibble(re)
     }
     mapping = sapply(probes, assemblePS, simplify=FALSE, USE.NAMES=TRUE)
 
+    attr(mapping, "ensembl_version") = version
+    attr(mapping, "dataset_version") = dataset_version
+
     dir.create(dirname(cache), showWarnings=FALSE)
-    save(mapping, file=cache)
+    saveRDS(mapping, file=cache)
+    printv(mapping)
     mapping
+}
+
+if (is.null(module_name())) {
+    probeset_table("hsapiens_gene_ensembl")
+    probeset_table("mmusculus_gene_ensembl")
 }
