@@ -34,13 +34,14 @@ mapping = list(
 #' @param normData   A normalized data object, or a list thereof
 #' @param summarize  IDs to annotate with: external_gene_name
 #' @param drop       For lists, drop arrays that could not be mapped instead of error
+#' @param dset       Annotation data set (ensembl biomart, e.g. hsapiens_gene_ensembl)
 #' @return           The annotated data
-annotate = function(normData, summarize="external_gene_name", ...) {
+annotate = function(normData, summarize="external_gene_name", ..., dset="hsapiens_gene_ensembl") {
     UseMethod("annotate")
 }
 
-annotate.list = function(normData, summarize="external_gene_name", drop=FALSE) {
-    re = lapply(normData, function(x) annotate(x) %catch% NA, summarize=summarize)
+annotate.list = function(normData, summarize="external_gene_name", dset="hsapiens_gene_ensembl", drop=FALSE) {
+    re = lapply(normData, function(x) annotate(x) %catch% NA, summarize=summarize, dset=dset)
     if (all(is.na(re)))
         stop("All annotations failed")
     if (any(is.na(re))) {
@@ -53,32 +54,24 @@ annotate.list = function(normData, summarize="external_gene_name", drop=FALSE) {
     re[!is.na(re)]
 }
 
-annotate.ExpressionSet = function(normData, summarize="external_gene_name") {
-    annotation = mapping[[normData@annotation]]
-    if (is.null(annotation))
-        stop("No annotation package found for: ", normData@annotation)
-
-    # read metadata and replace matrix by annotated matrix
-    emat = annotate(as.matrix(normData),
-                    annotation = annotation,
-                    summarize = summarize)
-
+annotate.ExpressionSet = function(normData, summarize="external_gene_name", dset="hsapiens_gene_ensembl") {
+    emat = annotate(as.matrix(normData), summarize=summarize, dset=dset)
     Biobase::ExpressionSet(assayData = emat,
                            phenoData = Biobase::phenoData(normData))
 }
 
-annotate.NChannelSet = function(normData, summarize="external_gene_name") {
+annotate.NChannelSet = function(normData, summarize="external_gene_name", dset="hsapiens_gene_ensembl") {
     if (! "E" %in% ls(assayData(normData)))
         stop("only single-channel implemented atm")
 
     # note: there are agilent annotation packages available, but the
     # array ID is not saved in normData@annotation
-	map_channel = function(expr, ids, from="agilent", to=summarize) {
-		rownames(expr) = ids
-		.idmap$probeset(expr, from=from, to=summarize)
-	}
+    map_channel = function(expr, ids, from="agilent", to=summarize) {
+        rownames(expr) = ids
+        .idmap$probeset(expr, from=from, to=summarize)
+    }
     ad = as.list(Biobase::assayData(normData))
-	mapped = sapply(ad, map_channel, ids=fData(normData)$ProbeName,
+    mapped = sapply(ad, map_channel, ids=fData(normData)$ProbeName,
                     simplify=FALSE, USE.NAMES=TRUE)
 
     es = ExpressionSet(mapped$E)
@@ -86,23 +79,7 @@ annotate.NChannelSet = function(normData, summarize="external_gene_name") {
     es
 }
 
-annotate.matrix = function(normData, annotation, summarize="external_gene_name") {
-    # load annotation package
-    if (summarize %in% c("external_gene_name", "entrezgene"))
-        if (!require(annotation, character.only=TRUE)) {
-            BiocManager::install(annotation)
-            library(annotation, character.only=TRUE)
-        }
-
-    # work on expression matrix, summarize using limma
-    if (summarize == "external_gene_name")
-        rownames(normData) = annotate::getSYMBOL(as.vector(rownames(normData)), annotation)
-    else if (summarize == "entrezgene")
-        rownames(normData) = annotate::getEG(as.vector(rownames(normData)), annotation)
-    else if (summarize == "ensembl_gene_id")
-        rownames(normData) = unname(.idmap$probeset(rownames(normData), to="ensembl_gene_id"))
-    else
-        stop("Method ", sQuote(summarize), " not supported, only ",
-             "'ensembl_gene/transcript_id'", "'external_gene_name', 'entrezgene'")
+annotate.matrix = function(normData, summarize="external_gene_name", dset="hsapiens_gene_ensembl") {
+    rownames(normData) = .idmap$probeset(rownames(normData), to=summarize, dset=dset)
     limma::avereps(normData[!is.na(rownames(normData)),])
 }

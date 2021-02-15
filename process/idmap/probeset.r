@@ -10,47 +10,51 @@ library(dplyr)
 #' @param to         the type of ids to map to
 #' @param summarize  the function to use to aggregate ids
 #' @return           the mapped and optionally summarized object
-probeset = function(obj, from=NULL, to, summarize=mean) {
+probeset = function(obj, from=NULL, to, summarize=mean, dset="hsapiens_gene_ensembl") {
     UseMethod("probeset")
 }
 
-probeset.character = function(obj, to, from=.guess$id_type(obj), summarize=mean) {
-    lookup = .probeset_table()[[from]]
+probeset.character = function(obj, to, from=.guess$id_type(obj),
+                              summarize=mean, dset="hsapiens_gene_ensembl") {
+    lookup = .probeset_table(dset)[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     .b$match(obj, from=df$from, to=df$to)
 }
 
-probeset.numeric = function(obj, to, from=.guess$id_type(names(obj)), summarize=mean) {
-    lookup = .probeset_table()[[from]]
+probeset.numeric = function(obj, to, from=.guess$id_type(names(obj)),
+                            summarize=mean, dset="hsapiens_gene_ensembl") {
+    lookup = .probeset_table(dset)[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     narray::translate(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
-probeset.matrix = function(obj, to, from=.guess$id_type(rownames(obj)), summarize=mean) {
-    lookup = .probeset_table()[[from]]
+probeset.matrix = function(obj, to, from=.guess$id_type(rownames(obj)),
+                           summarize=mean, dset="hsapiens_gene_ensembl") {
+    lookup = .probeset_table(dset)[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     narray::translate(obj, along=1, from=df$from, to=df$to, FUN=summarize)
 }
 
-probeset.ExpressionSet = function(obj, to, from=.guess$id_type(rownames(exprs(obj))),  summarize=mean) {
-    lookup = .probeset_table()[[from]]
+probeset.ExpressionSet = function(obj, to, from=.guess$id_type(rownames(exprs(obj))),
+                                  summarize=mean, dset="hsapiens_gene_ensembl") {
+    lookup = .probeset_table(dset)[[from]]
     df = na.omit(data.frame(from=lookup$probe_id, to=lookup[[to]]))
     df = df[!duplicated(df),]
     exprs(obj) = narray::translate(exprs(obj), along=1, from=df$from, to=df$to, FUN=summarize)
     obj
 }
 
-probeset.list = function(obj, to, from, summarize=mean) {
-    lapply(obj, probeset, to=to, from=from, summarize=summarize)
+probeset.list = function(obj, to, from, summarize=mean, dset="hsapiens_gene_ensembl") {
+    lapply(obj, probeset, to=to, from=from, summarize=summarize, dset=dset)
 }
 
 if (is.null(module_name())) {
     library(testthat)
 
-    cache = file.path("../../seq/cache", "probeset_table.RData")
+    cache = file.path("../../seq/cache", "probeset-hsapiens_gene_ensembl-ens103.rds")
     if (!file.exists(cache)) {
         warning("no cache available: skipping probeset test")
         quit(save="no", status=0)
