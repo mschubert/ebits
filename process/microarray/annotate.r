@@ -1,3 +1,4 @@
+.b = import('base/operators')
 .idmap = import('../idmap')
 
 #' Mapping of annotation identifier to annotation package
@@ -24,7 +25,8 @@ mapping = list(
     "pd.ht.hg.u133a" = "hthgu133a.db", # A-AFFY-76
 #    "pd.ht.hg.u133.plus.pm" = ???,
     "pd.hta.2.0" = "hta20transcriptcluster.db",
-    "u133aaofav2" = "hthgu133a.db" # needs to be manually processed by affy
+    "u133aaofav2" = "hthgu133a.db", # needs to be manually processed by affy
+    "pd.mouse430.2" = "mouse4302.db"
 )
 
 #' Function to annotate expression objects
@@ -51,12 +53,12 @@ annotate.ExpressionSet = function(normData, summarize="hgnc_symbol") {
         stop("No annotation package found for: ", normData@annotation)
 
     # read metadata and replace matrix by annotated matrix
-    emat = annotate(as.matrix(exprs(normData)),
+    emat = annotate(as.matrix(normData),
                     annotation = annotation,
                     summarize = summarize)
 
     Biobase::ExpressionSet(assayData = emat,
-                           phenoData = phenoData(normData))
+                           phenoData = Biobase::phenoData(normData))
 }
 
 annotate.NChannelSet = function(normData, summarize="hgnc_symbol") {
