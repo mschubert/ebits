@@ -39,7 +39,7 @@ annotate = function(normData, summarize="hgnc_symbol", ...) {
 }
 
 annotate.list = function(normData, summarize="hgnc_symbol") {
-    re = lapply(normData, function(x) annotate(x) %catch% NA)
+    re = lapply(normData, function(x) annotate(x) %catch% NA, summarize=summarize)
     if (any(is.na(re)))
         warning("dropping ", names(re)[is.na(re)])
     if (all(is.na(re)))
