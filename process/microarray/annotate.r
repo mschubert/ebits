@@ -32,22 +32,28 @@ mapping = list(
 #' Function to annotate expression objects
 #'
 #' @param normData   A normalized data object, or a list thereof
-#' @param summarize  IDs to annotate with: hgnc_symbol
+#' @param summarize  IDs to annotate with: external_gene_name
+#' @param drop       For lists, drop arrays that could not be mapped instead of error
 #' @return           The annotated data
-annotate = function(normData, summarize="hgnc_symbol", ...) {
+annotate = function(normData, summarize="external_gene_name", ...) {
     UseMethod("annotate")
 }
 
-annotate.list = function(normData, summarize="hgnc_symbol") {
+annotate.list = function(normData, summarize="external_gene_name", drop=FALSE) {
     re = lapply(normData, function(x) annotate(x) %catch% NA, summarize=summarize)
-    if (any(is.na(re)))
-        warning("dropping ", names(re)[is.na(re)])
     if (all(is.na(re)))
-        stop("all annotations failed")
+        stop("All annotations failed")
+    if (any(is.na(re))) {
+        fails = paste(names(re)[is.na(re)], collapse=", ")
+        if (drop)
+            warning("Dropping ", fails, immediate.=TRUE)
+        else
+            stop("Arrays could not be mapped: ", fails)
+    }
     re[!is.na(re)]
 }
 
-annotate.ExpressionSet = function(normData, summarize="hgnc_symbol") {
+annotate.ExpressionSet = function(normData, summarize="external_gene_name") {
     annotation = mapping[[normData@annotation]]
     if (is.null(annotation))
         stop("No annotation package found for: ", normData@annotation)
@@ -61,7 +67,7 @@ annotate.ExpressionSet = function(normData, summarize="hgnc_symbol") {
                            phenoData = Biobase::phenoData(normData))
 }
 
-annotate.NChannelSet = function(normData, summarize="hgnc_symbol") {
+annotate.NChannelSet = function(normData, summarize="external_gene_name") {
     if (! "E" %in% ls(assayData(normData)))
         stop("only single-channel implemented atm")
 
@@ -80,17 +86,16 @@ annotate.NChannelSet = function(normData, summarize="hgnc_symbol") {
     es
 }
 
-annotate.matrix = function(normData, annotation, summarize="hgnc_symbol") {
+annotate.matrix = function(normData, annotation, summarize="external_gene_name") {
     # load annotation package
-    if (summarize %in% c("hgnc_symbol", "entrezgene"))
+    if (summarize %in% c("external_gene_name", "entrezgene"))
         if (!require(annotation, character.only=TRUE)) {
-            source("http://bioconductor.org/biocLite.R")
-            biocLite(annotation)
+            BiocManager::install(annotation)
             library(annotation, character.only=TRUE)
         }
 
     # work on expression matrix, summarize using limma
-    if (summarize == "hgnc_symbol")
+    if (summarize == "external_gene_name")
         rownames(normData) = annotate::getSYMBOL(as.vector(rownames(normData)), annotation)
     else if (summarize == "entrezgene")
         rownames(normData) = annotate::getEG(as.vector(rownames(normData)), annotation)
@@ -98,6 +103,6 @@ annotate.matrix = function(normData, annotation, summarize="hgnc_symbol") {
         rownames(normData) = unname(.idmap$probeset(rownames(normData), to="ensembl_gene_id"))
     else
         stop("Method ", sQuote(summarize), " not supported, only ",
-             "'ensembl_gene/transcript_id'", "'hgnc_symbol', 'entrezgene'")
+             "'ensembl_gene/transcript_id'", "'external_gene_name', 'entrezgene'")
     limma::avereps(normData[!is.na(rownames(normData)),])
 }
