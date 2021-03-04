@@ -11,8 +11,8 @@ plot = import('./plot')$plot
 
     args = .sys$cmd$parse(
         opt('d', 'directory', 'directory prefix to look for files', '.'),
-        opt('o', 'outfile', 'file to save model to', 'model.RData'),
-        opt('p', 'plotfile', 'file to save plots to', 'model.pdf'),
+        opt('o', 'outfile', 'rds file to save model to', 'model.rds'),
+        opt('p', 'plotfile', 'pdf file to save plots to', 'model.pdf'),
         opt('a', 'assembly', 'genome assembly identifier', ''),
         opt('b', 'bin_width_ref', 'euploid reference for bin width', ''),
         opt('r', 'min_reads', 'minimum numer of reads for sample', '5e4'),
@@ -58,7 +58,7 @@ plot = import('./plot')$plot
             }
         }
     }
-    save(models, file=args$outfile)
+    saveRDS(models, file=args$outfile)
 
     if (!is.null(args$plotfile)) {
         message("Plotting sample heatmap ...")
