@@ -1,20 +1,32 @@
 #' Creates a table of different identifiers and caches it
 #'
 #' @param dset  Ensembl data set, e.g. '{hsapiens,mmusculus}_gene_ensembl'
-#' @param version   Ensembl version (integer)
-#' @param assembly  Genome assembly version (allowed: "GRCh37", "GRCh38")
+#' @param assembly  Genome assembly version (default: GRCh38/GRCm39)
+#' @param version   Ensembl version (integer); NULL: latest for assembly
 #' @param force  Re-generate table if it already exists
 #' @return       A data.frame with gene and transcript-level information
-gene_table = function(dset="hsapiens_gene_ensembl", version="latest",
-                      assembly="GRCh38", force=FALSE) {
+gene_table = function(dset="hsapiens_gene_ensembl", assembly=NULL, version=NULL, force=FALSE) {
     printv = function(dset) message(sprintf("Using Ensembl %s (%s)",
         attr(dset, "ensembl_version"), attr(dset, "dataset_version")))
 
-    grch = as.integer(sub("[^0-9]+([0-9]+)$", "\\1", assembly))
-    if (version == "latest")
-        version = 103 #TODO: get this + be robust offline
+    if (is.null(assembly))
+        assembly = switch(dset, hsapiens_gene_ensembl="GRCh38", mmusculus_gene_ensembl="GRCm39")
+    if (is.null(version))
+        version = switch(assembly, GRCm39="latest", GRCm38="102", GRCh38="latest", GRCh37="GRCh37")
 
-    fname = sprintf("gene_table-%s-ens%i-%i.rds", dset, version, grch)
+    # https://www.ensembl.org/info/website/archives/index.html
+    if (version == "latest") {
+        version = "103"
+        host = "https://www.ensembl.org"
+    } else if (tolower(version) == "grch37") {
+        version = "103"
+        host = "http://grch37.ensembl.org"
+    } else if (version == "102") {
+        host = "https://nov2020.archive.ensembl.org"
+    } else
+        stop("add archive link here if required")
+
+    fname = sprintf("gene_table-%s-ens%s-%s.rds", dset, version, assembly)
     cache = file.path(module_file(), "cache", fname)
     if (file.exists(cache) && !force) {
         mapping = readRDS(cache)
@@ -22,10 +34,7 @@ gene_table = function(dset="hsapiens_gene_ensembl", version="latest",
         return(mapping)
     }
 
-    grch2 = grch
-    if (grch == 38)
-        grch2 = NULL # they don't allow to specify GRCh38 explicitly
-    ensembl = biomaRt::useEnsembl("ensembl", dataset=dset, GRCh=grch2)
+    ensembl = biomaRt::useMart("ENSEMBL_MART_ENSEMBL", dataset=dset, host=host)
     marts = biomaRt::listMarts(ensembl)
     vstring = marts$version[marts$biomart == "ENSEMBL_MART_ENSEMBL"]
     version = as.integer(sub(".* ([0-9]+)$", "\\1", vstring))
@@ -33,7 +42,7 @@ gene_table = function(dset="hsapiens_gene_ensembl", version="latest",
     dataset_version = datasets$version[datasets$dataset == dset]
 
     # if biomart has newer ensembl update cache file name
-    fname = sprintf("gene_table-%s-ens%s-%i.rds", dset, version, grch)
+    fname = sprintf("gene_table-%s-ens%s-%s.rds", dset, version, assembly)
     cache = file.path(module_file(), "cache", fname)
     message("Generating cache file ", sQuote(fname))
 
@@ -58,5 +67,7 @@ gene_table = function(dset="hsapiens_gene_ensembl", version="latest",
 
 if (is.null(module_name())) {
     gene_table("hsapiens_gene_ensembl")
+    gene_table("hsapiens_gene_ensembl", assembly="GRCh37")
     gene_table("mmusculus_gene_ensembl")
+    gene_table("mmusculus_gene_ensembl", assembly="GRCm38")
 }
