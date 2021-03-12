@@ -14,10 +14,22 @@ read_bam.list = function(fnames, ...) {
 
 read_bam.character = function(fname, ..., assembly=NULL) {
     bai = paste0(fname, ".bai")
-    if (file.exists(bai))
-        bamindex = bai
-    else
-        bamindex = fname
+    # There is no real reason we should have to sort a bam in order to read
+    # the reads into a GRanges object. However, the GenomicAlignments::readGAlignments
+    # function needs it, so let's sort/index until we find a better option.
+    if (!file.exists(bai)) {
+        message("[read_bam] creating index file")
+        idx = try(Rsamtools::indexBam(fname))
+        if (class(idx) == "try-error") {
+            tmp = file.path(tempdir(), basename(fname))
+            message("[read_bam] indexing failed, creating temporary sorted bam")
+            Rsamtools::sortBam(fname, tools::file_path_sans_ext(tmp))
+            on.exit(unlink(tmp))
+        }
+        Rsamtools::indexBam(tmp)
+        fname = tmp
+        bai = paste0(fname, ".bai")
+    }
 
     if (!is.null(assembly)) {
         ff = .chr_lengths(Rsamtools::BamFile(fname))
@@ -33,7 +45,7 @@ read_bam.character = function(fname, ..., assembly=NULL) {
         }
     }
 
-    AneuFinder::bam2GRanges(fname, bamindex, ...)
+    AneuFinder::bam2GRanges(fname, bai, ...)
 }
 
 read_bam.default = function(fname, ...) {
