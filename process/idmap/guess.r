@@ -32,10 +32,12 @@ dset = function(from_ids) {
     if (idt == "mgi_symbol")
         "mmusculus_gene_ensembl"
     else if (idt %in% c("ensembl_gene_id", "ensembl_transcript_id")) {
-        if (grepl("^ENS[GT]", from_ids) > length(from_ids)/2)
+        if (mean(grepl("^ENS[GT]", from_ids)) > 0.5)
             "hsapiens_gene_ensembl"
-        else if (grepl("^ENSMUS[GT]", from_ids) > length(from_ids)/2)
+        else if (mean(grepl("^ENSMUS[GT]", from_ids)) > 0.5)
             "mmusculus_gene_ensembl"
+        else
+            stop("add implementation for other ensembl species here")
     } else
         "hsapiens_gene_ensembl"
 }
@@ -43,14 +45,14 @@ dset = function(from_ids) {
 if (is.null(module_name())) {
     library(testthat)
 
-    expect_equal(id_type("TP53"), "hgnc_symbol")
+    expect_equal(id_type(c("TP53", "MYC")), "hgnc_symbol")
     expect_equal(id_type("Trp53"), "mgi_symbol")
     expect_equal(id_type("ENSG00000141510"), "ensembl_gene_id")
     expect_equal(id_type("ENSMUST00000171247.8"), "ensembl_transcript_id")
 
     expect_equal(dset("TP53"), "hsapiens_gene_ensembl")
     expect_equal(dset("ENSG00000141510"), "hsapiens_gene_ensembl")
-    expect_equal(dset("Trp53"), "mmusculus_gene_ensembl")
+    expect_equal(dset(c("Trp53", "Myc")), "mmusculus_gene_ensembl")
     expect_equal(dset("ENSMUSG00000059552"), "mmusculus_gene_ensembl")
     expect_equal(dset("ENSMUST00000171247.8"), "mmusculus_gene_ensembl")
 }
