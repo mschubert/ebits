@@ -36,6 +36,13 @@ test = function(genes, sets,
         message("[geneset/test] column ", sQuote(stat), " as separation statistic")
     }
 
+    all_sets = unique(unlist(sets))
+    if (mean(all_sets %in% genes[[label]]) < 0.5) {
+        idt = .guess$id_type(all_sets)
+        message("[geneset/test] low identifier overlap, mapping ", sQuote(label), " to ", sQuote(idt))
+        genes[[label]] = .idmap$gene(genes[[label]], to=idt)
+    }
+
     lapply(sets, test_one, res=genes) %>%
         setNames(names(sets)) %>%
         dplyr::bind_rows(.id="label") %>%
