@@ -15,12 +15,11 @@ library(dplyr)
 #' @param dset  Ensembl data set, e.g. '{hsapiens,mmusculus}_gene_ensembl'
 #' @param summarize  the function to use to aggregate ids
 #' @return      the mapped and optionally summarized object
-gene = function(obj, from=NULL, to, dset="hsapiens_gene_ensembl", summarize=mean) {
+gene = function(obj, from=NULL, to, dset, summarize=mean) {
     UseMethod("gene")
 }
 
-gene.character = function(obj, to, from=.guess$id_type(obj),
-                          dset="hsapiens_gene_ensembl", summarize=mean) {
+gene.character = function(obj, to, from=.guess$id_type(obj), dset=.guess$dset(obj), summarize=mean) {
     if (to %in% c("hgnc_symbol", "mgi_symbol"))
         to = "external_gene_name"
 
@@ -32,7 +31,7 @@ gene.character = function(obj, to, from=.guess$id_type(obj),
 }
 
 gene.matrix = function(obj, to, from=.guess$id_type(narray::dimnames(obj, along=1)),
-                        dset="hsapiens_gene_ensembl", summarize=mean) {
+                       dset=.guess$dset(narray::dimnames(obj, along=1)), summarize=mean) {
     if (to %in% c("hgnc_symbol", "mgi_symbol"))
         to = "external_gene_name"
 
@@ -53,16 +52,16 @@ gene.matrix = function(obj, to, from=.guess$id_type(narray::dimnames(obj, along=
 }
 
 gene.ExpressionSet = function(obj, to, from=.guess$id_type(rownames(exprs(obj))),
-                              dset="hsapiens_gene_ensembl", summarize=mean) {
+                              dset=.guess$dset(rownames(exprs(obj))), summarize=mean) {
     exprs(obj) = gene(Biobase::exprs(obj), from=from, to=to, dset=dset, summarize=summarize)
     obj
 }
 
-gene.list = function(obj, to, from, dset="hsapiens_gene_ensembl", summarize=mean) {
+gene.list = function(obj, to, from, dset, summarize=mean) {
     lapply(obj, gene, to=to, from=from, dset=dset, summarize=summarize)
 }
 
-gene.default = function(obj, to, from, dset="hsapiens_gene_ensembl", summarize=mean) {
+gene.default = function(obj, to, from, dset, summarize=mean) {
     stop("Trying to map ", mode(obj), " object, did you forget as.character()?")
 }
 
