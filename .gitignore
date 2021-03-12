@@ -9,9 +9,14 @@ dependencies.txt
 *.Rdata
 *.RData
 **/cache/*
+**/data/*
 
 # vim .swp files
 *.swp
 
 # library files
 *.so
+
+# bio files
+*.gmt
+*.gz
