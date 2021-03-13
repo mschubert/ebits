@@ -4,6 +4,14 @@ import_package("dplyr", attach=TRUE)
 .msdb = import('../tools/msigdb')
 .go = import('./go')$go
 
+list = function() {
+    dbs = c("GO_Biological_Process_2020",
+      "DoRothEA",
+      .enr$dbs()$name,
+      .msdb$dbs())
+    gtools::mixedsort(dbs)
+}
+
 get_human = function(collections, ..., drop=TRUE) {
     get_one = function(col) {
         if (col == "GO_Biological_Process_2020") {
