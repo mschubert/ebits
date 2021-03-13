@@ -58,10 +58,13 @@ heatmap_aneuHMM = function(aneu) {
             mutate(cell = factor(cell, levels=ords$cell))
         heatmap(segs, aes(fill=copy.number, y=cell))
     } else if (class(aneu[[1]][[1]]) == "aneuHMM") { # multiple samples
+        if (is.null(names(aneu)))
+            names(aneu) = seq_along(aneu)
         ords = lapply(aneu, cluster_sample) %>%
             bind_rows(.id="sample")
         segs = lapply(aneu, ex_segs) %>%
             bind_rows(.id="sample") %>%
+            mutate(sample = factor(sample, levels=names(aneu))) %>%
             left_join(ords, by=c("sample", "cell")) %>% # assumes "cell" is unique across samples
             mutate(cell = factor(cell, levels=ords$cell))
 
