@@ -1,5 +1,6 @@
 .b = import('base/operators')
 .idmap = import('../idmap')
+.guess = import('../idmap/guess')
 
 #' Mapping of annotation identifier to annotation package
 #'
@@ -36,12 +37,12 @@ mapping = list(
 #' @param drop       For lists, drop arrays that could not be mapped instead of error
 #' @param dset       Annotation data set (ensembl biomart, e.g. hsapiens_gene_ensembl)
 #' @return           The annotated data
-annotate = function(normData, summarize="external_gene_name", ..., dset="hsapiens_gene_ensembl") {
+annotate = function(normData, summarize="external_gene_name", ..., dset=NULL) {
     UseMethod("annotate")
 }
 
-annotate.list = function(normData, summarize="external_gene_name", dset="hsapiens_gene_ensembl", drop=FALSE) {
-    re = lapply(normData, function(x) annotate(x) %catch% NA, summarize=summarize, dset=dset)
+annotate.list = function(normData, summarize="external_gene_name", dset=NULL, drop=FALSE) {
+    re = lapply(normData, function(x, ...) annotate(x, ...) %catch% NA, summarize=summarize, dset=dset)
     if (all(is.na(re)))
         stop("All annotations failed")
     if (any(is.na(re))) {
@@ -54,13 +55,22 @@ annotate.list = function(normData, summarize="external_gene_name", dset="hsapien
     re[!is.na(re)]
 }
 
-annotate.ExpressionSet = function(normData, summarize="external_gene_name", dset="hsapiens_gene_ensembl") {
+annotate.ExpressionSet = function(normData, summarize="external_gene_name", dset=NULL) {
+    if (is.null(dset)) {
+        anno = Biobase::annotation(normData)
+        if (grepl("mouse", anno)) {
+            dset = "mmusculus_gene_ensembl"
+        } else {
+            dset = "hsapiens_gene_ensembl" # assume human if it's not clearly mouse, fix if required
+        }
+        message("[microarray/annotate] mapping ", sQuote(anno), " -> ", sQuote(dset))
+    }
     emat = annotate(as.matrix(normData), summarize=summarize, dset=dset)
     Biobase::ExpressionSet(assayData = emat,
                            phenoData = Biobase::phenoData(normData))
 }
 
-annotate.NChannelSet = function(normData, summarize="external_gene_name", dset="hsapiens_gene_ensembl") {
+annotate.NChannelSet = function(normData, summarize="external_gene_name", dset=NULL) {
     if (! "E" %in% ls(assayData(normData)))
         stop("only single-channel implemented atm")
 
@@ -79,7 +89,9 @@ annotate.NChannelSet = function(normData, summarize="external_gene_name", dset="
     es
 }
 
-annotate.matrix = function(normData, summarize="external_gene_name", dset="hsapiens_gene_ensembl") {
+annotate.matrix = function(normData, summarize="external_gene_name", dset=NULL) {
+    if (is.null(dset))
+        dset = .guess$dset(rownames(normData))
     rownames(normData) = .idmap$probeset(rownames(normData), to=summarize, dset=dset)
     limma::avereps(normData[!is.na(rownames(normData)),])
 }
