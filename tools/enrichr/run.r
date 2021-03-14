@@ -6,7 +6,7 @@ import_package('dplyr', attach=TRUE)
 #' @param db     Character string of database interfier
 #' @return       Named (categories) list of genes (character vector)
 run = function(genes, db) {
-    url = function(...) paste0("http://amp.pharm.mssm.edu/Enrichr/", ...)
+    url = function(...) paste0("http://maayanlab.cloud/Enrichr/", ...)
     genes = paste(genes, collapse="\n")
 
     req = httr::POST(url=url("enrich"), body=list(list=genes))

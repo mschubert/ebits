@@ -2,7 +2,7 @@ import_package('dplyr', attach=TRUE)
 
 #' List available databases as character vector
 dbs = function() {
-    req = httr::GET(url="http://amp.pharm.mssm.edu/Enrichr/datasetStatistics")
+    req = httr::GET(url="http://maayanlab.cloud/Enrichr/datasetStatistics")
 
     if (!req$status == 200)
         stop("HTTP query error for database list")

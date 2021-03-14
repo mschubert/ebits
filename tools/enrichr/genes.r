@@ -5,7 +5,7 @@ import_package('dplyr', attach=TRUE)
 #' @param db     Character string of database interfier
 #' @return       Named (categories) list of genes (character vector)
 genes = function(db) {
-    url = function(...) paste0("http://amp.pharm.mssm.edu/Enrichr/", ...)
+    url = function(...) paste0("https://maayanlab.cloud/Enrichr/", ...)
 
     if (length(db) != 1)
         stop("Length of 'db' must be 1")
