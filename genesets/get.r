@@ -48,7 +48,7 @@ get_human = function(collections, ..., drop=TRUE) {
 }
 
 get_mouse = function(collections, ..., drop=TRUE) {
-    map_one = function(col) {
+    map_one = function(hum) {
         mouse = stack(hum)
         mouse$values = unname(.idmap$orthologue(mouse$values, from="external_gene_name", to="mgi_symbol"))
         unstack(na.omit(mouse))
@@ -57,9 +57,9 @@ get_mouse = function(collections, ..., drop=TRUE) {
     hum = get_human(collections)
 
     if (length(collections) == 1 & drop) {
-        map_one(collections)
+        map_one(hum)
     } else {
-        sapply(collections, map_one, simplify=FALSE)
+        lapply(hum, map_one)
     }
 }
 

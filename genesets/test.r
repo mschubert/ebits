@@ -28,12 +28,12 @@ test = function(genes, sets,
     if (length(label) > 1) {
         label = intersect(label, colnames(genes))[1]
         first = head(na.omit(genes[[label]]), 2) %>% sQuote() %>% paste(collapse=", ")
-        message("[geneset/test] column ", sQuote(label), " for as gene identifier (", first, ", ...)")
+        message("[geneset/test] using ", sQuote(label), " as gene identifier (", first, ", etc.)")
     }
     slab = rlang::sym(label)
     if (length(stat) > 1) {
         stat = intersect(stat, colnames(genes))[1]
-        message("[geneset/test] column ", sQuote(stat), " as separation statistic")
+        message("[geneset/test] using ", sQuote(stat), " as separation statistic")
     }
 
     all_sets = unique(unlist(sets))
