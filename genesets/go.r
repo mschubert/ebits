@@ -30,11 +30,13 @@ go = function(dset="hsapiens_gene_ensembl", genes="hgnc_symbol", valid=NULL,
         valid = unique(sets[[genes]])
     genes_per_set = sapply(unstack(sets), length)
 
+    terms = tibble::as_tibble(AnnotationDbi::toTable(GO.db::GOTERM)[,2:5]) %>%
+        filter(Ontology %in% ontology,
+               ! duplicated(go_id))
+
     obj = get(paste0("GO", ontology, "PARENTS"), asNamespace("GO.db"))
     tree = AnnotationDbi::toTable(obj)
-
-    terms = tibble::as_tibble(AnnotationDbi::toTable(GO.db::GOTERM)[,2:5])
-    terms = terms[!duplicated(terms$go_id),]
+    tree = tree[tree[[1]] %in% terms$go_id & tree[[2]] %in% terms$go_id,]
 
     valid_sets = intersect(terms$go_id, names(genes_per_set)[genes_per_set >= min_n])
     g = igraph::graph.data.frame(tree, vertices=terms)
