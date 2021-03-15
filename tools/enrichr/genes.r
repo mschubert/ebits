@@ -5,6 +5,10 @@ import_package('dplyr', attach=TRUE)
 #' @param db     Character string of database interfier
 #' @return       Named (categories) list of genes (character vector)
 genes = function(db) {
+    cache = file.path(module_file(), "cache", paste0(db, ".rds"))
+    if (file.exists(cache))
+        return(readRDS(cache))
+
     url = function(...) paste0("https://maayanlab.cloud/Enrichr/", ...)
 
     if (length(db) != 1)
@@ -20,6 +24,9 @@ genes = function(db) {
         `[[`(1) %>%
         `[[`('terms') %>%
         lapply(function(x) names(unlist(x)))
+
+    saveRDS(re, file=cache)
+    re
 }
 
 if (is.null(module_name())) {
