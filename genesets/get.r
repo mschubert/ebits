@@ -58,7 +58,7 @@ get_mouse = function(collections, ..., drop=TRUE) {
         unstack(na.omit(mouse))
     }
 
-    hum = get_human(collections)
+    hum = get_human(collections, drop=drop)
 
     if (length(collections) == 1 & drop) {
         map_one(hum)
@@ -72,8 +72,12 @@ if (is.null(module_name())) {
 
     d = get_human("DoRothEA")
     dm = get_mouse("DoRothEA")
+    dd = get_mouse("DoRothEA", drop=FALSE)
     expect_true(inherits(d, "list"))
     expect_true(inherits(d[[1]], "character"))
     expect_true(inherits(dm, "list"))
     expect_true(inherits(dm[[1]], "character"))
+    expect_true(inherits(dd, "list"))
+    expect_equal(length(dd), 1)
+    expect_true(inherits(dd$DoRothEA, "list"))
 }
