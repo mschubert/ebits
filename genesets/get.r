@@ -16,9 +16,9 @@ get_human = function(collections, ..., drop=TRUE) {
     get_one = function(col) {
         if (col == "GO_Biological_Process_2020") {
             .go(leaf_depth=3, ontology="BP", as_list=TRUE)
-        } if (col == "GO_Cellular_Component_2020") {
+        } else if (col == "GO_Cellular_Component_2020") {
             .go(leaf_depth=3, ontology="CC", as_list=TRUE)
-        } if (col == "GO_Molecular_Function_2020") {
+        } else if (col == "GO_Molecular_Function_2020") {
             .go(leaf_depth=3, ontology="MF", as_list=TRUE)
         } else if (col %in% .enr$dbs()$name) {
             .enr$genes(col)
