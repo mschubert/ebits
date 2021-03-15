@@ -12,14 +12,14 @@ list = function() {
     gtools::mixedsort(dbs)
 }
 
-get_human = function(collections, ..., drop=TRUE) {
+get_human = function(collections, ..., leaf_depth=4, drop=TRUE) {
     get_one = function(col) {
         if (col == "GO_Biological_Process_2020") {
-            .go(leaf_depth=3, ontology="BP", as_list=TRUE)
+            .go(leaf_depth=leaf_depth, ontology="BP", as_list=TRUE)
         } else if (col == "GO_Cellular_Component_2020") {
-            .go(leaf_depth=3, ontology="CC", as_list=TRUE)
+            .go(leaf_depth=leaf_depth, ontology="CC", as_list=TRUE)
         } else if (col == "GO_Molecular_Function_2020") {
-            .go(leaf_depth=3, ontology="MF", as_list=TRUE)
+            .go(leaf_depth=leaf_depth, ontology="MF", as_list=TRUE)
         } else if (col %in% .enr$dbs()$name) {
             .enr$genes(col)
         } else if (col %in% .msdb$dbs()) {
@@ -51,19 +51,19 @@ get_human = function(collections, ..., drop=TRUE) {
     }
 }
 
-get_mouse = function(collections, ..., drop=TRUE) {
-    map_one = function(hum) {
-        mouse = stack(hum)
-        mouse$values = unname(.idmap$orthologue(mouse$values, from="external_gene_name", to="mgi_symbol"))
-        unstack(na.omit(mouse))
-    }
+hu2mouse = function(hum) {
+    mouse = stack(hum)
+    mouse$values = .idmap$orthologue(mouse$values, from="external_gene_name", to="mgi_symbol")
+    unstack(na.omit(mouse))
+}
 
-    hum = get_human(collections, drop=drop)
+get_mouse = function(collections, ..., drop=TRUE) {
+    hum = get_human(collections, drop=drop, ...)
 
     if (length(collections) == 1 & drop) {
-        map_one(hum)
+        hu2mouse(hum)
     } else {
-        lapply(hum, map_one)
+        lapply(hum, hu2mouse)
     }
 }
 
