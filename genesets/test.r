@@ -25,16 +25,19 @@ test = function(genes, sets,
 #        }, error = function(e) data.frame(estimate = NA))
     }
 
+    msg = c()
     if (length(label) > 1) {
         label = intersect(label, colnames(genes))[1]
         first = head(na.omit(genes[[label]]), 2) %>% sQuote() %>% paste(collapse=", ")
-        message("[geneset/test] using ", sQuote(label), " as gene identifier (", first, ", etc.)")
+        msg = c(msg, paste0(sQuote(label), " for sets (", first, ", …)"))
     }
     slab = rlang::sym(label)
     if (length(stat) > 1) {
         stat = intersect(stat, colnames(genes))[1]
-        message("[geneset/test] using ", sQuote(stat), " as separation statistic")
+        msg = c(msg, paste0(sQuote(stat), " as separation statistic"))
     }
+    if (length(msg) > 0)
+        message("[geneset/test] using ", paste(msg, collapse=", "))
 
     all_sets = unique(unlist(sets))
     if (mean(all_sets %in% genes[[label]]) < 0.5) {
