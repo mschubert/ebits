@@ -51,13 +51,13 @@ heatmap_aneuHMM = function(aneu) {
             bind_rows(.id="cell")
     }
 
-    if (class(aneu[[1]]) == "aneuHMM") { # one sample
+    if (class(aneu[[1]]) == "aneuHMM" || inherits(aneu[[1]], "GRanges")) { # one sample
         ords = cluster_sample(aneu)
         segs = ex_segs(aneu) %>%
             left_join(ords, by="cell") %>%
             mutate(cell = factor(cell, levels=ords$cell))
         heatmap(segs, aes(fill=copy.number, y=cell))
-    } else if (class(aneu[[1]][[1]]) == "aneuHMM") { # multiple samples
+    } else if (class(aneu[[1]][[1]]) == "aneuHMM" || inherits(aneu[[1]][[1]], "GRanges")) { # multiple samples
         if (is.null(names(aneu)))
             names(aneu) = seq_along(aneu)
         ords = lapply(aneu, cluster_sample) %>%
