@@ -10,19 +10,17 @@ import_package("dplyr", attach=TRUE)
 #' @param stat   Column name of separation statistics
 #' @return       A data.frame with association results
 test = function(genes, sets,
-                label=c("external_gene_name", "gene", "name", "gene_name", "ensembl_gene_id"),
+                label=c("external_gene_name", "gene_name", "gene", "name", "label", "ensembl_gene_id"),
                 stat=c("stat", "statistic")) {
     test_one = function(res, set) {
-#        tryCatch({
-            res %>%
-                mutate(in_set = !! slab %in% set + 0) %>%
-                lm(as.formula(paste(stat, "~ in_set")), data=.) %>%
-                broom::tidy() %>%
-                filter(term == "in_set") %>%
-                select(-term) %>%
-                mutate(size = sum(res[[label]] %in% set),
-                       size_used = sum(res[[label]] %in% set & !is.na(res[[stat]])))
-#        }, error = function(e) data.frame(estimate = NA))
+        res %>%
+            mutate(in_set = !! slab %in% set + 0) %>%
+            lm(as.formula(paste(stat, "~ in_set")), data=.) %>%
+            broom::tidy() %>%
+            filter(term == "in_set") %>%
+            select(-term) %>%
+            mutate(size = sum(res[[label]] %in% set),
+                   size_used = sum(res[[label]] %in% set & !is.na(res[[stat]])))
     }
 
     msg = c()
