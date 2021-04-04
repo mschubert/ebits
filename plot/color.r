@@ -16,6 +16,7 @@ pvalue = function(df, pvalue="p.value", cmap="") {
 #' @param dir     Direction of effect considered positive [+/-1]
 #' @param thresh  Threshold for significance
 p_effect = function(df, pvalue="p.value", effect="estimate", dir=1, thresh=0.05) {
+    .Deprecated("p_effect is deprecated, use plot/volcano directly")
     df[[effect]] = sign(dir) * df[[effect]]
     df$color = rep(rgb(0, 151, 30, 120, maxColorValue=255), nrow(df)) # green
     df$color[df[[effect]] < 0] = rgb(225, 0, 0, 120, maxColorValue=255) # red

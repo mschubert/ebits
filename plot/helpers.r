@@ -1,21 +1,3 @@
-.scales = import_package_('scales')
-
-reverselog_trans = function(base=exp(1)) {
-    trans = function(x) -log(x, base)
-    inv = function(x) base^-x
-    .scales$trans_new(paste0("log-", format(base)),
-                      trans,
-                      inv,
-                      .scales$log_breaks(base = base), 
-                      domain = c(1e-100, Inf))
-}
-
-# function for relabeling the y-axis
-scientific_10 = function(x) {
-    fmt = ifelse(x < 0.01, .scales$scientific_format()(x), x)
-    parse(text=gsub("1e", "10^", fmt))
-}
-
 # http://stackoverflow.com/questions/6738085
 fill_brewer = function(fill, palette) {
     n = RColorBrewer::brewer.pal.info$maxcolors[palette == rownames(brewer.pal.info)]
@@ -37,4 +19,3 @@ discretize = function(x, discr, lim=c(NA,NA)) {
     breaks = seq(lower, upper, (upper-lower)/length(discr))
     discr[as.integer(cut(x, breaks=breaks, include.lowest=T))]
 }
-
