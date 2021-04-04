@@ -56,13 +56,13 @@ heatmap = function(segs, sample = c("Sample", "sample", "."), cell=c("Cell", "ce
         segs = .extract_aneuHMM(segs)
 
     msg = c()
-    if (length(sample) > 1) {
-        sample = intersect(sample, c(colnames(segs), "."))[1]
-        msg = c(msg, paste(sQuote(sample), "(sample)"))
-    }
     if (length(cell) > 1) {
         cell = intersect(cell, colnames(segs))[1]
         msg = c(msg, paste(sQuote(cell), "(cell)"))
+    }
+    if (length(sample) > 1) {
+        sample = intersect(sample, c(setdiff(colnames(segs), cell), "."))[1]
+        msg = c(msg, paste(sQuote(sample), "(sample)"))
     }
     if (length(chrs) > 1) {
         chrs = intersect(chrs, colnames(segs))[1]
