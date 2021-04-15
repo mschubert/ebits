@@ -21,7 +21,7 @@ import_package('GenomicRanges', attach=TRUE)
         chromosomes = c(1:100, 'X', 'Y', 'MT')
     coords = dplyr::filter(coords, chromosome_name %in% chromosomes)
 
-    coords = mutate(coords, canonical_tss =
+    coords = dplyr::mutate(coords, canonical_tss =
         ifelse(strand == 1, start_position, end_position))
 
     if (granges) {
