@@ -91,7 +91,7 @@ volcano = function(df, x = c("estimate", "log2FoldChange", ".x"),
                            abs(!! sx) < max(abs((!! sx)[(!! sy)<p]),
                            na.rm=TRUE))
 
-    df = dplyr::mutate(df, size = size*base.size)
+    df[[size]] = df[[size]] * base.size
 
     # set very low p-values to the cutoff value and label point
     # .Machine$double.eps too large, first != 0 too small
@@ -135,8 +135,8 @@ volcano = function(df, x = c("estimate", "log2FoldChange", ".x"),
                            limits = ylim,
                            breaks = breaks_with_thresh) +
         scale_x_continuous(limits = xlim) +
-        geom_point(size = ifelse(df$fill, sqrt(df$size), NA), color=df$color, na.rm=TRUE) +
-        geom_point(size = ifelse(df$circle, sqrt(df$size), NA),
+        geom_point(size = ifelse(df$fill, sqrt(df[[size]]), NA), color=df$color, na.rm=TRUE) +
+        geom_point(size = ifelse(df$circle, sqrt(df[[size]]), NA),
                    shape=1, color=ifelse(df$fill, '#00000088', df$color), na.rm=TRUE) +
         geom_vline(xintercept=0, color="#858585") +
         geom_hline(yintercept=p, linetype="dashed", color="#858585") +
