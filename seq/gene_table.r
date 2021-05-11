@@ -16,10 +16,10 @@ gene_table = function(dset="hsapiens_gene_ensembl", assembly=NULL, version=NULL,
 
     # https://www.ensembl.org/info/website/archives/index.html
     if (version == "latest") {
-        version = "103"
+        version = "104"
         host = "https://www.ensembl.org"
     } else if (tolower(version) == "grch37") {
-        version = "103"
+        version = "104"
         host = "http://grch37.ensembl.org"
     } else if (version == "102") {
         host = "https://nov2020.archive.ensembl.org"
