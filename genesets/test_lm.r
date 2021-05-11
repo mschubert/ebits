@@ -9,9 +9,9 @@ import_package("dplyr", attach=TRUE)
 #' @param label  Column name of gene names
 #' @param stat   Column name of separation statistics
 #' @return       A data.frame with association results
-test = function(genes, sets,
-                label=c("external_gene_name", "gene_name", "gene", "name", "label", "ensembl_gene_id"),
-                stat=c("stat", "statistic")) {
+test_lm = function(genes, sets,
+                   label=c("external_gene_name", "gene_name", "gene", "name", "label", "ensembl_gene_id"),
+                   stat=c("stat", "statistic")) {
     test_one = function(res, set) {
         res %>%
             mutate(in_set = !! slab %in% set + 0) %>%
@@ -35,12 +35,12 @@ test = function(genes, sets,
         msg = c(msg, paste0(sQuote(stat), " as separation statistic"))
     }
     if (length(msg) > 0)
-        message("[geneset/test] using ", paste(msg, collapse=", "))
+        message("[geneset/test_lm] using ", paste(msg, collapse=", "))
 
     all_sets = unique(unlist(sets))
     if (mean(all_sets %in% genes[[label]]) < 0.5) {
         idt = .guess$id_type(all_sets)
-        message("[geneset/test] low identifier overlap, mapping ", sQuote(label), " to ", sQuote(idt))
+        message("[geneset/test_lm] low identifier overlap, mapping ", sQuote(label), " to ", sQuote(idt))
         genes[[label]] = .idmap$gene(genes[[label]], to=idt)
     }
 
@@ -59,7 +59,7 @@ if (is.null(module_name())) {
 
     genes = data.frame(gene = LETTERS[1:10], stat=1:10)
     sets = list(a=LETTERS[1:5])
-    res = test(genes, sets)
+    res = test_lm(genes, sets)
 
     expect_true(inherits(res, "data.frame"))
     expect_equal(res$estimate, -5)
