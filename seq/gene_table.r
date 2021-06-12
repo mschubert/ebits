@@ -46,13 +46,13 @@ gene_table = function(dset="hsapiens_gene_ensembl", assembly=NULL, version=NULL,
     cache = file.path(module_file(), "cache", fname)
     message("Generating cache file ", sQuote(fname))
 
-    ids = c('external_gene_name', 'entrezgene_id', 'ensembl_gene_id',
+    ids = c('external_gene_name', 'entrezgene_id', 'ensembl_gene_id', 'ucsc',
             'band', 'chromosome_name', 'start_position', 'end_position',
             'ensembl_transcript_id', 'transcript_start', 'transcript_end',
             'transcription_start_site', 'strand', 'gene_biotype')
     mapping = tibble::as_tibble(biomaRt::getBM(attributes=ids, mart=ensembl))
     for (col in colnames(mapping)) {
-        is_empty = nchar(as.character(mapping[,col])) == 0
+        is_empty = nchar(as.character(mapping[[col]])) == 0
         mapping[[col]][is_empty] = NA
     }
 
