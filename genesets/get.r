@@ -12,7 +12,7 @@ list = function() {
     gtools::mixedsort(dbs)
 }
 
-get_human = function(collections, ..., leaf_depth=4, drop=TRUE) {
+get_human = function(collections, ..., leaf_depth=4, conf=c("A","B","C","D"), drop=TRUE) {
     get_one = function(col) {
         if (col == "GO_Biological_Process_2020") {
             .go(leaf_depth=leaf_depth, ontology="BP", as_list=TRUE)
@@ -27,7 +27,7 @@ get_human = function(collections, ..., leaf_depth=4, drop=TRUE) {
         } else if (col == "DoRothEA") {
             dorothea::dorothea_hs %>%
                 filter(mor == 1,
-                       confidence %in% c("A","B","C","D")) %>%
+                       confidence %in% conf) %>%
                 group_by(tf) %>%
                     filter(case_when(
                         sum(confidence %in% c("A")) >= 20 ~ confidence %in% c("A"),
