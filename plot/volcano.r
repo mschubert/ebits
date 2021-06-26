@@ -146,7 +146,9 @@ volcano = function(df, x = c("estimate", "log2FoldChange", ".x"),
     if (repel) {
         pl + ggrepel::geom_label_repel(aes_string(x=x, y=y, label=label),
                 colour="#353535", size=text.size, na.rm=TRUE, segment.alpha=0.3,
-                max.iter=5e4, max.overlaps=max.overlaps, label.size=NA, fill="#ffffff80")
+                max.iter=1e5, max.time=5, max.overlaps=max.overlaps,
+                label.size=NA, fill="#ffffff80",
+                label.padding = unit(0.12, "lines"), box.padding = unit(0.01, "lines"))
     } else {
         pl + geom_text(aes_string(x=x, y=y, label=label), colour="#353535", size=text.size,
                       vjust=-1, na.rm=TRUE, check_overlap=check_overlap)
