@@ -21,12 +21,13 @@ seq = import('../../seq')
 #'   value can either be NULL (fixed bins) or a path to a file to use for reference
 #' @param method         Aneufinder method: "edivisive", "HMM" or "dnacopy"
 #' @param ...            Additional parameters passed to 'findCNVs'
+#' @param cores          Number of cores to use for parallel processing
 #' @return               A list of models, one for each input file
 run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
                binsize=1e6, correction="GC", states=10, min_segment_size=10,
                mappability_reference=NULL, paired_reads=FALSE,
                duplicate_reads=FALSE, min_mapq=10, max_time=-1, n_trials=15,
-               bin_width_ref=NULL, method="edivisive", ...) {
+               bin_width_ref=NULL, method="edivisive", ..., cores=1L) {
 
     stopifnot(length(files) >= 1)
     stopifnot(length(binsize) == 1) # change [[1]] below if removing
@@ -72,21 +73,26 @@ run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
             is.null(bin_width_ref), mappability_reference, chr_lengths)
 
     # run HMM/dnacopy
-    models = lapply(binned_reads, function(br) {
+    do_fit = function(br) {
         m = try(AneuFinder::findCNVs(br,
-                eps = 0.1,
-#                min.segment.size = min_segment_size,
-                max.time = max_time,
-                max.iter = 5000,
-                num.trials = n_trials,
-                states = c("zero-inflation", sprintf("%i-somy", 0:states)),
-                most.frequent.state = "2-somy",
-                method = method,
-                ...))
+            eps = 0.1,
+#            min.segment.size = min_segment_size, # not a parameter for aneuf pkg
+            max.time = max_time,
+            max.iter = 5000,
+            num.trials = n_trials,
+            states = c("zero-inflation", sprintf("%i-somy", 0:states)),
+            most.frequent.state = "2-somy",
+            method = method,
+            ...))
         if (class(m$segments) == "GRanges") {
             idx = unique(as.character(GenomeInfoDb::seqnames(m$segments)))
             GenomeInfoDb::seqinfo(m$segments) = GenomeInfoDb::seqinfo(genome)[idx]
         }
         m
-    })
+    }
+    if (cores == 1L) {
+        lapply(binned_reads, do_fit)
+    } else {
+        parallel::mclapply(binned_reads, do_fit, mc.cores=min(length(binned_reads), cores))
+    }
 }
