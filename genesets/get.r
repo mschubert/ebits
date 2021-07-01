@@ -5,20 +5,24 @@ import_package("dplyr", attach=TRUE)
 .go = import('./go')$go
 
 list = function() {
-    dbs = c("GO_Biological_Process_2020",
-      "DoRothEA",
-      .enr$dbs()$name,
-      .msdb$dbs())
+    dbs = c(
+        "GO_Biological_Process_Tree",
+        "GO_Cellular_Component_Tree",
+        "GO_Molecular_Function_Tree",
+        "DoRothEA",
+        .enr$dbs()$name,
+        .msdb$dbs()
+    )
     gtools::mixedsort(dbs)
 }
 
 get_human = function(collections, ..., leaf_depth=4, conf=c("A","B","C","D"), drop=TRUE) {
     get_one = function(col) {
-        if (col == "GO_Biological_Process_2020") {
+        if (col == "GO_Biological_Process_Tree") {
             .go(leaf_depth=leaf_depth, ontology="BP", as_list=TRUE)
-        } else if (col == "GO_Cellular_Component_2020") {
+        } else if (col == "GO_Cellular_Component_Tree") {
             .go(leaf_depth=leaf_depth, ontology="CC", as_list=TRUE)
-        } else if (col == "GO_Molecular_Function_2020") {
+        } else if (col == "GO_Molecular_Function_Tree") {
             .go(leaf_depth=leaf_depth, ontology="MF", as_list=TRUE)
         } else if (col %in% .enr$dbs()$name) {
             .enr$genes(col)
