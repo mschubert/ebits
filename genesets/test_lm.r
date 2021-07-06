@@ -32,7 +32,7 @@ test_lm = function(genes, sets,
     slab = rlang::sym(label)
     if (length(stat) > 1) {
         stat = intersect(stat, colnames(genes))[1]
-        msg = c(msg, paste0(sQuote(stat), " as separation statistic"))
+        msg = c(msg, paste0(sQuote(stat), " for separation"))
     }
     if (length(msg) > 0)
         message("[geneset/test_lm] using ", paste(msg, collapse=", "))
