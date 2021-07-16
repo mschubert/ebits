@@ -3,6 +3,7 @@ import_package("dplyr", attach=TRUE)
 .enr = import('../tools/enrichr')
 .msdb = import('../tools/msigdb')
 .go = import('./go')$go
+.cin = import('./cin')$cin
 
 list = function() {
     dbs = c(
@@ -28,6 +29,8 @@ get_human = function(collections, ..., leaf_depth=4, conf=c("A","B","C","D"), dr
             .enr$genes(col)
         } else if (col %in% .msdb$dbs()) {
             .msdb$genes(col)
+        } else if (col == "CIN") {
+            .cin()
         } else if (col == "DoRothEA") {
             dorothea::dorothea_hs %>%
                 filter(mor == 1,
