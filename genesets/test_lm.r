@@ -38,7 +38,7 @@ test_lm = function(genes, sets,
         message("[geneset/test_lm] using ", paste(msg, collapse=", "))
 
     all_sets = unique(unlist(sets))
-    if (mean(all_sets %in% genes[[label]]) < 0.5) {
+    if (mean(all_sets %in% genes[[label]]) < 0.25) {
         idt = .guess$id_type(all_sets)
         message("[geneset/test_lm] low identifier overlap, mapping ", sQuote(label), " to ", sQuote(idt))
         genes[[label]] = .idmap$gene(genes[[label]], to=idt)
