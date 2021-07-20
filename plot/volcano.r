@@ -58,6 +58,8 @@ volcano = function(df, x = c("estimate", "log2FoldChange", ".x"),
             df$size = 1
             size = "size"
         }
+        if (size == "baseMean") # better circle sizes
+            df[[size]] = sqrt(df[[size]]) # should probably scale_size(...)
         msg = c(msg, paste(sQuote(size), "(size)"))
     }
     if (length(msg) > 0)
