@@ -19,7 +19,7 @@ test_lm = function(genes, sets,
             broom::tidy() %>%
             filter(term == "in_set") %>%
             select(-term) %>%
-            mutate(size = sum(res[[label]] %in% set),
+            mutate(size = length(set),
                    size_used = sum(res[[label]] %in% set & !is.na(res[[stat]])))
     }
 
