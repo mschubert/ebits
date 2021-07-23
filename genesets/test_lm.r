@@ -8,11 +8,16 @@ import_package("dplyr", attach=TRUE)
 #' @param sets   List of character vectors
 #' @param label  Column name of gene names
 #' @param stat   Column name of separation statistics
+#' @param add_means  Column name(s) of variables to compute the mean of the set of
 #' @return       A data.frame with association results
 test_lm = function(genes, sets,
                    label=c("external_gene_name", "gene_name", "gene", "name", "label", "ensembl_gene_id"),
-                   stat=c("stat", "statistic")) {
+                   stat=c("stat", "statistic"),
+                   add_means=c()) {
     test_one = function(res, set) {
+        sums = res %>% filter(!! slab %in% set) %>%
+            summarize_at(vars(all_of(add_means)), mean)
+
         res %>%
             mutate(in_set = !! slab %in% set + 0) %>%
             lm(as.formula(paste(stat, "~ in_set")), data=.) %>%
@@ -20,7 +25,8 @@ test_lm = function(genes, sets,
             filter(term == "in_set") %>%
             select(-term) %>%
             mutate(size = length(set),
-                   size_used = sum(res[[label]] %in% set & !is.na(res[[stat]])))
+                   size_used = sum(res[[label]] %in% set & !is.na(res[[stat]]))) %>%
+            cbind(sums)
     }
 
     msg = c()
@@ -49,7 +55,7 @@ test_lm = function(genes, sets,
         dplyr::bind_rows(.id="label") %>%
         as_tibble() %>%
         na.omit() %>%
-        select(label, size, size_used, everything()) %>%
+        select(label, size, size_used, !!! rlang::syms(add_means), everything()) %>%
         mutate(adj.p = p.adjust(p.value, method="fdr")) %>%
         arrange(adj.p, p.value)
 }
