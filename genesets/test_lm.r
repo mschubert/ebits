@@ -16,7 +16,7 @@ test_lm = function(genes, sets,
                    add_means=c()) {
     test_one = function(res, set) {
         sums = res %>% filter(!! slab %in% set) %>%
-            summarize_at(vars(all_of(add_means)), mean)
+            summarize_at(vars(all_of(add_means)), function(x) mean(x, na.rm=TRUE))
 
         res %>%
             mutate(in_set = !! slab %in% set + 0) %>%
