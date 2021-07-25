@@ -9,18 +9,20 @@ import_package("dplyr", attach=TRUE)
 #' @param label  Column name of gene names
 #' @param stat   Column name of separation statistics
 #' @param add_means  Column name(s) of variables to compute the mean of the set of
+#' @param trim   Fraction of extremes to ignore when computing the mean
 #' @return       A data.frame with association results
 test_lm = function(genes, sets,
                    label=c("external_gene_name", "gene_name", "gene", "name", "label", "ensembl_gene_id"),
-                   stat=c("stat", "statistic"),
-                   add_means=c()) {
+                   stat=c("stat", "statistic", "log2FoldChange"),
+                   add_means=c(), trim=0) {
     test_one = function(res, set) {
-        sums = res %>% filter(!! slab %in% set) %>%
-            summarize_at(vars(all_of(add_means)), function(x) mean(x, na.rm=TRUE))
+        dset = res %>% mutate(in_set = !! slab %in% set + 0)
 
-        res %>%
-            mutate(in_set = !! slab %in% set + 0) %>%
-            lm(as.formula(paste(stat, "~ in_set")), data=.) %>%
+        sums = dset %>% group_by(in_set) %>%
+            summarize_at(vars(all_of(add_means)), function(x) mean(x, na.rm=TRUE, trim=trim)) %>%
+            summarize_at(vars(all_of(add_means)), diff)
+
+        lm(as.formula(paste(stat, "~ in_set")), data=dset) %>%
             broom::tidy() %>%
             filter(term == "in_set") %>%
             select(-term) %>%
