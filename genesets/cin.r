@@ -30,6 +30,8 @@ cin = function() {
         bakhoum = file.path(module_file("data", "41586_2018_BFnature25432_MOESM3_ESM.xlsx"))
         bak = sapply(readxl::excel_sheets(bakhoum), readxl::read_xlsx, path=bakhoum, simplify=FALSE)
 
+        bucc = file.path(module_file("data"), "Buccitelli_Supplemental_Data_3")
+
         sets = list(
 #            CIN4 = ,
 #            CIN25 = ,
@@ -39,15 +41,19 @@ cin = function() {
             TRI70_pos = tri70[1:20],
             TRI70_neg = tri70[23:71],
             Bakhoum2018_CIN = bak[["CIN-Signature"]][[1]],
+            Bakhoum2018_NC_NFkB = bak[["NC-NFkB-Targets"]][[1]],
             Bakhoum2018_NC_NFkB_pos = bak[["NC-NFkB-Targets"]][[1]][1:13],
             Bakhoum2018_NC_NFkB_neg = bak[["NC-NFkB-Targets"]][[1]][14:18],
+            Bakhoum2018_NC_NFkB_reg_pos = toupper(bak[["NC-NFkB-Regulators"]][[1]]),
             Bakhoum2018_NC_NFkB_reg_pos = toupper(bak[["NC-NFkB-Regulators"]][[1]][1:3]),
             Bakhoum2018_NC_NFkB_reg_neg = bak[["NC-NFkB-Regulators"]][[1]][4:7],
             Bakhoum2018_NFkB_reg = toupper(bak[["NFkB-Regulators"]][[1]]),
             Bakhoum2018_IFN_reg = bak[["Interferon-Regulators"]][[1]],
             Bakhoum2018_EMT = bak[["EMT-Genes"]][[1]],
             Bakhoum2018_Inflammation = bak[["Inflammation-Genes"]][[1]],
-            Bakhoum2018_Migration = bak[["MigrationMotility-Genes"]][[1]]
+            Bakhoum2018_Migration = bak[["MigrationMotility-Genes"]][[1]],
+            Buccitelli_up = read.table(file.path(bucc, "concensus_genes", "up_consensus.txt"))$V1,
+            Buccitelli_down = read.table(file.path(bucc, "concensus_genes", "down_consensus.txt"))$V1
         )
         saveRDS(sets, file=fname)
     }
