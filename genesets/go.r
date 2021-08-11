@@ -64,10 +64,10 @@ go = function(dset="hsapiens_gene_ensembl", genes="hgnc_symbol", valid=NULL,
 #'
 #' @param ontology  Character vector of ontologies to use: BP (default), MF, CC
 #' @param root      A character vector to restrict children from
-#' @param order     How many nodes to travers if root is filtered
+#' @param order     How many nodes to traverse if root is filtered
 #' @param drop      Drop wrapping list of only one root element
 #' @return          An igraph object of GO term IDs
-go_graph = function(ontology="BP", root=NULL, order=3, drop=TRUE) {
+go_graph = function(root=NULL, ontology="BP", order=Inf, drop=TRUE) {
     terms = tibble::as_tibble(AnnotationDbi::toTable(GO.db::GOTERM)[,2:5]) %>%
         filter(Ontology %in% ontology,
                ! duplicated(go_id))
@@ -78,7 +78,7 @@ go_graph = function(ontology="BP", root=NULL, order=3, drop=TRUE) {
 
     g = igraph::graph.data.frame(tree, vertices=terms)
     if (!is.null(root)) {
-        g = igraph::make_ego_graph(g, nodes=root, mode="in", order=order)
+        g = igraph::make_ego_graph(g, nodes=root, mode="in", order=min(order, 1e5))
         if (drop && length(g) == 1)
             g = g[[1]]
     }
