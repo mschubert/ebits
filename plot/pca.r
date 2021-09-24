@@ -15,6 +15,7 @@ pca.prcomp = function(obj, aes=ggplot2::aes(), annot=NULL, repel=TRUE,
     rot = data.frame(varnames=rownames(obj$rotation), obj$rotation)
     x = rlang::quo_text(aes[["x"]])
     y = rlang::quo_text(aes[["y"]])
+    summ = summary(obj)$importance
 
     mult = min(
         (max(data[,y]) - min(data[,y])/(max(rot[,y])-min(rot[,y]))),
@@ -26,6 +27,10 @@ pca.prcomp = function(obj, aes=ggplot2::aes(), annot=NULL, repel=TRUE,
     )
 
     p = ggplot(data=data, mapping=aes)
+    if (grepl("^PC[0-9]+$", x))
+        p = p + xlab(sprintf("%s (%.0f%%)", x, 100*summ["Proportion of Variance", x]))
+    if (grepl("^PC[0-9]+$", y))
+        p = p + ylab(sprintf("%s (%.0f%%)", y, 100*summ["Proportion of Variance", y]))
 
     if (repel) {
         textfun = function(...) ggrepel::geom_text_repel(..., min.segment.length=Inf)
