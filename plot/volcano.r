@@ -67,6 +67,7 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
 
     sx = rlang::sym(x)
     sy = rlang::sym(y)
+    sl = rlang::sym(label)
 
     if (nrow(df) == 0)
         stop("No observations to plot")
@@ -102,7 +103,7 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
     pmin = df[[y]] < ceil
     if (any(pmin, na.rm=TRUE)) {
         df[pmin,] = mutate(df[pmin,],
-            label = paste0(label, " (p < 1e", ceiling(log10(!! sy)), ")"),
+            !! sl := paste0(!! sl, " (p < 1e", ceiling(log10(!! sy)), ")"),
             !! sy := ceil)
     }
 
@@ -113,8 +114,8 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
     point_dist = abs(rel_effect) * x_label_bias + abs(rel_pval)
     point_dist[rel_effect > 0] = point_dist[rel_effect > 0] * pos_label_bias
     point_dist[df[[y]] > p] = NA
-    point_dist[is.na(df$label)] = NA # only keep points where we have labels
-    df$label[rank(-point_dist) > label_top & xor(df$fill, df$circle)] = NA
+    point_dist[is.na(df[[label]])] = NA # only keep points where we have labels
+    df[[label]][rank(-point_dist) > label_top & xor(df$fill, df$circle)] = NA
 
     # make sure we don't plot too many insignificant points
     if (simplify && sum(df[[y]] > p, na.rm=TRUE) > 800) {
@@ -124,7 +125,7 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
         prob[df$circle[idx]] = 1
         keep = sample(idx, size=500, replace=FALSE, prob=prob)
         df[[y]][setdiff(idx, keep)] = NA
-        df$label[idx] = NA
+        df[[label]][idx] = NA
     }
 
     breaks_with_thresh = function(...) c(p, scales::log_breaks(base=10)(df[[y]], 5))
