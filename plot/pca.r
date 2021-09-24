@@ -46,3 +46,10 @@ pca.prcomp = function(obj, aes=ggplot2::aes(), annot=NULL, repel=TRUE,
 pca.default = function(...) {
     stop("only `prcomp` supported for now")
 }
+
+if (is.null(module_name())) {
+    library(ggplot2)
+    obj = prcomp(iris[1:4])
+    pca(obj, aes(x=PC1, y=PC2, color=Species), annot=iris["Species"], biplot=TRUE) +
+        geom_point()
+}
