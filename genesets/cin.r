@@ -55,6 +55,11 @@ cin = function() {
             Buccitelli_up = read.table(file.path(bucc, "concensus_genes", "up_consensus.txt"))$V1,
             Buccitelli_down = read.table(file.path(bucc, "concensus_genes", "down_consensus.txt"))$V1
         )
+
+        bt549 = file.path(module_file("data"), "mad2pb_bt549_stat1de.rds")
+        bt549_sets = lapply(readRDS(bt549), function(x) head(x$gene_name, 70))
+        sets = c(sets, bt549_sets)
+
         saveRDS(sets, file=fname)
     }
 
