@@ -52,8 +52,10 @@ cnacol = c(`2`="#ffffbf", `0`="#0530a1", `1`="#66c2a5", `3`="#fdae61", `4`="#d53
 heatmap = function(segs, sample = c("Sample", "sample", "."), cell=c("Cell", "cell"),
                    chrs=c("seqnames", "chr", "chrom"), fill=c("copy.number", "ploidy"),
                    cluster=NULL, max_copies=8) {
-    if (!is.data.frame(segs))
+    if (is.list(segs) && !is.data.frame(segs)) {
+        seg_ord = names(segs)
         segs = .extract_aneuHMM(segs)
+    }
 
     msg = c()
     if (length(cell) > 1) {
@@ -74,6 +76,9 @@ heatmap = function(segs, sample = c("Sample", "sample", "."), cell=c("Cell", "ce
     }
     if (length(msg) > 0)
         message("[plot/genome/heatmap] using ", paste(msg, collapse=", "))
+
+    if (!is.null(seg_ord))
+        segs[[sample]] = factor(segs[[sample]], levels=seg_ord)
 
     if (!is.factor(segs[[fill]])) {
         segs[[fill]] = factor(segs[[fill]])
