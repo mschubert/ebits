@@ -39,6 +39,8 @@ run = function(files, assembly, chromosomes=NULL, blacklist=NULL,
     # get assembly information
     genome = seq$genome(assembly)
     chr_lengths = seq$chr_lengths(genome)
+    if (is.null(chromosomes))
+        chromosomes = names(chr_lengths)
 
     # partition the reads into bins
     if (!is.null(bin_width_ref)) {
