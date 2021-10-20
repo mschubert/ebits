@@ -51,7 +51,7 @@ cnacol = c(`2`="#ffffbf", `0`="#0530a1", `1`="#66c2a5", `3`="#fdae61", `4`="#d53
 #' @return         A ggplot2 object with copy number segments along the genome
 heatmap = function(segs, sample = c("Sample", "sample", "."), cell=c("Cell", "cell"),
                    chrs=c("seqnames", "chr", "chrom"), fill=c("copy.number", "ploidy"),
-                   cluster=NULL, max_copies=8) {
+                   cluster=NULL, max_copies=8, x_breaks=c(50,100,150)) {
     if (is.list(segs) && !is.data.frame(segs)) {
         seg_ord = names(segs)
         segs = .extract_aneuHMM(segs)
@@ -106,7 +106,7 @@ heatmap = function(segs, sample = c("Sample", "sample", "."), cell=c("Cell", "ce
               strip.background.y = element_blank(),
               strip.placement = "outside",
               panel.spacing.y=unit(0.3, "lines")) +
-        scale_x_continuous(expand=c(0,0), name="Position (Mb)", breaks=c(50,100,150)) +
+        scale_x_continuous(expand=c(0,0), name="Position (Mb)", breaks=x_breaks) +
         scale_y_continuous(expand=c(0,0), breaks=seq_along(levels(segs[[cell]])),
                            labels=levels(segs[[cell]]), trans=scales::reverse_trans())
 }
