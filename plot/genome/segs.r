@@ -6,7 +6,7 @@
 #' @param breaks  dashed line breaks indicating secondary axis
 #' @param name  name of the secondary axis
 #' @return  ggplot2 object
-segs = function(segs, aes, fml, ..., breaks=NULL, name=waiver()) {
+segs = function(segs, aes, fml, ..., breaks=waiver(), name=waiver()) {
     if ("GRanges" %in% class(segs))
         segs = as.data.frame(segs)
 
@@ -20,11 +20,12 @@ segs = function(segs, aes, fml, ..., breaks=NULL, name=waiver()) {
     args = utils::modifyList(defaults, args)
 
     fscale = eval(fml[[2]][[3]], envir=environment(fml))
-    if (is.null(breaks) && nrow(segs) > 0)
-        breaks = 1:ceiling(max(segs[[as.character(aes[['y']][[2]])]])/fscale)
-    breaks = breaks * fscale
+    if (nrow(segs) > 0)
+        seg_breaks = 1:(ceiling(max(segs[[as.character(aes[['y']][[2]])]])/fscale))
+    else
+        seg_breaks = c()
 
-    list(geom_hline(yintercept=breaks, color="grey", linetype="dashed"),
+    list(geom_hline(yintercept=seg_breaks*fscale, color="grey", linetype="dashed"),
          do.call(geom_segment, c(list(data=segs, mapping=aes_segs), args)),
          facet_grid(. ~ seqnames, scales="free_x"),
          scale_y_continuous(sec.axis=sec_axis(fml, breaks=breaks, name=name)))
