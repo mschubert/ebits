@@ -55,7 +55,8 @@ heatmap = function(segs, sample = c("Sample", "sample", "."), cell=c("Cell", "ce
     if (is.list(segs) && !is.data.frame(segs)) {
         seg_ord = names(segs)
         segs = .extract_aneuHMM(segs)
-    }
+    } else
+        seg_ord = NULL
 
     msg = c()
     if (length(cell) > 1) {
