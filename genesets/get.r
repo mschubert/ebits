@@ -4,6 +4,7 @@ import_package("dplyr", attach=TRUE)
 .msdb = import('../tools/msigdb')
 .go = import('./go')$go
 .cin = import('./cin')$cin
+.cor = import('./corum')
 
 list = function() {
     dbs = c(
@@ -11,6 +12,9 @@ list = function() {
         "GO_Cellular_Component_Tree",
         "GO_Molecular_Function_Tree",
         "DoRothEA",
+        "CORUM_core",
+        "CORUM_all",
+        "CORUM_splice",
         .enr$dbs()$name,
         .msdb$dbs()
     )
@@ -25,6 +29,12 @@ get_human = function(collections, ..., leaf_depth=4, conf=c("A","B","C","D"), dr
             .go(leaf_depth=leaf_depth, ontology="CC", as_list=TRUE)
         } else if (col == "GO_Molecular_Function_Tree") {
             .go(leaf_depth=leaf_depth, ontology="MF", as_list=TRUE)
+        } else if (col == "CORUM_core") {
+            .cor$corum_core()
+        } else if (col == "CORUM_all") {
+            .cor$corum_all()
+        } else if (col == "CORUM_splice") {
+            .cor$corum_splice()
         } else if (col %in% .enr$dbs()$name) {
             .enr$genes(col)
         } else if (col %in% .msdb$dbs()) {

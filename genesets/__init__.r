@@ -1,5 +1,6 @@
 export_submodule('./get')
 export_submodule('./go')
+export_submodule('./corum')
 filter = import('./filter')$filter
 cin = import('./cin')$cin
 test_lm = import('./test_lm')$test_lm
