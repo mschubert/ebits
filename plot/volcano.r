@@ -36,7 +36,7 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
                    y = c("adj.p", "padj", "p.value", "pval", ".y"),
                    size = c("size", "n", "baseMean"),
                    base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=FALSE,
-                   text.size=3.5, xlim=NULL, ylim=NULL, simplify=TRUE, repel=TRUE, max.overlaps=20,
+                   text.size="auto", xlim=NULL, ylim=NULL, simplify=TRUE, repel=TRUE, max.overlaps=20,
                    x_label_bias=1, pos_label_bias=1) {
 
     msg = c()
@@ -75,6 +75,8 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
         df$circle = FALSE
     if (!'fill' %in% colnames(df))
         df$fill = TRUE
+    if (is.character(text.size))
+        text.size = 1.5 + 5 * 1/sqrt(mean(nchar(df[[label]])))
 
     df$color = rep(rgb(0, 151, 30, 120, maxColorValue=255), nrow(df)) # green
     df$color[df[[x]] < 0] = rgb(225, 0, 0, 120, maxColorValue=255) # red
