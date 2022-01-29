@@ -11,6 +11,9 @@ filter = function(genesets, ...) {
 }
 
 filter.list = function(genesets, valid=NULL, min=2, max=Inf, warn=TRUE) {
+    if (is.list(genesets[[1]]))
+        return(lapply(genesets, filter, valid=valid, min=min, max=max, warn=warn))
+
     if (!is.null(valid)) {
         if (any(is.na(valid)))
             warning("NA found in valid set")
