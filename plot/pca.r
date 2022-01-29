@@ -8,7 +8,18 @@ pca = function(obj, aes, annot=NULL, biplot=FALSE, ...) {
     UseMethod("pca")
 }
 
-pca.prcomp = function(obj, aes=ggplot2::aes(), annot=NULL, repel=TRUE,
+pca.DESeqDataSet = function(eset, ...) {
+    vst = DESeq2::varianceStabilizingTransformation(eset)
+    pca(vst, ...)
+}
+
+pca.DESeqTransform = function(vst, aes=ggplot2::aes(x=PC1, y=PC2), annot=NULL, ...) {
+    if (is.null(annot))
+        annot = as.data.frame(SummarizedExperiment::colData(vst))
+    pr = prcomp(SummarizedExperiment::assay(vst), aes, annot, ...)
+}
+
+pca.prcomp = function(obj, aes=ggplot2::aes(x=PC1, y=PC2), annot=NULL, repel=TRUE,
                       biplot=FALSE, bi_color="red", bi_size=5, bi_arrow=0.2, bi_alpha=0.4) {
     # adapted: https://stackoverflow.com/questions/6578355/plotting-pca-biplot-with-ggplot2
     data = cbind(annot, obj$x)
@@ -49,7 +60,7 @@ pca.prcomp = function(obj, aes=ggplot2::aes(), annot=NULL, repel=TRUE,
 }
 
 pca.default = function(...) {
-    stop("only `prcomp` supported for now")
+    stop("only `prcomp` and DESeq2 supported for now")
 }
 
 if (is.null(module_name())) {
