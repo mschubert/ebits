@@ -12,7 +12,7 @@ read_bam.list = function(fnames, ...) {
     lapply(fnames, read_bam, ...)
 }
 
-read_bam.character = function(fname, ..., assembly=NULL) {
+read_bam.character = function(fname, paired_reads=TRUE, use_names=TRUE, remove_duplicates=FALSE, assembly=NULL) {
     bai = paste0(fname, ".bai")
     # There is no real reason we should have to sort a bam in order to read
     # the reads into a GRanges object. However, the GenomicAlignments::readGAlignments
@@ -45,7 +45,20 @@ read_bam.character = function(fname, ..., assembly=NULL) {
         }
     }
 
-    AneuFinder::bam2GRanges(fname, bai, ...)
+    remove_duplicates = Rsamtools::scanBamFlag()
+    if (remove_duplicates)
+        flag = Rsamtools::scanBamFlag(isDuplicate = FALSE)
+    param = Rsamtools::ScanBamParam(flag=flag) #, which=range(gr), what=what, mapqFilter=min.mapq)
+
+    if (paired_reads) {
+        reads = GenomicAlignments::readGAlignmentPairs(fname, use.names=use_names, index=bai, param=param)
+    } else {
+        reads = GenomicAlignments::readGAlignments(fname, use.names=use_names, index=bai, param=param)
+    }
+    if (length(reads) == 0)
+        stop("No reads in ", sQuote(fname), " (looking for PE in SE file?)")
+
+    GenomicAlignments::granges(reads, use.mcols=TRUE)
 }
 
 read_bam.default = function(fname, ...) {
