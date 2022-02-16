@@ -16,7 +16,8 @@ pca.DESeqDataSet = function(eset, ...) {
 pca.DESeqTransform = function(vst, aes=ggplot2::aes(x=PC1, y=PC2), annot=NULL, ...) {
     if (is.null(annot))
         annot = as.data.frame(SummarizedExperiment::colData(vst))
-    pr = prcomp(SummarizedExperiment::assay(vst), aes, annot, ...)
+    pr = prcomp(t(SummarizedExperiment::assay(vst)))
+    pca(pr, aes, annot, ...)
 }
 
 pca.prcomp = function(obj, aes=ggplot2::aes(x=PC1, y=PC2), annot=NULL, repel=TRUE,
