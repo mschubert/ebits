@@ -10,8 +10,8 @@ Depends:
     R (>= 3.0.2)
 SystemRequirements: arpack
 Imports:
-    modules
     @@@
+    modules
 Remotes:
     klmr/modules@master
 License: Apache License (== 2.0) | file LICENSE

@@ -30,7 +30,7 @@ install-deps: dependencies.txt
 	  -e "BiocManager::install(new)"
 
 DESCRIPTION: DESCRIPTION.in dependencies.txt
-	sed "s/^/\ \ \ \ /" dependencies.txt | sed -e "/@@@/r /dev/stdin" -e "/@@@/d" $< > $@
+	sed "s/^/\ \ \ \ /" dependencies.txt | sed 's/$$/,/' | sed -e "/@@@/r /dev/stdin" -e "/@@@/d" $< > $@
 
 dependencies.txt: dependencies.sh
 	bash $< > $@
