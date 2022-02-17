@@ -80,5 +80,8 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
+      - name: make prepare
+        run: make prepare
+
       - name: make test
-        run: timeout 1800 make test
+        run: make test

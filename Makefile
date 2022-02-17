@@ -8,14 +8,14 @@ DEPS=$(shell ./dependencies.sh)
 R_PKG=modules,$(shell Rscript -e 'cat(sub("package:", "", grep("^package:", search(), value=TRUE)), sep=",")')
 Rscript = Rscript --default-packages=$(R_PKG)
 
-.PHONY: test install-deps
+.PHONY: test install-deps prepare
 
 define \n
 
 
 endef
 
-stats/nmf_mu.so:
+prepare:
 	make -C stats nmf_mu.so
 
 test:
@@ -30,7 +30,7 @@ install-deps: dependencies.txt
 	  -e "BiocManager::install(new)"
 
 DESCRIPTION: DESCRIPTION.in dependencies.txt
-	sed "s/^/\ \ \ \ /" dependencies.txt | sed 's/$$/,/' | sed -e "/@@@/r /dev/stdin" -e "/@@@/d" $< > $@
+	sed "s/^/\ \ \ \ /" $(word 2,$^) | sed 's/$$/,/' | sed -e "/@@@/r /dev/stdin" -e "/@@@/d" $< > $@
 
 dependencies.txt: dependencies.sh
 	bash $< > $@
