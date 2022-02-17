@@ -35,7 +35,8 @@ test_lm = function(genes, sets,
     if (length(label) > 1) {
         label = intersect(label, colnames(genes))[1]
         first = head(na.omit(genes[[label]]), 2) %>% sQuote() %>% paste(collapse=", ")
-        msg = c(msg, paste0(sQuote(label), " for sets (", first, ", …)"))
+        id_type_df = .guess$id_type(genes[[label]])
+        msg = c(msg, paste0(sQuote(label), " [", id_type_df, "] for sets (", first, ", …)"))
     }
     slab = rlang::sym(label)
     if (length(stat) > 1) {
@@ -45,11 +46,14 @@ test_lm = function(genes, sets,
     if (length(msg) > 0)
         message("[geneset/test_lm] using ", paste(msg, collapse=", "))
 
-    all_sets = unique(unlist(sets))
-    if (mean(all_sets %in% genes[[label]]) < 0.25) {
-        idt = .guess$id_type(all_sets)
-        message("[geneset/test_lm] low identifier overlap, mapping ", sQuote(label), " to ", sQuote(idt))
-        genes[[label]] = .idmap$gene(genes[[label]], to=idt)
+    all_set_genes = unique(unlist(sets))
+    common_genes = intersect(all_set_genes, genes[[label]])
+    min_n_genes = min(length(all_set_genes), length(genes[[label]]))
+    if (length(common_genes) < 0.1 * min_n_genes) {
+        id_type_sets = .guess$id_type(all_set_genes)
+        message("[geneset/test_lm] low identifier overlap, mapping ",
+                sQuote(label), " to ", sQuote(id_type_sets))
+        genes[[label]] = .idmap$gene(genes[[label]], to=id_type_sets)
     }
 
     lapply(sets, test_one, res=genes) %>%
@@ -65,9 +69,10 @@ test_lm = function(genes, sets,
 if (is.null(module_name())) {
     library(testthat)
 
-    genes = data.frame(gene = LETTERS[1:10], stat=1:10)
-    sets = list(a=LETTERS[1:5])
-    res = test_lm(genes, sets)
+    genes = replicate(10, paste(c(sample(LETTERS, 5), sample(1:9, 1)), collapse=""))
+    gdf = data.frame(gene = genes, stat=1:10)
+    sets = list(a=head(genes, 5))
+    res = test_lm(gdf, sets)
 
     expect_true(inherits(res, "data.frame"))
     expect_equal(res$estimate, -5)

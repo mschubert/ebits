@@ -53,12 +53,12 @@ if (is.null(module_name())) {
     x = list(a=data.frame(), b=c(a=5))
 
     expect_equal(bind_rows(x, name_col=NULL, drop=TRUE),
-                 tibble::data_frame(a=5))
+                 tibble::tibble(a=5))
     expect_equal(bind_rows(x, name_col=NULL, drop=FALSE),
-                 tibble::data_frame(a=c(NA, 5)))
+                 tibble::tibble(a=c(NA, 5)))
 
     expect_equal(bind_rows(x, name_col="n", drop=TRUE),
-                 tibble::data_frame(a=5, n="b"))
+                 tibble::tibble(a=5, n="b"))
     expect_equal(bind_rows(x, name_col="n", drop=FALSE),
-                 tibble::data_frame(a=c(NA, 5), n=c("a", "b")))
+                 tibble::tibble(n=c("a", "b"), a=c(NA, 5)))
 }

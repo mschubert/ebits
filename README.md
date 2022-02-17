@@ -1,7 +1,7 @@
 ebits: bioinformatics-related R modules
 =======================================
 
-[![Build Status](https://travis-ci.org/mschubert/ebits.svg?branch=master)](https://travis-ci.org/mschubert/ebits)
+[![Build Status](https://github.com/mschubert/ebits/workflows/R-check/badge.svg?branch=master)](https://github.com/mschubert/ebits/actions)
 
 This repository is meant as a collection of bioinformatics-related R
 code that simplify workflows and can be shared with other people.

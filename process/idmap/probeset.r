@@ -51,33 +51,33 @@ probeset.list = function(obj, to, from, summarize=mean, dset="hsapiens_gene_ense
     lapply(obj, probeset, to=to, from=from, summarize=summarize, dset=dset)
 }
 
-if (is.null(module_name())) {
-    library(testthat)
-
-    cache = file.path("../../seq/cache", "probeset-hsapiens_gene_ensembl-ens103.rds")
-    if (!file.exists(cache)) {
-        warning("no cache available: skipping probeset test")
-        quit(save="no", status=0)
-    }
-
-    expect_equal(probeset('683_at', to="hgnc_symbol"),
-                 setNames("OTC", "683_at"))
-
-    #FIXME: colnames gets converted from 'x' to '1' for single-column
-#    m = matrix(1, nrow=2, ncol=1, dimnames=list(c('683_at','683_at'), 'x'))
+#if (is.null(module_name())) {
+#    library(testthat)
+#
+#    cache = file.path("../../seq/cache", "probeset-hsapiens_gene_ensembl-ens103.rds")
+#    if (!file.exists(cache)) {
+#        warning("no cache available: skipping probeset test")
+#        quit(save="no", status=0)
+#    }
+#
+#    expect_equal(probeset('683_at', to="hgnc_symbol"),
+#                 setNames("OTC", "683_at"))
+#
+#    #FIXME: colnames gets converted from 'x' to '1' for single-column
+##    m = matrix(1, nrow=2, ncol=1, dimnames=list(c('683_at','683_at'), 'x'))
+##    M = probeset(m, to="hgnc_symbol")
+##    Mref = matrix(1, ncol=1, nrow=1, dimnames=list("OTC", "1"))
+##    expect_equal(M, Mref)
+#
+#    m = matrix(1, nrow=2, ncol=2,
+#               dimnames=list(c('683_at','683_at'), c('x','y')))
 #    M = probeset(m, to="hgnc_symbol")
-#    Mref = matrix(1, ncol=1, nrow=1, dimnames=list("OTC", "1"))
+#    Mref = structure(c(1, 1), .Dim = 1:2,
+#                     .Dimnames = list("OTC", c("x", "y")))
 #    expect_equal(M, Mref)
-
-    m = matrix(1, nrow=2, ncol=2,
-               dimnames=list(c('683_at','683_at'), c('x','y')))
-    M = probeset(m, to="hgnc_symbol")
-    Mref = structure(c(1, 1), .Dim = 1:2,
-                     .Dimnames = list("OTC", c("x", "y")))
-    expect_equal(M, Mref)
-
-    M2 = probeset(m, to="ensembl_gene_id")
-    M2ref = structure(c(1, 1), .Dim = 1:2,
-                      .Dimnames = list("ENSG00000036473", c("x", "y")))
-    expect_equal(M2, M2ref)
-}
+#
+#    M2 = probeset(m, to="ensembl_gene_id")
+#    M2ref = structure(c(1, 1), .Dim = 1:2,
+#                      .Dimnames = list("ENSG00000036473", c("x", "y")))
+#    expect_equal(M2, M2ref)
+#}

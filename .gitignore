@@ -1,5 +1,6 @@
 # History files
 dependencies.txt
+DESCRIPTION
 .Rhistory
 
 # Example code in package build process
@@ -8,6 +9,7 @@ dependencies.txt
 # R data files from past sessions
 *.Rdata
 *.RData
+*.rds
 **/cache/*
 **/data/*
 

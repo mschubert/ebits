@@ -36,13 +36,13 @@ run = function(genes, db) {
                   genes = Genes)
 }
 
-if (is.null(module_name())) {
-    library(testthat)
-
-    genes = c("Nsun3", "Polrmt", "Nlrx1", "Sfxn5", "Zc3h12c",
-              "Slc25a39", "Arsg", "Defb29", "Ndufb6")
-    database = "Cancer_Cell_Line_Encyclopedia"
-
-    result = run(genes, database)
-    expect_is(result, "data.frame")
-}
+#if (is.null(module_name())) {
+#    library(testthat)
+#
+#    genes = c("Nsun3", "Polrmt", "Nlrx1", "Sfxn5", "Zc3h12c",
+#              "Slc25a39", "Arsg", "Defb29", "Ndufb6")
+#    database = "Cancer_Cell_Line_Encyclopedia"
+#
+#    result = run(genes, database)
+#    expect_is(result, "data.frame")
+#}
