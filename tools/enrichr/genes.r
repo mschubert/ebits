@@ -25,6 +25,7 @@ genes = function(db) {
         `[[`('terms') %>%
         lapply(function(x) names(unlist(x)))
 
+    dir.create(dirname(cache), showWarnings=FALSE)
     saveRDS(re, file=cache)
     re
 }
