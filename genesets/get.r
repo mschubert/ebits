@@ -1,5 +1,5 @@
 import_package("dplyr", attach=TRUE)
-.idmap = import('process/idmap')
+.idmap = import('../process/idmap')
 .enr = import('../tools/enrichr')
 .msdb = import('../tools/msigdb')
 .go = import('./go')$go
