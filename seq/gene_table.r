@@ -34,6 +34,9 @@ gene_table = function(dset="hsapiens_gene_ensembl", assembly=NULL, version=NULL,
         return(mapping)
     }
 
+    # workaround: useMart error: SSL certificate problem: unable to get local issuer certificate
+    httr::set_config(httr::config(ssl_verifypeer = FALSE), override = FALSE)
+
     message("[seq/gene_table] creating new cache file ", sQuote(fname))
     ensembl = biomaRt::useMart("ENSEMBL_MART_ENSEMBL", dataset=dset, host=host)
     marts = biomaRt::listMarts(ensembl)

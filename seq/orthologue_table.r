@@ -11,6 +11,9 @@ ortho_table = function(dset="hsapiens_gene_ensembl", to="mmusculus", force=FALSE
     if (file.exists(cache) && !force)
         return(io$load(cache))
 
+    # workaround: useMart error: SSL certificate problem: unable to get local issuer certificate
+    httr::set_config(httr::config(ssl_verifypeer = FALSE), override = FALSE)
+
     mart = biomaRt::useMart(biomart="ensembl", dataset=dset)
     ids = c('external_gene_name', 'ensembl_gene_id',
             paste0(to, '_homolog_ensembl_gene'),

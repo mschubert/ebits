@@ -21,6 +21,9 @@ probeset_table = function(dset="hsapiens_gene_ensembl", version="latest", force=
         return(mapping)
     }
 
+    # workaround: useMart error: SSL certificate problem: unable to get local issuer certificate
+    httr::set_config(httr::config(ssl_verifypeer = FALSE), override = FALSE)
+
     mart = biomaRt::useMart(biomart="ensembl", dataset=dset)
     marts = biomaRt::listMarts(mart)
     vstring = marts$version[marts$biomart == "ENSEMBL_MART_ENSEMBL"]
