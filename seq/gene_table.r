@@ -16,10 +16,10 @@ gene_table = function(dset="hsapiens_gene_ensembl", assembly=NULL, version=NULL,
 
     # https://www.ensembl.org/info/website/archives/index.html
     if (version == "latest") {
-        version = "104"
+        version = "105"
         host = "https://www.ensembl.org"
     } else if (tolower(version) == "grch37") {
-        version = "104"
+        version = "105"
         host = "http://grch37.ensembl.org"
     } else if (version == "102") {
         host = "https://nov2020.archive.ensembl.org"
@@ -34,6 +34,7 @@ gene_table = function(dset="hsapiens_gene_ensembl", assembly=NULL, version=NULL,
         return(mapping)
     }
 
+    message("[seq/gene_table] creating new cache file ", sQuote(fname))
     ensembl = biomaRt::useMart("ENSEMBL_MART_ENSEMBL", dataset=dset, host=host)
     marts = biomaRt::listMarts(ensembl)
     vstring = marts$version[marts$biomart == "ENSEMBL_MART_ENSEMBL"]
@@ -44,7 +45,6 @@ gene_table = function(dset="hsapiens_gene_ensembl", assembly=NULL, version=NULL,
     # if biomart has newer ensembl update cache file name
     fname = sprintf("gene_table-%s-ens%s-%s.rds", dset, version, assembly)
     cache = file.path(module_file(), "cache", fname)
-    message("Generating cache file ", sQuote(fname))
 
     ids = c('external_gene_name', 'entrezgene_id', 'ensembl_gene_id', 'ucsc',
             'band', 'chromosome_name', 'start_position', 'end_position',
