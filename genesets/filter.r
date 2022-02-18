@@ -1,4 +1,4 @@
-import('base/operators')
+import('../base/operators')
 
 #' Takes a list of gene sets and returns the list filtered by valid IDs and number
 #'

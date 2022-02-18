@@ -1,4 +1,4 @@
-.b = import('base/operators')
+.b = import('../../base/operators')
 .idmap = import('../idmap')
 .guess = import('../idmap/guess')
 
