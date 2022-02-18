@@ -6,19 +6,19 @@ RSCRIPTS_NO_T = $(filter-out $(RSCRIPTS_T),$(RSCRIPTS))
 
 DEPS=$(shell ./dependencies.sh)
 R_PKG=modules,$(shell Rscript -e 'cat(sub("package:", "", grep("^package:", search(), value=TRUE)), sep=",")')
-Rscript = Rscript --default-packages=$(R_PKG)
+Rscript = Rscript --no-save --no-restore --slave --default-packages=$(R_PKG)
 
-.PHONY: test install-deps prepare
+.PHONY: prepare test install-deps
 
 define \n
 
 
 endef
 
-prepare:
-	make -C stats nmf_mu.so
+prepare::
+	@$(foreach DIR,$(MDIRS),make -C $(DIR) prepare$(\n))
 
-test:
+test::
 	@$(foreach DIR,$(MDIRS),make -C $(DIR) test$(\n))
 	$(if $(RSCRIPTS_NO_T), @echo "*** NO TESTS FOUND FOR: $(RSCRIPTS_NO_T) ***", )
 	@$(foreach R,$(RSCRIPTS_T),echo $(R); $(Rscript) $(R)$(\n))

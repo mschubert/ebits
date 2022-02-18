@@ -9,6 +9,8 @@ OBJ = $(SOURCE:%.c=%.o)
 
 .INTERMEDIATE: $(OBJ)
 
+prepare:: nmf_mu.so
+
 nmf_mu.so: nmf_mu.o
 	$(CC) -shared -Wl,-soname,$@ $(LIBS) -o $@ $^
 
