@@ -1,4 +1,4 @@
 #' List all availables collections
 dbs = function() {
-    msigdb::msigdb.collections
+    msigdb::listSubCollections(msigdb::getMsigdb())
 }
