@@ -14,7 +14,7 @@ import_package("dplyr", attach=TRUE)
 #' @return       A data.frame with association results
 test_lm = function(genes, sets,
                    label=c("external_gene_name", "gene_name", "gene", "name", "label", "ensembl_gene_id"),
-                   stat=c("stat", "statistic", "log2FoldChange"),
+                   stat=c("stat", "statistic", "log2FoldChange", "estimate"),
                    min_n=2, add_means=c(), trim=0) {
     test_one = function(res, set) {
         dset = res %>% mutate(in_set = !! slab %in% set + 0)
