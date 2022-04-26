@@ -16,7 +16,7 @@ list = function() {
         "CORUM_all",
         "CORUM_splice",
         .enr$dbs()$name,
-        .msdb$dbs()
+        setdiff(.msdb$dbs(), c("GO:BP", "GO:MF", "GO:CC"))
     )
     gtools::mixedsort(dbs)
 }
@@ -44,7 +44,7 @@ get_human = function(collections, ..., leaf_depth=4, conf=c("A","B","C","D"), dr
         } else if (col == "DoRothEA") {
             dorothea::dorothea_hs %>%
                 filter(mor == 1,
-                       confidence %in% conf) %>%
+                       confidence %in% toupper(conf)) %>%
                 group_by(tf) %>%
                     filter(case_when(
                         sum(confidence %in% c("A")) >= 20 ~ confidence %in% c("A"),
@@ -55,7 +55,7 @@ get_human = function(collections, ..., leaf_depth=4, conf=c("A","B","C","D"), dr
                     )) %>%
                     mutate(tf = sprintf("%s (%s)", tf, tolower(tail(sort(confidence), 1)))) %>%
                 ungroup() %>%
-                select(target, tf) %>%
+                dplyr::select(target, tf) %>%
                 unstack()
         } else
             stop("invalid gene set: ", args$geneset)
