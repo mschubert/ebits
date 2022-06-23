@@ -25,10 +25,23 @@ extract_result = function(mod, rn) {
 #' @param extract  A regular expression of which resultsNames to extract
 #' @return         A tibble with columns: term, genes[, sets]
 genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)") {
-    DESeq2::design(eset) = design
-    for (v in all.vars(design))
-        if (is.factor(colData(eset)[[v]]))
-            colData(eset)[[v]] = droplevels(colData(eset)[[v]])
+    # drop unused factor levels, record constant variables
+    one_level = c()
+    for (key in all.vars(design)) {
+        val = colData(eset)[[key]]
+        if (is.factor(val))
+            colData(eset)[[key]] = droplevels(val)
+        if (length(unique(val)) == 1)
+            one_level = c(one_level, key)
+    }
+
+    # remove single-level factors and single-value integers from design
+    rhs = stringr::str_trim(strsplit(as.character(design), "\\+")[[2]])
+    rhs2 = sprintf("~ %s", paste(setdiff(rhs, one_level), collapse=" + "))
+    if (length(one_level) > 0)
+        warning("Dropping constant factors: ", paste(one_level, collapse=", "),
+                " (new design: ", rhs2, ")", immediate.=TRUE)
+    DESeq2::design(eset) = as.formula(rhs2)
 
     mod = DESeq2::DESeq(eset)
     res = tibble::tibble(term=grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)) %>%
