@@ -25,14 +25,23 @@ extract_result = function(mod, rn) {
 #' @param extract  A regular expression of which resultsNames to extract
 #' @return         A tibble with columns: term, genes[, sets]
 genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)") {
-    # drop unused factor levels, record constant variables
+    # drop unused factor levels, record constant/NA variables
     one_level = c()
+    drop_sample = rep(FALSE, ncol(eset))
     for (key in all.vars(design)) {
         val = colData(eset)[[key]]
         if (is.factor(val))
             colData(eset)[[key]] = droplevels(val)
         if (length(unique(val)) == 1)
             one_level = c(one_level, key)
+        drop_sample = drop_sample | is.na(val)
+    }
+
+    # remove samples where design value is NA
+    if (any(drop_sample)) {
+        warning("Dropping sample(s): ",
+                paste(colnames(eset)[drop_sample], collapse=", "), immediate.=TRUE)
+        eset = eset[,!drop_sample]
     }
 
     # remove single-level factors and single-value integers from design
