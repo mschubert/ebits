@@ -1,7 +1,7 @@
 import_package("dplyr", attach=TRUE)
 .idmap = import('../process/idmap')
 .enr = import('../tools/enrichr')
-.msdb = import('../tools/msigdb')
+#.msdb = import('../tools/msigdb')
 .go = import('./go')$go
 .cin = import('./cin')$cin
 .cor = import('./corum')
@@ -16,7 +16,7 @@ list = function() {
         "CORUM_all",
         "CORUM_splice",
         .enr$dbs()$name,
-        .msdb$dbs()
+#        .msdb$dbs()
     )
     gtools::mixedsort(dbs)
 }
@@ -37,14 +37,14 @@ get_human = function(collections, ..., leaf_depth=4, conf=c("A","B","C","D"), dr
             .cor$corum_splice()
         } else if (col %in% .enr$dbs()$name) {
             .enr$genes(col)
-        } else if (col %in% .msdb$dbs()) {
-            .msdb$genes(col)
+#        } else if (col %in% .msdb$dbs()) {
+#            .msdb$genes(col)
         } else if (col == "CIN") {
             .cin()
         } else if (col == "DoRothEA") {
             dorothea::dorothea_hs %>%
                 filter(mor == 1,
-                       confidence %in% conf) %>%
+                       confidence %in% toupper(conf)) %>%
                 group_by(tf) %>%
                     filter(case_when(
                         sum(confidence %in% c("A")) >= 20 ~ confidence %in% c("A"),
@@ -55,7 +55,7 @@ get_human = function(collections, ..., leaf_depth=4, conf=c("A","B","C","D"), dr
                     )) %>%
                     mutate(tf = sprintf("%s (%s)", tf, tolower(tail(sort(confidence), 1)))) %>%
                 ungroup() %>%
-                select(target, tf) %>%
+                dplyr::select(target, tf) %>%
                 unstack()
         } else
             stop("invalid gene set: ", args$geneset)
