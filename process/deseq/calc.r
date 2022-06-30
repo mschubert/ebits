@@ -25,6 +25,33 @@ extract_result = function(mod, rn) {
 #' @param extract  A regular expression of which resultsNames to extract
 #' @return         A tibble with columns: term, genes[, sets]
 genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)") {
+    eset = clean_obj(eset, design)
+    mod = DESeq2::DESeq(eset)
+    res = tibble::tibble(term=grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)) %>%
+        mutate(genes = lapply(term, extract_result, mod=mod))
+
+    if (is.character(sets))
+        sets = .gset$get_human(sets, drop=FALSE)
+    if (is.null(names(sets)))
+        stop("'sets' parameter must be a named list")
+
+    for (ns in names(sets)) {
+        message("[process/deseq] Testing set: ", ns)
+        res[[ns]] = lapply(res$genes, .gset$test_lm, sets=sets[[ns]])
+    }
+
+    res
+}
+
+#' Clean a DESeq2 object and design
+#'
+#' This is removing sampes with NA values in design terms, unused factor
+#' levels, and unused design terms
+#'
+#' @param eset     DESeq2 object
+#' @param design   Design formula for differential expression
+#' @return  A cleaned DESeq2 object
+clean_obj = function(eset, design=DESeq2::design(eset)) {
     # remove samples where design value is NA
     drop_sample = rep(FALSE, ncol(eset))
     for (key in all.vars(design))
@@ -52,20 +79,5 @@ genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extrac
         warning("Dropping constant factors: ", paste(one_level, collapse=", "),
                 " (new design: ", rhs2, ")", immediate.=TRUE)
     DESeq2::design(eset) = as.formula(rhs2)
-
-    mod = DESeq2::DESeq(eset)
-    res = tibble::tibble(term=grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)) %>%
-        mutate(genes = lapply(term, extract_result, mod=mod))
-
-    if (is.character(sets))
-        sets = .gset$get_human(sets, drop=FALSE)
-    if (is.null(names(sets)))
-        stop("'sets' parameter must be a named list")
-
-    for (ns in names(sets)) {
-        message("[process/deseq] Testing set: ", ns)
-        res[[ns]] = lapply(res$genes, .gset$test_lm, sets=sets[[ns]])
-    }
-
-    res
+    eset
 }
