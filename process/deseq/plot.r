@@ -1,6 +1,7 @@
 import_package("SummarizedExperiment", attach=TRUE)
 import_package("ggplot2", attach=TRUE)
 import_package("patchwork", attach=TRUE)
+.calc = import('./calc')
 .plt = import('../../plot')
 
 plot_pca = function(eset) {
@@ -42,6 +43,7 @@ plot_volc = function(..., nrow=NULL, title_size=6, title_height=0.1) {
 #'
 #' @param eset  A DESeq2 data set
 plot_design = function(eset) {
+    eset = .calc$clean_obj(eset)
     mm = model.matrix(DESeq2::design(eset), data=colData(eset))
     gridExtra::grid.arrange(gridExtra::tableGrob(mm))
 }
