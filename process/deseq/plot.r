@@ -27,13 +27,17 @@ plot_pca = function(eset) {
 #' @param nrow   Number of rows to wrap the plots in (default: auto)
 #' @param title_size    Text size of the title
 #' @param title_height  Multiplier for the title panel height
+#' @param add_design  NULL or eset to add design plot for (at first position)
 #' @return  A patchwork object
-plot_volc = function(..., nrow=NULL, title_size=6, title_height=0.1) {
+plot_volc = function(..., nrow=NULL, title_size=6, title_height=0.1, add_design=NULL) {
     args = rlang::dots_list(...)
     res = args[-1]
 
     plots = mapply(function(x, xn) .plt$volcano(x) + ggtitle(xn),
                    x=res, xn=names(res), SIMPLIFY=FALSE)
+
+    if (!is.null(add_design))
+        plots = c(list(plot_design(add_design)), plots)
 
     (.plt$text(args[[1]], size=title_size) / wrap_plots(plots, nrow=nrow)) +
         plot_layout(heights=c(title_height, max(c(1,nrow))))
