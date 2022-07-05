@@ -45,5 +45,5 @@ plot_volc = function(..., nrow=NULL, title_size=6, title_height=0.1) {
 plot_design = function(eset) {
     eset = .calc$clean_obj(eset)
     mm = model.matrix(DESeq2::design(eset), data=colData(eset))
-    gridExtra::grid.arrange(gridExtra::tableGrob(mm))
+    patchwork::wrap_elements(gridExtra::tableGrob(mm))
 }
