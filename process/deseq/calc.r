@@ -23,8 +23,9 @@ extract_result = function(mod, rn) {
 #' @param design   Design formula for differential expression
 #' @param sets     A named list of gene set collections (lists of character vectors)
 #' @param extract  A regular expression of which resultsNames to extract
+#' @param cl       A parallel cluster object or integer for number of cores
 #' @return         A tibble with columns: term, genes[, sets]
-genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)") {
+genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)", n_jobs=0) {
     eset = clean_obj(eset, design)
     mod = DESeq2::DESeq(eset)
     res = tibble::tibble(term=grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)) %>%
@@ -37,7 +38,7 @@ genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extrac
 
     for (ns in names(sets)) {
         message("[process/deseq] Testing set: ", ns)
-        res[[ns]] = lapply(res$genes, .gset$test_lm, sets=sets[[ns]])
+        res[[ns]] = lapply(res$genes, .gset$test_lm, sets=sets[[ns]], n_jobs=n_jobs)
     }
 
     res

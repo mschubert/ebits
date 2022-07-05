@@ -11,13 +11,14 @@ import_package("dplyr", attach=TRUE)
 #' @param min_n  Minimum number of genes to consider this set (default: 2)
 #' @param add_means  Column name(s) of variables to compute the mean of the set of
 #' @param trim   Fraction of extremes to ignore when computing the mean
+#' @param cl     Parallel cluster to use, or integer for number of cores
 #' @return       A data.frame with association results
 test_lm = function(genes, sets,
                    label=c("external_gene_name", "gene_name", "gene", "name", "label", "ensembl_gene_id"),
                    stat=c("stat", "statistic", "log2FoldChange", "estimate"),
-                   min_n=2, add_means=c(), trim=0) {
+                   min_n=2, add_means=c(), trim=0, n_jobs=0) {
     test_one = function(res, set) {
-        dset = res %>% mutate(in_set = !! slab %in% set + 0)
+        dset = res %>% mutate(in_set = !! rlang::sym(label) %in% set + 0)
         if (sum(dset$in_set, na.rm=TRUE) < min_n)
             return(data.frame(estimate=NA, size=length(set), size_used=NA))
 
@@ -41,7 +42,6 @@ test_lm = function(genes, sets,
         id_type_df = .guess$id_type(genes[[label]])
         msg = c(msg, paste0(sQuote(label), " [", id_type_df, "] for sets (", first, ", …)"))
     }
-    slab = rlang::sym(label)
     if (length(stat) > 1) {
         stat = intersect(stat, colnames(genes))[1]
         msg = c(msg, paste0(sQuote(stat), " for separation"))
@@ -59,7 +59,9 @@ test_lm = function(genes, sets,
         genes[[label]] = .idmap$gene(genes[[label]], to=id_type_sets)
     }
 
-    lapply(sets, test_one, res=genes) %>%
+    clustermq::Q(test_one, set=sets, const=list(res=genes), n_jobs=n_jobs, pkgs="dplyr",
+                 export=list(min_n=min_n, add_means=add_means, stat=stat, label=label)) %>%
+#    lapply(sets, test_one, res=genes) %>%
         setNames(names(sets)) %>%
         dplyr::bind_rows(.id="label") %>%
         as_tibble() %>%
