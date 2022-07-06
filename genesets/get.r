@@ -15,7 +15,7 @@ list = function() {
         "CORUM_core",
         "CORUM_all",
         "CORUM_splice",
-        .enr$dbs()$name,
+        .enr$dbs()$name
 #        .msdb$dbs()
     )
     gtools::mixedsort(dbs)
