@@ -30,7 +30,7 @@ plot_pca = function(eset) {
 #' @param add_design  NULL or eset to add design plot for (at first position)
 #' @return  A patchwork object
 plot_volc = function(..., nrow=NULL, title_size=6, title_height=0.1, add_design=NULL) {
-    args = rlang::dots_list(...)
+    args = rlang::dots_list(..., .named=TRUE)
     res = args[-1]
 
     plots = mapply(function(x, xn) .plt$volcano(x) + ggtitle(xn),
