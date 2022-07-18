@@ -70,6 +70,29 @@ pca.default = function(...) {
     stop("only `prcomp` and DESeq2 supported for now")
 }
 
+biplot = function(prc, aes=ggplot2::aes(x=PC1, y=PC2), bi_color="red", bi_size=5, bi_arrow=0.2, bi_alpha=0.4) {
+    data = prc$x
+    rot = data.frame(varnames=rownames(prc$rotation), prc$rotation)
+    x = rlang::quo_text(aes$x)
+    y = rlang::quo_text(aes$y)
+
+    mult = min(
+        (max(data[,y]) - min(data[,y])/(max(rot[,y])-min(rot[,y]))),
+        (max(data[,x]) - min(data[,x])/(max(rot[,x])-min(rot[,x])))
+    )
+    rot = transform(rot,
+        v1 = .7 * mult * rot[[x]],
+        v2 = .7 * mult * rot[[y]]
+    )
+
+    list(
+         ggrepel::geom_text_repel(data=rot, aes(x=v1, y=v2, label=varnames),
+                                  size=bi_size, vjust=1, color=bi_color),
+         geom_segment(data=rot, aes(x=0, y=0, xend=v1, yend=v2), alpha=bi_alpha,
+                      arrow=arrow(length=unit(bi_arrow,"cm")), color=bi_color)
+    )
+}
+
 if (is.null(module_name())) {
     library(ggplot2)
     obj = prcomp(iris[1:4])
