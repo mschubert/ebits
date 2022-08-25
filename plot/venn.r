@@ -5,8 +5,9 @@ import_package('dplyr', attach=TRUE)
 #'
 #' @param sets   List of set vectors or other input supported by 'eulerr'
 #' @param ...    Parameters passed to 'eulerr::euler' fit
+#' @param alpha  Transparency of the fill color
 #' @return       ggplot2 object
-venn = function(sets, ...) {
+venn = function(sets, ..., alpha=0.5) {
     fit = eulerr::euler(sets, ...)
 #    slens = sapply(sets, length)
     df = as.data.frame(fit[c('original.values', 'fitted.values',
@@ -30,7 +31,7 @@ venn = function(sets, ...) {
         cbind(centers)
 
     ggplot(polygons, aes(x=x, y=y)) +
-        geom_polygon(aes(fill=set), color="#686868", alpha=0.2) +
+        geom_polygon(aes(fill=set), color="#686868", alpha=alpha) +
         geom_text(data=na.omit(meta %>% select(-label)), aes(label=original.values)) +
         ggrepel::geom_text_repel(data=na.omit(meta), aes(label=label), parse=TRUE) +
         theme_void() +
