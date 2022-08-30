@@ -6,8 +6,10 @@ import_package('dplyr', attach=TRUE)
 #' @param sets   List of set vectors or other input supported by 'eulerr'
 #' @param ...    Parameters passed to 'eulerr::euler' fit
 #' @param alpha  Transparency of the fill color
+#' @param label  Whether to draw labels
+#' @param nums   Whether to draw numbers
 #' @return       ggplot2 object
-venn = function(sets, ..., alpha=0.5) {
+venn = function(sets, ..., alpha=0.5, label=TRUE, nums=TRUE) {
     fit = eulerr::euler(sets, ...)
 #    slens = sapply(sets, length)
     df = as.data.frame(fit[c('original.values', 'fitted.values',
@@ -30,10 +32,15 @@ venn = function(sets, ..., alpha=0.5) {
         filter(!is.na(label)) %>%
         cbind(centers)
 
+    labs = list()
+    if (label)
+        labs = c(labs, ggrepel::geom_text_repel(data=na.omit(meta), aes(label=label), parse=TRUE))
+    if (nums)
+        labs = c(labs, geom_text(data=na.omit(meta %>% select(-label)), aes(label=original.values)))
+
     ggplot(polygons, aes(x=x, y=y)) +
         geom_polygon(aes(fill=set), color="#686868", alpha=alpha) +
-        geom_text(data=na.omit(meta %>% select(-label)), aes(label=original.values)) +
-        ggrepel::geom_text_repel(data=na.omit(meta), aes(label=label), parse=TRUE) +
+        labs +
         theme_void() +
         guides(size=FALSE, fill=FALSE) +
         coord_fixed()
