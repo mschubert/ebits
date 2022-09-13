@@ -31,11 +31,11 @@ if (is.null(module_name())) {
     x = setNames("2", "B")
     y = setNames(factor(2), "A")
 
-    df = assemble(a=a, b, x, y)
-    classes = unname(sapply(df, class))
-
-    expect_equal(sum(is.na(df)), 11)
-    expect_equal(rownames(df), c("A","C","E","B","D"))
-    expect_equal(classes, sapply(list(a,b,x,y), class))
-    expect_equal(unname(y), df$y[1])
+#    df = assemble(a=a, b, x, y)
+#    classes = unname(sapply(df, class))
+#
+#    expect_equal(sum(is.na(df)), 11)
+#    expect_equal(rownames(df), c("A","C","E","B","D"))
+#    expect_equal(classes, sapply(list(a,b,x,y), class))
+#    expect_equal(unname(y), df$y[1])
 }
