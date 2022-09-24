@@ -4,23 +4,6 @@ import_package("patchwork", attach=TRUE)
 .calc = import('./calc')
 .plt = import('../../plot')
 
-plot_pca = function(eset) {
-    vst = DESeq2::varianceStabilizingTransformation(eset)
-
-    pcadata = DESeq2::plotPCA(vst, intgroup=c("sample name", "cell line", "treatment", "amplification", "DM amount"), returnData=TRUE)
-    pcavar = round(100 * attr(pcadata, "percentVar"))
-    shapes = c(HeLa=21, HT29=22)
-
-    ggplot(pcadata, aes(PC1, PC2)) +
-        geom_point(aes(fill=treatment, shape=cell.line, size=DM.amount), alpha=0.5) +
-        scale_fill_discrete(guide=guide_legend(override.aes=list(shape=21))) +
-        scale_shape_manual(values=shapes) +
-        scale_size_manual(values=c(none=3, low=5, mid=6, high=7)) +
-        xlab(paste0("PC1: ", pcavar[1], "% variance")) +
-        ylab(paste0("PC2: ", pcavar[2], "% variance")) +
-        ggrepel::geom_text_repel(aes(label=sample.name))
-}
-
 #' Volcano plots from DESeq2 results
 #'
 #' @param ...    Plot title (first) and genes or gene set result tibbles

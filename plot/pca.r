@@ -1,29 +1,28 @@
+.deseq = import('../process/deseq/prcomp')
+
 #' GGplot2 PCA plot of different base R objects
 #'
 #' @param obj    A PCA object (e.g. from prcomp function)
 #' @param aes    Aesthetics mapping; use "PC<num>" for principal components
 #' @param annot  Additional data.frame with sample annotation
+#' @param pr     A previously computed prcomp (optional)
 #' @return       ggplot2 object including PCs and sample annotations
 pca = function(obj, aes, annot=NULL, biplot=FALSE, ...) {
     UseMethod("pca")
 }
 
-pca.DESeqDataSet = function(eset, ..., ntop=500) {
-    vst = DESeq2::varianceStabilizingTransformation(eset)
-    pca(vst, ..., ntop=ntop)
+pca.DESeqDataSet = function(eset, ..., pr=NULL, ntop=500) {
+    if (is.null(pr))
+        pr = .deseq$prcomp(eset, ntop=ntop)
+    pca(pr, annot=as.data.frame(SummarizedExperiment::colData(eset)), ...)
 }
 
-pca.DESeqTransform = function(vst, aes=ggplot2::aes(x=PC1, y=PC2), ..., annot=NULL, ntop=500) {
+pca.DESeqTransform = function(vst, ..., annot=NULL, pr=NULL, ntop=500) {
     if (is.null(annot))
         annot = as.data.frame(SummarizedExperiment::colData(vst))
-
-    # same as DESeq2::plotPCA.DESeqTransform
-    mat = SummarizedExperiment::assay(vst)
-    rv = genefilter::rowVars(mat)
-    keep = order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
-
-    pr = prcomp(t(mat[keep,]))
-    pca(pr, aes, annot, ...)
+    if (is.null(pr))
+        pr = .deseq$prcomp(vst, ntop=ntop)
+    pca(pr, annot=annot, ...)
 }
 
 pca.prcomp = function(obj, aes=ggplot2::aes(x=PC1, y=PC2), annot=NULL, repel=TRUE,
