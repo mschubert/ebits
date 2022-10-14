@@ -13,7 +13,8 @@ extract_result = function(mod, rn) {
         as.data.frame() %>%
         tibble::as_tibble(rownames="ensembl_gene_id") %>%
         arrange(padj) %>%
-        mutate(label = .idmap$gene(ensembl_gene_id, to="hgnc_symbol")) %>%
+        mutate(label = .idmap$gene(ensembl_gene_id, to="hgnc_symbol"),
+               label = ifelse(is.na(label), ensembl_gene_id, label)) %>%
         select(ensembl_gene_id, label, everything())
 }
 
