@@ -28,7 +28,7 @@ pca.DESeqTransform = function(vst, ..., annot=NULL, pr=NULL, ntop=500) {
 pca.prcomp = function(obj, aes=ggplot2::aes(x=PC1, y=PC2), annot=NULL, repel=TRUE,
                       biplot=FALSE, bi_color="red", bi_size=5, bi_arrow=0.2, bi_alpha=0.4) {
     # adapted: https://stackoverflow.com/questions/6578355/plotting-pca-biplot-with-ggplot2
-    data = cbind(annot, obj$x)
+    data = as.data.frame(cbind(annot, obj$x))
     rot = data.frame(varnames=rownames(obj$rotation), obj$rotation)
     x = rlang::quo_text(aes$x)
     y = rlang::quo_text(aes$y)
