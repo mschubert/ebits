@@ -42,8 +42,10 @@ genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extrac
     res = genes(eset, design, extract)
     if (is.character(sets))
         sets = .gset$get_human(sets, drop=FALSE)
-    if (is.null(names(sets)))
-        stop("'sets' parameter must be a named list")
+    if (!is.list(sets[[1]]))
+        stop("'sets' must be a list of lists")
+    if (is.null(names(sets)) || is.null(names(sets[[1]])))
+        stop("'sets' parameter must be a named list of lists")
 
     for (ns in names(sets)) {
         message("[process/deseq] Testing set: ", ns)
