@@ -12,6 +12,7 @@ export_submodule('./venn')
 export_submodule('./color')
 export_submodule('./symmetrise_scale')
 export_submodule('./build_or_spacer')
+export_submodule('./denspt')
 
 error = import('./error')$error
 text = import('./text')$text
