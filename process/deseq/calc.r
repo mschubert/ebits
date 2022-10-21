@@ -96,6 +96,8 @@ clean_obj = function(eset, design=DESeq2::design(eset)) {
         val = colData(eset)[[key]]
         if (is.factor(val))
             colData(eset)[[key]] = droplevels(val)
+        if (is.character(val))
+            colData(eset)[[key]] = factor(val)
         if (length(unique(val)) == 1)
             one_level = c(one_level, key)
     }
