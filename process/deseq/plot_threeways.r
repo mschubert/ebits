@@ -25,7 +25,7 @@ plot_threeways = function(res, field, max_ov=25, add_cols=FALSE) {
     }
 
     clean = function(x) gsub("_", " ", sub("^[^_]+_(.*)$", "\\1", x))
-    volc = function(df, tit) plt$volcano(df, label_top=30) + ggtitle(clean(tit))
+    volc = function(df, tit) plt$volcano(df, label_top=30, clamp_x=10) + ggtitle(clean(tit))
     volcs = mapply(volc, df=res[[field]], tit=res$term, SIMPLIFY=FALSE)
 
     vci = seq(3, nrow(res), by=3)

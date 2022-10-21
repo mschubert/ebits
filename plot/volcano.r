@@ -22,6 +22,7 @@ import_package("ggplot2", attach=TRUE)
 #' @param base.size  Scaling factor for the points drawn
 #' @param p          Line between significant and insignificant associations
 #' @param ceil       Minimum p-value to set top associations to; default: 0, no filter
+#' @param clamp_x    Maximumg x axis (usually fold change) to show
 #' @param check_overlap  Don't print overlapping labels in geom_text()
 #' @param xlim       Limits along the horizontal axis; default: fit data
 #' @param ylim       Limits along the vertical axis; default: fit data
@@ -35,7 +36,7 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
                    label = c("label", "name", "gene_name", "gene", "external_gene_name", "set_name", "set"),
                    y = c("adj.p", "padj", "p.value", "pval", ".y"),
                    size = c("size", "n", "baseMean"),
-                   base.size=1, p=0.05, label_top=20, ceil=0, check_overlap=FALSE,
+                   base.size=1, p=0.05, label_top=20, ceil=0, clamp_x=Inf, check_overlap=FALSE,
                    text.size="auto", xlim=NULL, ylim=NULL, simplify=TRUE, repel=TRUE, max.overlaps=20,
                    x_label_bias=1, pos_label_bias=1) {
 
@@ -108,6 +109,9 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
             !! sl := paste0(!! sl, " (p < 1e", ceiling(log10(!! sy)), ")"),
             !! sy := ceil)
     }
+
+    # clamp x (LFC) for positive and negative values
+    df[[x]] = ifelse(abs(df[[x]]) > clamp_x, Inf * sign(df[[x]]), df[[x]])
 
     # filter labels, but only for points we don't highlight
     rel_effect = df[[x]] / abs(df[[x]][rank(-abs(df[[x]]), ties.method="first") == 10])
