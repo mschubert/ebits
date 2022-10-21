@@ -110,9 +110,6 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
             !! sy := ceil)
     }
 
-    # clamp x (LFC) for positive and negative values
-    df[[x]] = ifelse(abs(df[[x]]) > clamp_x, Inf * sign(df[[x]]), df[[x]])
-
     # filter labels, but only for points we don't highlight
     rel_effect = df[[x]] / abs(df[[x]][rank(-abs(df[[x]]), ties.method="first") == 10])
     rel_effect[is.na(rel_effect)] = 0
@@ -122,6 +119,9 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
     point_dist[df[[y]] > p] = NA
     point_dist[is.na(df[[label]])] = NA # only keep points where we have labels
     df[[label]][rank(-point_dist) > label_top & xor(df$fill, df$circle)] = NA
+
+    # clamp x (LFC) for positive and negative values
+    df[[x]] = ifelse(abs(df[[x]]) > clamp_x, Inf * sign(df[[x]]), df[[x]])
 
     # make sure we don't plot too many insignificant points
     if (simplify && sum(df[[y]] > p, na.rm=TRUE) > 800) {
