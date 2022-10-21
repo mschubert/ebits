@@ -39,6 +39,5 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
         scale_color_distiller(palette="RdPu", trans="log10", guide="none", direction=1) +
         scale_fill_distiller(palette="RdPu", trans="log10",
             breaks=c(1,10,50,200,1000,5000,20000), direction=1) +
-        ggtitle(sprintf("R^2=%.2f (p=%.2g)", m$r.squared, m$p.value)) +
         theme_classic()
 }
