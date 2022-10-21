@@ -6,10 +6,18 @@ import_package("dplyr", attach=TRUE)
 #' Extract a data.frame with DE genes from a DESeq2 object
 #'
 #' @param mod  DESeq2 object
-#' @param rn   Name of the coefficient to extract
+#' @param rn   Name of the coefficient or contrast to extract
 #' @return     A tibble with DE stats incl. 'ensembl_gene_id', 'label'
 extract_result = function(mod, rn) {
-    DESeq2::results(mod, name=rn) %>%
+    rns = DESeq2::resultsNames(mod)
+    if (rn %in% rns)
+        res = DESeq2::results(mod, name=rn)
+    else {
+        term = strsplit(sub("_", "@", rn), "@")[[1]]
+        res = DESeq2::results(mod, contrast=c(term[1], strsplit(term[2], "_vs_")[[1]]))
+    }
+
+    res %>%
         as.data.frame() %>%
         tibble::as_tibble(rownames="ensembl_gene_id") %>%
         arrange(padj) %>%
@@ -22,12 +30,16 @@ extract_result = function(mod, rn) {
 #'
 #' @param eset     DESeq2 object
 #' @param design   Design formula for differential expression
-#' @param extract  A regular expression of which resultsNames to extract
+#' @param extract  A regular expression of which resultsNames or contrasts to extract
 #' @return         A tibble with columns: term, genes[, sets]
 genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)") {
     eset = clean_obj(eset, design)
     mod = DESeq2::DESeq(eset)
-    tibble::tibble(term=grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)) %>%
+
+    if (length(extract) == 1)
+        extract = grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)
+
+    tibble::tibble(term=extract) %>%
         mutate(genes = lapply(term, extract_result, mod=mod))
 }
 
@@ -36,7 +48,7 @@ genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)") {
 #' @param eset     DESeq2 object
 #' @param design   Design formula for differential expression
 #' @param sets     A named list of gene set collections (lists of character vectors)
-#' @param extract  A regular expression of which resultsNames to extract
+#' @param extract  A regular expression of which resultsNames or contrast to extract
 #' @param cl       A parallel cluster object or integer for number of cores
 #' @return         A tibble with columns: term, genes[, sets]
 genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)", n_jobs=0) {
