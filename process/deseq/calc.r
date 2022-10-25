@@ -14,7 +14,9 @@ extract_result = function(mod, rn) {
         res = DESeq2::results(mod, name=rn)
     else {
         term = strsplit(sub("_", "@", rn), "@")[[1]]
-        res = DESeq2::results(mod, contrast=c(term[1], strsplit(term[2], "_vs_")[[1]]))
+        res = try(DESeq2::results(mod, contrast=c(term[1], strsplit(term[2], "_vs_")[[1]])))
+        if (class(res) == "try-error")
+            return()
     }
 
     res %>%
@@ -36,7 +38,7 @@ genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)") {
     eset = clean_obj(eset, design)
     mod = DESeq2::DESeq(eset)
 
-    if (length(extract) == 1)
+    if (length(extract) == 1) #FIXME: not a good criterium, what if 1 contrast supplied?
         extract = grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)
 
     tibble::tibble(term=extract) %>%
@@ -62,7 +64,8 @@ genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extrac
 
     for (ns in names(sets)) {
         message("[process/deseq] Testing set: ", ns)
-        res[[ns]] = lapply(res$genes, .gset$test_lm, sets=sets[[ns]], n_jobs=n_jobs)
+        test_fun = function(x, ...) if (is.null(x)) NULL else .gset$test_lm(x, ...)
+        res[[ns]] = lapply(res$genes, test_fun, sets=sets[[ns]], n_jobs=n_jobs)
     }
     res
 }

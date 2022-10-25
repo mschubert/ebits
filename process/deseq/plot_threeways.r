@@ -9,6 +9,7 @@ plt = import('../../plot')
 #' @return  A patchwork object with volcanos sample1 vs ref, 2 vs ref, cor of 1/2 ref, 2 vs 1
 plot_threeways = function(res, field, max_ov=25, add_cols=FALSE) {
     do_cor = function(i) {
+        if (any(sapply(res[[field]][i], is.null))) return(plt$text("Not in data"))
         both = inner_join(res[[field]][[i[1]]], res[[field]][[i[2]]], by="label") %>%
             filter(!is.na(stat.x) & !is.na(stat.y))
         m = broom::glance(lm(stat.y ~ stat.x, data=both))
@@ -21,12 +22,14 @@ plot_threeways = function(res, field, max_ov=25, add_cols=FALSE) {
         stop("add_cols needs exactly 6 or 8 comparisons")
 
     if (field != "genes") {
-        res[[field]] = lapply(res[[field]], . %>% dplyr::rename(stat=statistic))
+        rename_fun = function(x) if (is.null(x)) x else dplyr::rename(x, stat=statistic)
+        res[[field]] = lapply(res[[field]], rename_fun)
         max_ov = max_ov * 0.5
     }
 
     clean = function(x) gsub("_", " ", sub("^[^_]+_(.*)$", "\\1", x))
-    volc = function(df, tit) plt$volcano(df, label_top=30, clamp_x=10) + ggtitle(clean(tit))
+    volc = function(df, tit) if (is.null(df)) plt$text(sprintf("%s:\nNot in data", clean(tit))) else
+        plt$volcano(df, label_top=30, clamp_x=10) + ggtitle(clean(tit))
     volcs = mapply(volc, df=res[[field]], tit=res$term, SIMPLIFY=FALSE)
 
     vci = seq(3, nrow(res), by=3)
