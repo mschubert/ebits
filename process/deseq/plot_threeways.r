@@ -13,7 +13,7 @@ plot_threeways = function(res, field, max_ov=25, add_cols=FALSE) {
             filter(!is.na(stat.x) & !is.na(stat.y))
         m = broom::glance(lm(stat.y ~ stat.x, data=both))
         plt$denspt(both, aes(x=stat.x, y=stat.y, label=label)) +
-            labs(x=res$term[i[1]], y=res$term[i[2]]) +
+            labs(x=clean(res$term[i[1]]), y=clean(res$term[i[2]])) +
             ggtitle(sprintf("R^2=%.2f (p=%.2g)", m$r.squared, m$p.value))
     }
 
