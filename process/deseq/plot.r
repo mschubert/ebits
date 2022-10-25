@@ -29,8 +29,8 @@ plot_volc = function(..., nrow=NULL, title_size=6, title_height=0.1, add_design=
 #' Plot the design matrix as table
 #'
 #' @param eset  A DESeq2 data set
-plot_design = function(eset) {
-    eset = .calc$clean_obj(eset)
+plot_design = function(eset, design=DESeq2::design(eset)) {
+    eset = .calc$clean_obj(eset, design=design)
     mm = model.matrix(DESeq2::design(eset), data=colData(eset))
     patchwork::wrap_elements(gridExtra::tableGrob(mm))
 }
