@@ -1,4 +1,5 @@
 `%>%` = magrittr::`%>%`
+import_package('patchwork', attach=TRUE)
 plt = import('../../plot')
 
 #' Plot threeway DE comparisons for each row in results
