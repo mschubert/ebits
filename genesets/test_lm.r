@@ -16,7 +16,7 @@ import_package("dplyr", attach=TRUE)
 test_lm = function(genes, sets,
                    label=c("external_gene_name", "gene_name", "gene", "name", "label", "ensembl_gene_id"),
                    stat=c("stat", "statistic", "log2FoldChange", "estimate"),
-                   min_n=2, add_means=c(), trim=0, n_jobs=0) {
+                   min_n=2, add_means=c(), trim=0, cl=0) {
     test_one = function(res, set) {
         dset = res %>% mutate(in_set = !! rlang::sym(label) %in% set + 0)
         if (sum(dset$in_set, na.rm=TRUE) < min_n)
@@ -59,7 +59,10 @@ test_lm = function(genes, sets,
         genes[[label]] = .idmap$gene(genes[[label]], to=id_type_sets)
     }
 
-    clustermq::Q(test_one, set=sets, const=list(res=genes), n_jobs=n_jobs, pkgs="dplyr",
+    if (is.numeric(cl))
+        cl = clustermq::workers(cl, reuse=FALSE)
+
+    clustermq::Q(test_one, set=sets, const=list(res=genes), workers=cl, chunk_size=10, pkgs="dplyr",
                  export=list(min_n=min_n, add_means=add_means, stat=stat, label=label)) %>%
 #    lapply(sets, test_one, res=genes) %>%
         setNames(names(sets)) %>%

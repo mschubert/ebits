@@ -53,7 +53,7 @@ genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)") {
 #' @param extract  A regular expression of which resultsNames or contrast to extract
 #' @param cl       A parallel cluster object or integer for number of cores
 #' @return         A tibble with columns: term, genes[, sets]
-genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)", n_jobs=0) {
+genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)", cl=0) {
     res = genes(eset, design, extract)
     if (is.character(sets))
         sets = .gset$get_human(sets, drop=FALSE)
@@ -62,11 +62,20 @@ genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extrac
     if (is.null(names(sets)) || is.null(names(sets[[1]])))
         stop("'sets' parameter must be a named list of lists")
 
+    do_cleanup = FALSE
+    if (is.numeric(cl)) {
+        do_cleanup = TRUE
+        cl = clustermq::workers(cl, reuse=TRUE)
+    }
+
     for (ns in names(sets)) {
         message("[process/deseq] Testing set: ", ns)
         test_fun = function(x, ...) if (is.null(x)) NULL else .gset$test_lm(x, ...)
-        res[[ns]] = lapply(res$genes, test_fun, sets=sets[[ns]], n_jobs=n_jobs)
+        res[[ns]] = lapply(res$genes, test_fun, sets=sets[[ns]], cl=cl)
     }
+
+    if (do_cleanup)
+        cl$cleanup()
     res
 }
 
