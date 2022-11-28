@@ -28,9 +28,9 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
         dens_geom = list(geom_hex(aes(color=..count..), bins=n_tile))
 
     ggplot(data, mapping) +
+        dens_geom +
         geom_hline(yintercept=0, color="grey", linetype="dashed") +
         geom_vline(xintercept=0, color="grey", linetype="dashed") +
-        dens_geom +
         geom_point(aes(shape=draw_pt, ...), color="black", alpha=0.5) +
         geom_smooth(method="lm", se=FALSE) +
         ggrepel::geom_label_repel(max.overlaps=max_ov, size=tsize,
