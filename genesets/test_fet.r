@@ -8,9 +8,10 @@ import_package("dplyr", attach=TRUE)
 #' @param valid  All genes that are considered
 #' @param hits   Genes that are considered hits
 #' @param sets   List of character vectors
-#' @param stat   Column name of separation statistics
+#' @param min    The minimum number of genes in a list to keep the list
+#' @param max    The maximum number of genes in a list to keep the list
 #' @return       A data.frame with association results
-test_fet = function(valid, hits, sets) {
+test_fet = function(valid, hits, sets, min=2, max=Inf) {
     test_one = function(valid, hits, set) {
         mat = matrix(ncol=2,
             c(length(setdiff(valid, set)), length(setdiff(set, hits)),
@@ -32,7 +33,7 @@ test_fet = function(valid, hits, sets) {
         valid = .idmap$gene(valid, to=idt)
     }
 
-    sets = .filter(sets, valid=valid)
+    sets = .filter(sets, valid=valid, min=min, max=max)
     lapply(sets, test_one, valid=valid, hits=hits) %>%
         setNames(names(sets)) %>%
         dplyr::bind_rows(.id="label") %>%
