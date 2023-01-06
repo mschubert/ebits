@@ -8,8 +8,10 @@
 #' @param draw_label  How many points to label
 #' @param max_ov   Maximumg overlap for point labels (ggrepel)
 #' @param h  Kernel width for density estimation in number of tiles (x=y or x,y)
+#' @param palette  The color palette to use
+#' @param pal_dir  The direction of the palette
 denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=60,
-                  max_ov=25, h=15, ...) {
+                  max_ov=25, h=15, ..., palette="RdPu", pal_dir=1, pal_alpha=1) {
     lx = rlang::as_name(mapping$x)
     ly = rlang::as_name(mapping$y)
     ll = rlang::as_name(mapping$label)
@@ -25,7 +27,7 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
 
     dens_geom = list()
     if (nrow(data) > nodens)
-        dens_geom = list(geom_hex(aes(color=..count..), bins=n_tile))
+        dens_geom = list(geom_hex(bins=n_tile, alpha=pal_alpha))
 
     ggplot(data, mapping) +
         dens_geom +
@@ -37,10 +39,9 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
             min.segment.length=0, segment.alpha=0.3, fill="#ffffffa0", label.size=NA,
             max.iter=1e6, max.time=10, label.padding = unit(0.12, "lines"),
             box.padding = unit(0.01, "lines"), na.rm=TRUE) +
-        scale_color_distiller(palette="RdPu", trans="log10", guide="none", direction=1) +
-        scale_fill_distiller(palette="RdPu", trans="log10",
-            breaks=c(1,10,50,200,1000,5000,20000), direction=1) +
+        scale_fill_distiller(palette=palette, trans="log10",
+            breaks=c(1,10,50,200,1000,5000,20000), direction=pal_dir) +
         scale_shape_manual(values=c(pt=19)) +
-        guides(shape="none") +
+        guides(fill = guide_legend(override.aes=list(alpha=pal_alpha))) +
         theme_classic()
 }
