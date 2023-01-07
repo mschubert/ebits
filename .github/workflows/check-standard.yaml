@@ -50,6 +50,10 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      - name: install modules package (https://github.com/r-lib/actions/issues/534)
+        run: remotes::install_github("klmr/modules")
+        shell: Rscript {0}
+
       - name: make prepare
         run: make prepare
 
