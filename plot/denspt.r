@@ -42,6 +42,7 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
         scale_fill_distiller(palette=palette, trans="log10",
             breaks=c(1,10,50,200,1000,5000,20000), direction=pal_dir) +
         scale_shape_manual(values=c(pt=19)) +
-        guides(fill = guide_legend(override.aes=list(alpha=pal_alpha))) +
+        guides(shape = "none",
+               fill = guide_legend(override.aes=list(alpha=pal_alpha))) +
         theme_classic()
 }
