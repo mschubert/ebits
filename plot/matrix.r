@@ -34,7 +34,7 @@ cluster = function(df, formula, cols=TRUE, rows=TRUE, size=NULL, fill=NA) {
     df
 }
 
-#' Draws a matrix plot using ggplot::geom_tile or circle
+#' Draws a matrix plot using ggplot2::geom_tile or circle
 #'
 #' @param df       A data.frame containing the data
 #' @param formula  Formula of sort value ~ row + col

@@ -18,10 +18,7 @@ combat = function(X, batch, covariate=NULL) {
 }
 
 dwd = function(X, batch) {
-    ll = .mat2list(X, subsets=batch)
-    esets = lapply(ll, ExpressionSet)
-    eset = inSilicoMerging::merge(esets, method="DWD")
-    exprs(eset)
+    stop("inSilicoMerging package no longer available on Bioconductor")
 }
 
 none = function(X, batch=NA) {
