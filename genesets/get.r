@@ -58,7 +58,7 @@ get_human = function(collections, ..., leaf_depth=4, conf=c("A","B","C","D"), dr
                 dplyr::select(target, tf) %>%
                 unstack()
         } else
-            stop("invalid gene set: ", args$geneset)
+            stop("invalid gene set: ", col)
     }
 
     if (length(collections) == 1 & drop) {
