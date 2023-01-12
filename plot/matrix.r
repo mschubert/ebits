@@ -21,9 +21,11 @@ cluster = function(df, formula, cols=TRUE, rows=TRUE, size=NULL, fill=NA) {
     ord_rows = rownames(mat)
     ord_cols = colnames(mat)
     if (rows)
-        ord_rows = rownames(mat)[hclust(dist(mat))$order]
+        ord_rows = rownames(mat)[rank(umap::umap(mat, n_neighbors=nrow(mat), n_components=1)$layout)]
+#        ord_rows = rownames(mat)[hclust(dist(mat))$order]
     if (cols)
-        ord_cols = colnames(mat)[hclust(dist(t(mat)))$order]
+        ord_cols = colnames(mat)[rank(umap::umap(t(mat), n_neighbors=ncol(mat), n_components=1)$layout)]
+#        ord_cols = colnames(mat)[hclust(dist(t(mat)))$order]
 
     df = df[df[[rname]] %in% ord_rows,]
     df = df[df[[cname]] %in% ord_cols,]
