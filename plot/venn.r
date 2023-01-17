@@ -31,12 +31,14 @@ venn = function(sets, ..., alpha=0.5, label=TRUE, nums=TRUE) {
     meta = df %>%
         filter(!is.na(label)) %>%
         cbind(centers)
+    meta$n_total = sapply(sets, length)
 
     labs = list()
     if (label)
-        labs = c(labs, ggrepel::geom_text_repel(data=na.omit(meta), aes(label=label), parse=TRUE))
+        labs = c(labs, ggrepel::geom_text_repel(data=na.omit(meta), aes(label=label),
+            parse=TRUE, min.segment.length=Inf, point.padding=5))
     if (nums)
-        labs = c(labs, geom_text(data=na.omit(meta %>% select(-label)), aes(label=original.values)))
+        labs = c(labs, geom_text(data=na.omit(meta %>% select(-label)), aes(label=n_total)))
 
     ggplot(polygons, aes(x=x, y=y)) +
         geom_polygon(aes(fill=set), color="#686868", alpha=alpha) +
