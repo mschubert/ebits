@@ -10,6 +10,7 @@
 #' @param h  Kernel width for density estimation in number of tiles (x=y or x,y)
 #' @param palette  The color palette to use
 #' @param pal_dir  The direction of the palette
+#' @param pal_alpha  The transparency of the density layer
 denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=60,
                   max_ov=25, h=15, ..., palette="RdPu", pal_dir=1, pal_alpha=1) {
     lx = rlang::as_name(mapping$x)
