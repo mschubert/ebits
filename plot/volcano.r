@@ -77,7 +77,7 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
     if (!'fill' %in% colnames(df))
         df$fill = TRUE
     if (is.character(text.size))
-        text.size = 1.5 + 5 * 1/sqrt(mean(nchar(df[[label]])))
+        text.size = 1.5 + 5 * 1/sqrt(mean(nchar(as.character(df[[label]]))))
 
     df$color = rep(rgb(0, 151, 30, 120, maxColorValue=255), nrow(df)) # green
     df$color[df[[x]] < 0] = rgb(225, 0, 0, 120, maxColorValue=255) # red
@@ -137,18 +137,21 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
     breaks_with_thresh = function(...) c(p, scales::log_breaks(base=10)(df[[y]], 5))
 
     # and do the actual plot
-    df = dplyr::arrange(df, - !! sy)
+    df = dplyr::arrange(df, - !! sy) %>%
+        mutate(size_fill = ifelse(fill, sqrt(!! rlang::sym(size)), NA_real_),
+               size_circle = ifelse(circle, sqrt(!! rlang::sym(size)), NA_real_),
+               color_circle = ifelse(fill, '#00000088', color))
     pl = ggplot(df, aes_string(x = x, y = y)) +
         scale_y_continuous(trans = .reverselog_trans(base=10),
                            labels = .scientific_10,
                            limits = ylim,
                            breaks = breaks_with_thresh) +
         scale_x_continuous(limits = xlim) +
-        geom_point(size = ifelse(df$fill, sqrt(df[[size]]), NA), color=df$color, na.rm=TRUE) +
-        geom_point(size = ifelse(df$circle, sqrt(df[[size]]), NA),
-                   shape=1, color=ifelse(df$fill, '#00000088', df$color), na.rm=TRUE) +
+        geom_point(aes(size=size_fill, color=color), na.rm=TRUE) +
+        geom_point(aes(size=size_circle, color=color_circle), shape=1, na.rm=TRUE) +
         geom_vline(xintercept=0, color="#858585") +
         geom_hline(yintercept=p, linetype="dashed", color="#858585") +
+        scale_color_identity() +
         ylab(ylab) +
         theme_classic()
 
