@@ -1,6 +1,6 @@
 Package: ebits
 Title: A collection of bioinformatics-related R modules
-Version: 0
+Version: 0.1
 Author: Michael Schubert <mschu.dev@gmail.com>
 Maintainer: Michael Schubert <mschu.dev@gmail.com>
 Description: File to support dependency installation on Github Actions
