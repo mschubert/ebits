@@ -12,8 +12,7 @@ SystemRequirements: arpack
 Imports:
     @@@
 Remotes:
-    klmr/modules@master,
-    cran/ReorderCluster
+    klmr/modules@master
 License: Apache License (== 2.0) | file LICENSE
 LazyData: true
 Encoding: UTF-8
