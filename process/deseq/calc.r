@@ -5,21 +5,15 @@ import_package("dplyr", attach=TRUE)
 
 #' Extract a data.frame with DE genes from a DESeq2 object
 #'
-#' @param mod  DESeq2 object
-#' @param rn   Name of the coefficient or contrast to extract
-#' @return     A tibble with DE stats incl. 'ensembl_gene_id', 'label'
-extract_result = function(mod, rn) {
-    rns = DESeq2::resultsNames(mod)
-    if (rn %in% rns)
-        res = DESeq2::results(mod, name=rn)
-    else {
-        term = strsplit(sub("_", "@", rn), "@")[[1]]
-        res = try(DESeq2::results(mod, contrast=c(term[1], strsplit(term[2], "_vs_")[[1]])))
-        if (class(res) == "try-error")
-            return()
-    }
+#' @param mod   DESeq2 object
+#' @param name  Name of the coefficient or contrast to extract
+#' @param contrast  Contrast to extract, allows "{factor}_{x}_vs_{y}"
+#' @return      A tibble with DE stats incl. 'ensembl_gene_id', 'label'
+extract_result = function(mod, name, contrast) {
+    if (!missing(contrast) && length(contrast) == 1 && grepl("_vs_", contrast))
+        contrast = strsplit(contrast, "_")[[1]][c(1,2,4)]
 
-    res %>%
+    DESeq2::results(mod, name=name, contrast=contrast) %>%
         as.data.frame() %>%
         tibble::as_tibble(rownames="ensembl_gene_id") %>%
         arrange(padj) %>%
