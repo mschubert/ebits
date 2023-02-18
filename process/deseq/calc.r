@@ -45,16 +45,13 @@ genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)") {
         mutate(genes = lapply(term, extract_result, mod=mod))
 }
 
-#' Test genes and gene sets for a given DESeq2 data set
+#' Test gene sets for a given DESeq2 data set
 #'
-#' @param eset     DESeq2 object
-#' @param design   Design formula for differential expression
+#' @param res  Results data.frame from genes()
 #' @param sets     A named list of gene set collections (lists of character vectors)
-#' @param extract  A regular expression of which resultsNames or contrast to extract
 #' @param cl       A parallel cluster object or integer for number of cores
 #' @return         A tibble with columns: term, genes[, sets]
-genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)", cl=0) {
-    res = genes(eset, design, extract)
+sets = function(res, sets, cl=0) {
     if (is.character(sets))
         sets = .gset$get_human(sets, drop=FALSE)
     if (!is.list(sets[[1]]))
@@ -79,8 +76,14 @@ genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extrac
     res
 }
 
-genes_and_sets_1vall = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)") {
-    eset = clean_obj(eset, design)
+#' Test genes and gene sets for a given DESeq2 data set
+#'
+#' @inheritParams  genes
+#' @inheritParams  sets
+#' @return         A tibble with columns: term, genes[, sets]
+genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)", cl=0) {
+    res = genes(eset, design, extract)
+    sets(res, sets, cl)
 }
 
 #' Clean a DESeq2 object and design
