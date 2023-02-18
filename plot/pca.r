@@ -25,8 +25,15 @@ pca.DESeqTransform = function(vst, ..., annot=NULL, pr=NULL, ntop=500) {
     pca(pr, annot=annot, ...)
 }
 
-pca.prcomp = function(obj, aes=ggplot2::aes(x=PC1, y=PC2), annot=NULL, repel=TRUE,
+pca.prcomp = function(obj, aes, annot=NULL, repel=TRUE,
                       biplot=FALSE, bi_color="red", bi_size=5, bi_arrow=0.2, bi_alpha=0.4) {
+    if (!inherits(aes, "uneval"))
+        stop("`aes` parameter must be a ggplot2::aes (uneval) object")
+    if (!"x" %in% names(aes))
+        aes$x = quote(PC1)
+    if (!"y" %in% names(aes))
+        aes$y = quote(PC2)
+
     # adapted: https://stackoverflow.com/questions/6578355/plotting-pca-biplot-with-ggplot2
     data = as.data.frame(cbind(annot, obj$x))
     rot = data.frame(varnames=rownames(obj$rotation), obj$rotation)
