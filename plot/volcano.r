@@ -152,7 +152,7 @@ volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
         geom_vline(xintercept=0, color="#858585") +
         geom_hline(yintercept=p, linetype="dashed", color="#858585") +
         scale_color_identity() +
-        ylab(ylab) +
+        labs(y=ylab, size=size) +
         theme_classic()
 
     if (repel) {
