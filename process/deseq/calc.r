@@ -10,8 +10,10 @@ import_package("dplyr", attach=TRUE)
 #' @param contrast  Contrast to extract, allows "{factor}_{x}_vs_{y}"
 #' @return      A tibble with DE stats incl. 'ensembl_gene_id', 'label'
 extract_result = function(mod, name, contrast) {
-    if (!missing(contrast) && length(contrast) == 1 && grepl("_vs_", contrast))
-        contrast = strsplit(contrast, "_")[[1]][c(1,2,4)]
+    if (!missing(contrast) && length(contrast == 1) && grepl("_vs_", contrast)) {
+        contrast = contrast %>% sub("_", "@", .) %>% sub("_vs_", "@", .)
+        contrast = strsplit(contrast, "@")[[1]]
+    }
 
     DESeq2::results(mod, name=name, contrast=contrast) %>%
         as.data.frame() %>%
@@ -27,16 +29,19 @@ extract_result = function(mod, name, contrast) {
 #' @param eset     DESeq2 object
 #' @param design   Design formula for differential expression
 #' @param extract  A regular expression of which resultsNames or contrasts to extract
+#' @param contrast Whether `extract` refers to a contrast instead of a result name
 #' @return         A tibble with columns: term, genes[, sets]
-genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)") {
+genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)", contrast=FALSE) {
     eset = clean_obj(eset, design)
     mod = DESeq2::DESeq(eset)
 
-    if (length(extract) == 1) #FIXME: not a good criterium, what if 1 contrast supplied?
+    if (!contrast) {
         extract = grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)
-
-    tibble::tibble(term=extract) %>%
-        mutate(genes = lapply(term, extract_result, mod=mod))
+        tibble::tibble(term=extract) %>%
+            mutate(genes = lapply(term, function(t) extract_result(mod, name=t)))
+    } else
+        tibble::tibble(term=extract) %>%
+            mutate(genes = lapply(term, function(t) extract_result(mod, contrast=t)))
 }
 
 #' Test gene sets for a given DESeq2 data set
@@ -75,8 +80,9 @@ sets = function(res, sets, cl=0) {
 #' @inheritParams  genes
 #' @inheritParams  sets
 #' @return         A tibble with columns: term, genes[, sets]
-genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(), extract="^(?!Intercept)", cl=0) {
-    res = genes(eset, design, extract)
+genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(),
+                          extract="^(?!Intercept)", contrast=FALSE, cl=0) {
+    res = genes(eset, design, extract, contrast)
     sets(res, sets, cl)
 }
 
