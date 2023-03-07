@@ -30,18 +30,22 @@ extract_result = function(mod, name, contrast) {
 #' @param design   Design formula for differential expression
 #' @param extract  A regular expression of which resultsNames or contrasts to extract
 #' @param contrast Whether `extract` refers to a contrast instead of a result name
+#' @param on_error   Function to call if an error occurred (takes one parameter)
 #' @return         A tibble with columns: term, genes[, sets]
-genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)", contrast=FALSE) {
+genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)",
+                 contrast=FALSE, on_error=function(e) stop(e)) {
     eset = clean_obj(eset, design)
     mod = DESeq2::DESeq(eset)
 
     if (!contrast) {
         extract = grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)
         tibble::tibble(term=extract) %>%
-            mutate(genes = lapply(term, function(t) extract_result(mod, name=t)))
+            mutate(genes = lapply(term, function(t)
+                tryCatch(extract_result(mod, name=t), error=on_error)))
     } else
         tibble::tibble(term=extract) %>%
-            mutate(genes = lapply(term, function(t) extract_result(mod, contrast=t)))
+            mutate(genes = lapply(term, function(t)
+                tryCatch(extract_result(mod, contrast=t), error=on_error)))
 }
 
 #' Test gene sets for a given DESeq2 data set
@@ -81,8 +85,8 @@ sets = function(res, sets, cl=0) {
 #' @inheritParams  sets
 #' @return         A tibble with columns: term, genes[, sets]
 genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(),
-                          extract="^(?!Intercept)", contrast=FALSE, cl=0) {
-    res = genes(eset, design, extract, contrast)
+            extract="^(?!Intercept)", contrast=FALSE, on_error=function(e) stop(e), cl=0) {
+    res = genes(eset, design, extract, contrast, on_error)
     sets(res, sets, cl)
 }
 
