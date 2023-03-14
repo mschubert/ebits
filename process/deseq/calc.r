@@ -18,7 +18,7 @@ extract_result = function(mod, name, contrast) {
     DESeq2::results(mod, name=name, contrast=contrast) %>%
         as.data.frame() %>%
         tibble::as_tibble(rownames="ensembl_gene_id") %>%
-        arrange(padj) %>%
+        arrange(padj, pvalue) %>%
         mutate(label = .idmap$gene(ensembl_gene_id, to="hgnc_symbol"),
                label = ifelse(is.na(label), ensembl_gene_id, label)) %>%
         select(ensembl_gene_id, label, everything())
