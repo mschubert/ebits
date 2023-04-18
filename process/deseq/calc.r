@@ -7,16 +7,17 @@ import_package("dplyr", attach=TRUE)
 #'
 #' @param mod   DESeq2 object
 #' @param name  Name of the coefficient or contrast to extract
-#' @param contrast  Contrast to extract, allows "{factor}_{x}_vs_{y}"
 #' @return      A tibble with DE stats incl. 'ensembl_gene_id', 'label'
-extract_result = function(mod, name, contrast) {
-    if (!missing(contrast) && length(contrast == 1) && grepl("_vs_", contrast)) {
-        contrast = contrast %>% sub("_", "@", .) %>% sub("_vs_", "@", .)
+extract_result = function(mod, name) {
+    if (grepl("_vs_", name) && !name %in% DESeq2::resultsNames(mod)) {
+        contrast = name %>% sub("_", "@", .) %>% sub("_vs_", "@", .)
         contrast = strsplit(contrast, "@")[[1]]
+        res = DESeq2::results(mod, contrast=contrast)
+    } else {
+        res = DESeq2::results(mod, name=name)
     }
 
-    DESeq2::results(mod, name=name, contrast=contrast) %>%
-        as.data.frame() %>%
+    as.data.frame(res) %>%
         tibble::as_tibble(rownames="ensembl_gene_id") %>%
         arrange(padj, pvalue) %>%
         mutate(label = .idmap$gene(ensembl_gene_id, to="hgnc_symbol"),
@@ -37,15 +38,12 @@ genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)",
     eset = clean_obj(eset, design)
     mod = DESeq2::DESeq(eset)
 
-    if (!contrast) {
+    if (!contrast)
         extract = grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)
-        tibble::tibble(term=extract) %>%
-            mutate(genes = lapply(term, function(t)
-                tryCatch(extract_result(mod, name=t), error=on_error)))
-    } else
-        tibble::tibble(term=extract) %>%
-            mutate(genes = lapply(term, function(t)
-                tryCatch(extract_result(mod, contrast=t), error=on_error)))
+
+    tibble::tibble(term=extract) %>%
+        mutate(genes = lapply(term, function(t)
+            tryCatch(extract_result(mod, name=t), error=on_error)))
 }
 
 #' Test gene sets for a given DESeq2 data set
