@@ -53,6 +53,8 @@ genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)",
 #' @param cl       A parallel cluster object or integer for number of cores
 #' @return         A tibble with columns: term, genes[, sets]
 sets = function(res, sets, cl=0) {
+    if (length(sets) == 0)
+        return(res);
     if (is.character(sets))
         sets = .gset$get_human(sets, drop=FALSE)
     if (!is.list(sets[[1]]))
