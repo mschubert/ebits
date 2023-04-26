@@ -34,14 +34,14 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
 
     dens_geom = list()
     if (nrow(data) > nodens)
-        dens_geom = list(geom_hex(bins=n_tile, alpha=pal_alpha))
+        dens_geom = list(geom_hex(bins=n_tile, alpha=pal_alpha, color=NA))
 
     ggplot(data, mapping) +
         dens_geom +
         geom_hline(yintercept=0, color="grey", linetype="dashed") +
         geom_vline(xintercept=0, color="grey", linetype="dashed") +
-        geom_point(aes(shape=draw_pt, ...), color="black", alpha=0.5) +
-        geom_smooth(method="lm", se=FALSE) +
+        geom_point(aes(shape=draw_pt, ...)) +
+        geom_smooth(color=NA, method="lm", se=FALSE) +
         ggrepel::geom_label_repel(max.overlaps=max_ov, size=tsize,
             min.segment.length=0, segment.alpha=0.3, fill="#ffffffa0", label.size=NA,
             max.iter=1e6, max.time=10, label.padding = unit(0.12, "lines"),
@@ -51,5 +51,5 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
         scale_shape_manual(values=c(pt=19)) +
         guides(shape = "none",
                fill = guide_legend(override.aes=list(alpha=pal_alpha))) +
-        theme_classic()
+        theme_minimal()
 }
