@@ -13,9 +13,15 @@
 #' @param pal_alpha  The transparency of the density layer
 denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=60,
                   max_ov=25, h=15, ..., palette="RdPu", pal_dir=1, pal_alpha=1) {
+    mis_map = setdiff(c("x", "y", "label"), names(mapping))
+    if (length(mis_map) > 0)
+        stop("Missing mapping: ", paste(mis_map, collapse=", "))
+
     lx = rlang::as_name(mapping$x)
     ly = rlang::as_name(mapping$y)
     ll = rlang::as_name(mapping$label)
+    keep = apply(data[c(lx, ly)], 1, function(x) !any(is.na(x) | is.infinite(x)))
+    data = data[keep,]
     x = data[[lx]]
     y = data[[ly]]
 
