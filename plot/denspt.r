@@ -41,8 +41,8 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
         geom_hline(yintercept=0, color="grey", linetype="dashed") +
         geom_vline(xintercept=0, color="grey", linetype="dashed") +
         geom_point(aes(shape=draw_pt, ...)) +
-        geom_smooth(color=NA, method="lm", se=FALSE) +
-        ggrepel::geom_label_repel(max.overlaps=max_ov, size=tsize,
+        geom_smooth(color="blue", method="lm", se=FALSE) +
+        ggrepel::geom_label_repel(max.overlaps=max_ov, size=tsize, alpha=1,
             min.segment.length=0, segment.alpha=0.3, fill="#ffffffa0", label.size=NA,
             max.iter=1e6, max.time=10, label.padding = unit(0.12, "lines"),
             box.padding = unit(0.01, "lines"), na.rm=TRUE) +
