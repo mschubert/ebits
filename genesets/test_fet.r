@@ -25,9 +25,11 @@ test_fet = function(valid, hits, sets, min=2, max=Inf) {
     }
 
     msg = c()
+    if (is.list(hits))
+        stop("hits needs to character vector, mxn not implemented yet")
 
     all_sets = unique(unlist(sets))
-    if (mean(all_sets %in% valid) < 0.2) {
+    if (mean(all_sets %in% valid) < 0.05) {
         idt = .guess$id_type(all_sets)
         message("[geneset/test] low identifier overlap, mapping genes to ", sQuote(idt))
         valid = .idmap$gene(valid, to=idt)
