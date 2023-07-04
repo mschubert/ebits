@@ -28,7 +28,7 @@ import_package("ggplot2", attach=TRUE)
 #' @param ylim       Limits along the vertical axis; default: fit data
 #' @param simplify   Drop some insignificant points and labels to reduce file size
 #' @param repel      Whether to use repel package for labels
-#' @param max_overlaps   Parameter passed to ggrepel if repel is TRUE
+#' @param max.overlaps   Parameter passed to ggrepel if repel is TRUE
 #' @param x_label_bias   Multiplier to focus more on effect size than significance
 #' @param pos_label_bias Multiplier to focus more on positive than negative labels
 #' @return           A ggplot2 object of the volcano plot
