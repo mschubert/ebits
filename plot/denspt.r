@@ -12,7 +12,7 @@
 #' @param pal_dir  The direction of the palette
 #' @param pal_alpha  The transparency of the density layer
 denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=60,
-                  max_ov=25, h=15, ..., palette="RdPu", pal_dir=1, pal_alpha=1) {
+                  tsize=NULL, max_ov=25, h=15, ..., palette="RdPu", pal_dir=1, pal_alpha=1) {
     mis_map = setdiff(c("x", "y", "label"), names(mapping))
     if (length(mis_map) > 0)
         stop("Missing mapping: ", paste(mis_map, collapse=", "))
@@ -30,7 +30,8 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
     data$dens = fields::interp.surface(dens, data.frame(x=x, y=y))
     data$draw_pt = ifelse(rank(data$dens)<draw_pt, "pt", NA)
     data[[ll]] = ifelse(rank(data$dens)<draw_label, data[[ll]], NA)
-    tsize = 1.5 + 5 * 1/sqrt(mean(nchar(data[[ll]]), na.rm=TRUE))
+    if (is.null(tsize))
+        tsize = 1.5 + 5 * 1/sqrt(mean(nchar(data[[ll]]), na.rm=TRUE))
 
     dens_geom = list()
     if (nrow(data) > nodens)
@@ -42,7 +43,7 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
         geom_vline(xintercept=0, color="grey", linetype="dashed") +
         geom_point(aes(shape=draw_pt, ...)) +
         geom_smooth(color="blue", method="lm", se=FALSE) +
-        ggrepel::geom_label_repel(max.overlaps=max_ov, size=tsize, alpha=1,
+        ggrepel::geom_label_repel(max.overlaps=max_ov, size=tsize,
             min.segment.length=0, segment.alpha=0.3, fill="#ffffffa0", label.size=NA,
             max.iter=1e6, max.time=10, label.padding = unit(0.12, "lines"),
             box.padding = unit(0.01, "lines"), na.rm=TRUE) +
