@@ -6,12 +6,13 @@
 #' @param draw_pt  How many points to draw at lowest density
 #' @param nodens   Do not draw density if fewer points than this number
 #' @param draw_label  How many points to label
+#' @param always_label  Character vector of labels to always draw
 #' @param max_ov   Maximumg overlap for point labels (ggrepel)
 #' @param h  Kernel width for density estimation in number of tiles (x=y or x,y)
 #' @param palette  The color palette to use
 #' @param pal_dir  The direction of the palette
 #' @param pal_alpha  The transparency of the density layer
-denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=60,
+denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=60, always_label=c(),
                   tsize=NULL, max_ov=25, h=15, ..., palette="RdPu", pal_dir=1, pal_alpha=1) {
     mis_map = setdiff(c("x", "y", "label"), names(mapping))
     if (length(mis_map) > 0)
@@ -29,7 +30,7 @@ denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=
     dens = MASS::kde2d(x, y, h, n=n_tile)
     data$dens = fields::interp.surface(dens, data.frame(x=x, y=y))
     data$draw_pt = ifelse(rank(data$dens)<draw_pt, "pt", NA)
-    data[[ll]] = ifelse(rank(data$dens)<draw_label, data[[ll]], NA)
+    data[[ll]] = ifelse(rank(data$dens)<draw_label | data[[ll]] %in% always_label, data[[ll]], NA)
     if (is.null(tsize))
         tsize = 1.5 + 5 * 1/sqrt(mean(nchar(data[[ll]]), na.rm=TRUE))
 
