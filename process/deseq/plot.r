@@ -37,7 +37,7 @@ plot_design = function(eset, design=DESeq2::design(eset)) {
 
     ggplot(df, aes(x=Var2, y=Var1)) +
         geom_tile(fill="#ababab", color="white") +
-        geom_text(aes(label=value)) +
+        geom_text(aes(label=sprintf("%.2g", value))) +
         labs(x="term", y="sample") +
         theme_minimal() +
         theme(axis.text.x = element_text(angle=15, hjust=1, vjust=1))
