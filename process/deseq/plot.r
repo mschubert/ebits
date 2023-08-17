@@ -32,5 +32,13 @@ plot_volc = function(..., nrow=NULL, title_size=6, title_height=0.1, add_design=
 plot_design = function(eset, design=DESeq2::design(eset)) {
     eset = .calc$clean_obj(eset, design=design)
     mm = model.matrix(DESeq2::design(eset), data=colData(eset))
-    patchwork::wrap_elements(gridExtra::tableGrob(mm))
+    df = reshape2::melt(mm)
+    df = df[df$value != 0,]
+
+    ggplot(df, aes(x=Var2, y=Var1)) +
+        geom_tile(fill="#ababab", color="white") +
+        geom_text(aes(label=value)) +
+        labs(x="term", y="sample") +
+        theme_minimal() +
+        theme(axis.text.x = element_text(angle=15, hjust=1, vjust=1))
 }
