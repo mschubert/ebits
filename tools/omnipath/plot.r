@@ -1,5 +1,6 @@
 import_package("dplyr", attach=TRUE)
 import_package("ggplot2", attach=TRUE)
+import_package("tidygraph", attach=TRUE)
 import_package("ggraph", attach=TRUE)
 
 #' Plot OmniPath network including edge signs and directions
