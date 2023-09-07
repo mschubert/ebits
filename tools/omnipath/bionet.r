@@ -1,12 +1,5 @@
 import_package("tidygraph", attach=TRUE)
 
-#' Automatically compute threshold based on variable and number of genes
-#'
-#' @inherit bionet
-autothresh = function(assocs, var, n_genes) {
-    sort(assocs[[var]])[n_genes]
-}
-
 #' Return BioNet Steiner Tree subnetwork
 #'
 #' @param g  tidygraph-compatible network
@@ -23,14 +16,18 @@ bionet = function(g, assocs, thresh=0.05, n_genes=NULL, var=c("adj.p", "padj")) 
         message("[tools/omnipath]: using ", sQuote(var), " for scoring")
     }
     if (!is.null(n_genes))
-        tresh = autothresh(assocs, var, n_genes)
+        thresh = sort(assocs[[var]])[n_genes]
 
     g = g %>% activate(nodes) %>% left_join(assocs)
     scores = setNames(pull(g, !! rlang::sym(var)), pull(g, name))
     scores[is.na(scores)] = 1
     scores = pmax(-log10(scores) + log10(thresh), 0)
-    BioNet::runFastHeinz(g, scores) %>%
+    net = BioNet::runFastHeinz(g, scores) %>%
         as_tbl_graph() %>%
         activate(edges) %>%
         filter(from != to)
+
+    attr(net, "var") = var
+    attr(net, "thresh") = thresh
+    net
 }
