@@ -12,7 +12,7 @@ bionet = function(g, assocs, thresh=0.05, n_genes=NULL, var=c("adj.p", "padj")) 
     if (is.null(assocs$name) || any(duplicated(assocs$name)))
         stop("[tools/omnipath]: bionet needs 'assocs' with unique 'name' field")
     if (length(var) > 1) {
-        var = var[1]
+        var = intersect(colnames(assocs), var)[1]
         message("[tools/omnipath]: using ", sQuote(var), " for scoring")
     }
     if (!is.null(n_genes))
