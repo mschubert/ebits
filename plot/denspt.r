@@ -13,7 +13,7 @@
 #' @param pal_dir  The direction of the palette
 #' @param pal_alpha  The transparency of the density layer
 denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=60, always_label=c(),
-                  tsize=NULL, max_ov=25, h=15, ..., palette="RdPu", pal_dir=1, pal_alpha=1) {
+                  tsize=NULL, max_ov=25, h=15, ..., palette="Greys", pal_dir=1, pal_alpha=1) {
     mis_map = setdiff(c("x", "y", "label"), names(mapping))
     if (length(mis_map) > 0)
         stop("Missing mapping: ", paste(mis_map, collapse=", "))
