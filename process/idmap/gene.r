@@ -20,6 +20,8 @@ gene = function(obj, from=NULL, to, dset, summarize=mean) {
 }
 
 gene.character = function(obj, to, from=.guess$id_type(obj), dset=.guess$dset(obj), summarize=mean) {
+    if (from %in% c("hgnc_symbol", "mgi_symbol"))
+        from = "external_gene_name"
     if (to %in% c("hgnc_symbol", "mgi_symbol"))
         to = "external_gene_name"
 
