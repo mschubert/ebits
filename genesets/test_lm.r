@@ -26,12 +26,14 @@ test_lm = function(genes, sets,
             summarize_at(vars(all_of(add_means)), function(x) mean(x, na.rm=TRUE, trim=trim)) %>%
             summarize_at(vars(all_of(add_means)), diff)
 
+        vlab = paste("mean", stat)
         lm(as.formula(paste(stat, "~ in_set")), data=dset) %>%
             broom::tidy() %>%
             filter(term == "in_set") %>%
             select(-term) %>%
             mutate(size = length(set),
                    size_used = sum(res[[label]] %in% set & !is.na(res[[stat]]))) %>%
+            dplyr::rename({{ vlab }} := estimate) %>%
             cbind(sums)
     }
 
@@ -83,5 +85,5 @@ if (is.null(module_name())) {
     res = test_lm(gdf, sets)
 
     expect_true(inherits(res, "data.frame"))
-    expect_equal(res$estimate, -5)
+    expect_equal(res$`mean stat`, -5)
 }

@@ -32,10 +32,10 @@ import_package("ggplot2", attach=TRUE)
 #' @param x_label_bias   Multiplier to focus more on effect size than significance
 #' @param pos_label_bias Multiplier to focus more on positive than negative labels
 #' @return           A ggplot2 object of the volcano plot
-volcano = function(df, x = c("log2FoldChange", "avg_log2FC", "estimate", ".x"),
+volcano = function(df, x = c("mean log2FoldChange", "log2FoldChange", "avg_log2FC", "mean stat", "stat", "estimate", ".x"),
                    label = c("label", "name", "gene_name", "gene", "external_gene_name", "set_name", "set"),
                    y = c("adj.p", "padj", "p_val_adj", "p.value", "pval", ".y"),
-                   size = c("size", "n", "baseMean", "pct.2"),
+                   size = c("size_used", "size", "n", "baseMean", "pct.2"),
                    base.size=1, p=0.05, label_top=20, ceil=0, clamp_x=Inf, check_overlap=FALSE,
                    text.size="auto", xlim=NULL, ylim=NULL, simplify=TRUE, repel=TRUE, max.overlaps=20,
                    x_label_bias=1, pos_label_bias=1) {
@@ -141,7 +141,7 @@ volcano = function(df, x = c("log2FoldChange", "avg_log2FC", "estimate", ".x"),
         mutate(size_fill = ifelse(fill, sqrt(!! rlang::sym(size)), NA_real_),
                size_circle = ifelse(circle, sqrt(!! rlang::sym(size)), NA_real_),
                color_circle = ifelse(fill, '#00000088', color))
-    pl = ggplot(df, aes_string(x = x, y = y)) +
+    pl = ggplot(df, aes(x = !! rlang::sym(x) , y = !! rlang::sym(y))) +
         scale_y_continuous(trans = .reverselog_trans(base=10),
                            labels = .scientific_10,
                            limits = ylim,
@@ -156,13 +156,13 @@ volcano = function(df, x = c("log2FoldChange", "avg_log2FC", "estimate", ".x"),
         theme_classic()
 
     if (repel) {
-        pl + ggrepel::geom_label_repel(aes_string(x=x, y=y, label=label),
+        pl + ggrepel::geom_label_repel(aes(x=!!rlang::sym(x), y=!!rlang::sym(y), label=label),
                 colour="#353535", size=text.size, na.rm=TRUE, segment.alpha=0.3,
                 max.iter=1e5, max.time=5, max.overlaps=max.overlaps,
                 label.size=NA, fill="#ffffff80",
                 label.padding = unit(0.12, "lines"), box.padding = unit(0.01, "lines"))
     } else {
-        pl + geom_text(aes_string(x=x, y=y, label=label), colour="#353535", size=text.size,
+        pl + geom_text(aes(x=!!rlang::sym(x), y=!!rlang::sym(y), label=label), colour="#353535", size=text.size,
                       vjust=-1, na.rm=TRUE, check_overlap=check_overlap)
     }
 }
@@ -170,8 +170,8 @@ volcano = function(df, x = c("log2FoldChange", "avg_log2FC", "estimate", ".x"),
 if (is.null(module_name())) {
     library(testthat)
 
-    df = data.frame(estimate = -12:12/12)
-    df$adj.p = 10^(-10*abs(df$estimate))
+    df = data.frame(`mean stat` = -12:12/12, check.names=FALSE)
+    df$adj.p = 10^(-10*abs(df$`mean stat`))
     df$label = LETTERS[1:25]
     df$size = 1:25
     df$circle = rep(c(T,F,T,F,T),5)
