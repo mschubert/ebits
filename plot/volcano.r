@@ -32,10 +32,10 @@ import_package("ggplot2", attach=TRUE)
 #' @param x_label_bias   Multiplier to focus more on effect size than significance
 #' @param pos_label_bias Multiplier to focus more on positive than negative labels
 #' @return           A ggplot2 object of the volcano plot
-volcano = function(df, x = c("log2FoldChange", "estimate", ".x"),
+volcano = function(df, x = c("log2FoldChange", "avg_log2FC", "estimate", ".x"),
                    label = c("label", "name", "gene_name", "gene", "external_gene_name", "set_name", "set"),
-                   y = c("adj.p", "padj", "p.value", "pval", ".y"),
-                   size = c("size", "n", "baseMean"),
+                   y = c("adj.p", "padj", "p_val_adj", "p.value", "pval", ".y"),
+                   size = c("size", "n", "baseMean", "pct.2"),
                    base.size=1, p=0.05, label_top=20, ceil=0, clamp_x=Inf, check_overlap=FALSE,
                    text.size="auto", xlim=NULL, ylim=NULL, simplify=TRUE, repel=TRUE, max.overlaps=20,
                    x_label_bias=1, pos_label_bias=1) {
