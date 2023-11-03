@@ -40,7 +40,7 @@ test_fet = function(valid, hits, sets, min=2, max=Inf) {
         setNames(names(sets)) %>%
         dplyr::bind_rows(.id="label") %>%
         as_tibble() %>%
-        na.omit() %>%
+        filter(size >= min) %>%
         select(label, size, size_used, everything()) %>%
         mutate(adj.p = p.adjust(p.value, method="fdr")) %>%
         arrange(adj.p, p.value)

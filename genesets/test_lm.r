@@ -19,8 +19,9 @@ test_lm = function(genes, sets,
                    min_n=2, add_means=c(), trim=0, cl=0) {
     test_one = function(res, set) {
         dset = res %>% mutate(in_set = !! rlang::sym(label) %in% set + 0)
-        if (sum(dset$in_set, na.rm=TRUE) < min_n)
-            return(data.frame(estimate=NA, size=length(set), size_used=NA))
+        sz_use = sum(dset$in_set, na.rm=TRUE)
+        if (sz_use < min_n)
+            return(data.frame(size=length(set), size_used=sz_use))
 
         sums = dset %>% group_by(in_set) %>%
             summarize_at(vars(all_of(add_means)), function(x) mean(x, na.rm=TRUE, trim=trim)) %>%
@@ -70,7 +71,7 @@ test_lm = function(genes, sets,
         setNames(names(sets)) %>%
         dplyr::bind_rows(.id="label") %>%
         as_tibble() %>%
-        na.omit() %>%
+        filter(size_used >= min_n) %>%
         select(label, size, size_used, !!! rlang::syms(add_means), everything()) %>%
         mutate(adj.p = p.adjust(p.value, method="fdr")) %>%
         arrange(adj.p, p.value)
