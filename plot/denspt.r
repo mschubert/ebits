@@ -1,17 +1,18 @@
 #' Draw a density Hex with points at its border
 #'
-#' @param data     A data.frame
-#' @param mapping  ggplot2 mapping for variables: x, y, fill, label
-#' @param n_tile   How many density tiles to draw along each axis
-#' @param draw_pt  How many points to draw at lowest density
-#' @param nodens   Do not draw density if fewer points than this number
+#' @param data        A data.frame
+#' @param mapping     ggplot2 mapping for variables: x, y, fill, label
+#' @param n_tile      How many density tiles to draw along each axis
+#' @param draw_pt     How many points to draw at lowest density
+#' @param nodens      Do not draw density if fewer points than this number
 #' @param draw_label  How many points to label
 #' @param always_label  Character vector of labels to always draw
-#' @param max_ov   Maximumg overlap for point labels (ggrepel)
-#' @param h  Kernel width for density estimation in number of tiles (x=y or x,y)
-#' @param palette  The color palette to use
-#' @param pal_dir  The direction of the palette
-#' @param pal_alpha  The transparency of the density layer
+#' @param max_ov      Maximumg overlap for point labels (ggrepel)
+#' @param h           Kernel width for density estimation in number of tiles (x=y or x,y)
+#' @param ...         Parameters passed to `geom_point()`
+#' @param palette     The color palette to use
+#' @param pal_dir     The direction of the palette
+#' @param pal_alpha   The transparency of the density layer
 denspt = function(data, mapping, n_tile=50, draw_pt=500, nodens=500, draw_label=60, always_label=c(),
                   tsize=NULL, max_ov=25, h=15, ..., palette="Greys", pal_dir=1, pal_alpha=1) {
     mis_map = setdiff(c("x", "y"), names(mapping))
