@@ -156,14 +156,14 @@ volcano = function(df, x = c("mean log2FoldChange", "log2FoldChange", "avg_log2F
         theme_classic()
 
     if (repel) {
-        pl + ggrepel::geom_label_repel(aes(x=!!rlang::sym(x), y=!!rlang::sym(y), label=label),
+        pl + ggrepel::geom_label_repel(aes(x=!!rlang::sym(x), y=!!rlang::sym(y), label=!!rlang::sym(label)),
                 colour="#353535", size=text.size, na.rm=TRUE, segment.alpha=0.3,
                 max.iter=1e5, max.time=5, max.overlaps=max.overlaps,
                 label.size=NA, fill="#ffffff80",
                 label.padding = unit(0.12, "lines"), box.padding = unit(0.01, "lines"))
     } else {
-        pl + geom_text(aes(x=!!rlang::sym(x), y=!!rlang::sym(y), label=label), colour="#353535", size=text.size,
-                      vjust=-1, na.rm=TRUE, check_overlap=check_overlap)
+        pl + geom_text(aes(x=!!rlang::sym(x), y=!!rlang::sym(y), label=!!rlang::sym(label)),
+                colour="#353535", size=text.size, vjust=-1, na.rm=TRUE, check_overlap=check_overlap)
     }
 }
 
