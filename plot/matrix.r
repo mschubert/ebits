@@ -43,7 +43,7 @@ cluster = function(df, formula, cols=TRUE, rows=TRUE, size=NULL, fill=NA) {
 #' @param palette  ggplot palette that should be used; default: RdYlGn
 #' @param geom     ggplot geom that should be used, 'tile' or 'circle'
 #' @param limits
-matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn", text_size=7,
+matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn",
                   geom="tile", limits=NULL, na_value="#f5f5f5",
                   reverse_colors=FALSE, symmetric=FALSE) {
     value = all.vars(formula[[2]])
@@ -60,8 +60,7 @@ matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn", text
         panel.background = element_blank(),
         panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text.x = element_text(angle=45, hjust=1, size=text_size),
-        axis.text.y = element_text(size=text_size))
+        axis.text.x = element_text(angle=45, hjust=1))
     )
 
     p = ggplot(df, aes_string(x=cols, y=rows, fill=value))
@@ -82,10 +81,10 @@ matrix = function(df, formula, color="color", label=NULL, palette="RdYlGn", text
 #            geom_point(aes(size = 15, colour = "white"))
     else
         stop("geom needs to be either 'tile' or 'circle'")
-        
+
     p = p + po.nopanel
     if (is.null(label))
         p
     else
-        p + geom_text(data=df, aes(label=label), size=text_size)
+        p + geom_text(data=df, aes(label=label))
 }
