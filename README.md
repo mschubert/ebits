@@ -19,8 +19,9 @@ This collection of tools requires `modules`, install using using `devtools`:
 devtools::install_github('klmr/modules')
 ```
 
-The scripts also depend on a range of R packages. You can list/install all
-of them by typing:
+The scripts also depend on a range of R packages. If using only a few modules,
+you may want to install only the packages you need. Otherwise you can
+list/install all of them by typing:
 
 ```sh
 ./dependencies.sh # list all packages
@@ -33,12 +34,15 @@ Setup
 ```bash
 cd your_local_directory
 git clone https://github.com/EBI-predocs/ebits.git
+cd ebits && git submodule --init --recursive
 ```
 
-Additionally, you need to tell R where to find the `ebits` module.
-In order to do this, set your `import.path` in your *~/.Rprofile*:
+Additionally, you need load the `modules` package and tell R where to find the
+`ebits` module. In order to do this, set your `import.path` in your
+*~/.Rprofile*:
 
 ```r
+library(modules) # can also load manually
 options(import.path=c("/path/to/ebits",
                       "/path/to/other/module")
 ```
