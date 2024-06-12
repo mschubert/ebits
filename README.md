@@ -25,7 +25,7 @@ list/install all of them by typing:
 
 ```sh
 ./dependencies.sh # list all packages
-make deps # install all packages (warning: there's a lot)
+make install-deps # install all packages (warning: there's a lot)
 ```
 
 Setup
