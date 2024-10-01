@@ -17,6 +17,7 @@ extract_result = function(mod, name) {
         res = DESeq2::results(mod, name=name)
     }
 
+    #todo: add shrinkage option
     as.data.frame(res) %>%
         tibble::as_tibble(rownames="ensembl_gene_id") %>%
         arrange(padj, pvalue) %>%
@@ -36,7 +37,11 @@ extract_result = function(mod, name) {
 genes = function(eset, design=DESeq2::design(eset), extract="^(?!Intercept)",
                  contrast=FALSE, on_error=function(e) stop(e)) {
     eset = clean_obj(eset, design)
-    mod = DESeq2::DESeq(eset)
+    if (is.null(DESeq2::dispersions(eset))) {
+        mod = DESeq2::DESeq(eset)
+    } else {
+        mod = DESeq2::nbinomWaldTest(eset)
+    }
 
     if (!contrast)
         extract = grep(extract, DESeq2::resultsNames(mod), value=TRUE, perl=TRUE)
