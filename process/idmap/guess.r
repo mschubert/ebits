@@ -15,9 +15,9 @@ id_type = function(from_ids) {
         'entrezgene_id'
     else if (sum(grepl("^[A-Z]{1,3}[0-9]{5,6}$", from_ids)) > length(from_ids)/2)
         'genbank'
-    else if (sum(grepl("^[A-Z]+[0-9]{1,2}?$", from_ids)) > length(from_ids)/4)
+    else if (sum(grepl("^[A-Z]+[0-9]{1,2}?$", from_ids)) > length(from_ids)/5)
         'hgnc_symbol'
-    else if (sum(grepl("^[A-Z][a-z]+[0-9]{1,2}?$", from_ids)) > length(from_ids)/4)
+    else if (sum(grepl("^[A-Z][a-z]+[0-9]{1,2}?$", from_ids)) > length(from_ids)/5)
         'mgi_symbol'
     else
         stop("Can not guess ID type: ", paste(head(from_ids), collapse=", "))
