@@ -106,8 +106,11 @@ genes_and_sets = function(eset, design=DESeq2::design(eset), sets=list(),
 clean_obj = function(eset, design=DESeq2::design(eset)) {
     # remove samples where design value is NA
     drop_sample = rep(FALSE, ncol(eset))
-    for (key in all.vars(design))
+    for (key in all.vars(design)) {
+        if (is.factor(eset[[key]]))
+            eset[[key]] = forcats::fct_na_level_to_value(eset[[key]])
         drop_sample = drop_sample | is.na(colData(eset)[[key]])
+    }
     if (any(drop_sample)) {
         warning("Dropping sample(s): ",
                 paste(colnames(eset)[drop_sample], collapse=", "), immediate.=TRUE)
