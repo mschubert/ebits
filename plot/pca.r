@@ -33,6 +33,10 @@ pca.prcomp = function(obj, aes, annot=NULL, repel=TRUE,
         aes$x = quote(PC1)
     if (!"y" %in% names(aes))
         aes$y = quote(PC2)
+    if (inherits(annot, "DESeqDataSet") || inherits(annot, "DESeqTransform"))
+        annot = SummarizedExperiment::colData(annot)
+    if (inherits(annot, "DataFrame"))
+        annot = as.data.frame(annot)
 
     # adapted: https://stackoverflow.com/questions/6578355/plotting-pca-biplot-with-ggplot2
     data = as.data.frame(cbind(annot, obj$x))
